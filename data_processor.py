@@ -1,6 +1,8 @@
 import os
 import collections
 import itertools
+import pickle
+from collections import Counter
 import numpy as np
 import tensorflow as tf
 import gluonnlp as nlp
@@ -56,6 +58,10 @@ class DataProcessor:
         self.vocabulary_size = vocab_size
         self.label_index = label_index
 
+        # Create label list and vocabulary if they have not been created
+        if not os.path.isfile(self.output_dir + "/metadata.pkl"):
+            self.get_metadata()
+
         # Get the datasets vocabulary and label lists
         self.vocabulary = self.get_vocabulary()
         self.labels = self.get_labels()
@@ -93,19 +99,31 @@ class DataProcessor:
         return self._get_examples(lines, "dev")
 
     def get_labels(self):
-        """Load Labels from metadata text file."""
-        with open(self.input_dir + '/metadata/labels.txt', 'r') as file:
-            labels = [line.split()[0] for line in file.readlines()]
-        return labels
+        """Load Labels from metadata file."""
+        with open(self.output_dir + '/metadata.pkl', 'rb') as file:
+            metadata = pickle.load(file)
+        return metadata['labels']
 
     def get_vocabulary(self):
-        """Generate a Vocabulary from the whole dataset.
-        Tokenizes, strips whitespace and lower-cases text to create a GluonNLP Vocabulary object.
-        """
-        with open(self.input_dir + '/all_' + self.set_name + '.txt', 'r') as file:
+        """Load Vocabulary from metadata file."""
+        with open(self.output_dir + '/metadata.pkl', 'rb') as file:
+            metadata = pickle.load(file)
+        return metadata['vocabulary']
 
+    def get_metadata(self):
+        """Generate a Vocabulary and label list from the whole dataset.
+        Tokenizes, strips whitespace and lower-cases text and creates a GluonNLP Vocabulary object.
+        Counts labels and creates list sorted in descending order.
+        Vocabulary (obj) and labels (list) are saved in the dataset directory as a .pkl file.
+        """
+
+        with open(self.input_dir + '/all_' + self.set_name + '.txt', 'r') as file:
+            label_counter = []
             tokenized_utterances = []
             for line in file:
+                # Get the labels
+                label_counter.append(line.split('|')[self.label_index].rstrip('\r\n'))
+
                 # Get text and strip whitespace
                 sentence = line.split('|')[1].rstrip('\r\n')
                 # Tokenize, convert to lowercase and remove punctuation
@@ -116,9 +134,22 @@ class DataProcessor:
 
             # Count the word frequencies and generate vocabulary with vocabulary_size (-1 to account for <unk>)
             vocab_counter = nlp.data.count_tokens(list(itertools.chain(*tokenized_utterances)))
-            vocabulary = nlp.Vocab(vocab_counter, self.vocabulary_size - 1, padding_token=None, bos_token=None, eos_token=None)
+            vocabulary = nlp.Vocab(vocab_counter, self.vocabulary_size - 1,
+                                   padding_token=None,
+                                   bos_token=None,
+                                   eos_token=None)
 
-        return vocabulary
+        # Create and sort the labels counter
+        label_counter = Counter(label_counter)
+        labels = sorted(label_counter, key=label_counter.get, reverse=True)
+
+        # Create the metadata dictionary
+        metadata = dict()
+        metadata['labels'] = labels
+        metadata['vocabulary'] = vocabulary
+        # Save to pickle
+        with open(self.output_dir + '/metadata.pkl', 'wb') as file:
+            pickle.dump(metadata, file, protocol=2)
 
     def _get_examples(self, lines, set_type):
         """Gets examples for the training, eval and test sets from plain text files.
@@ -148,9 +179,10 @@ class DataProcessor:
     def _serialize_example(self, example):
 
         features = collections.OrderedDict()
-        features['example_id'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=[example.example_id.encode('utf-8')]))
+        features['example_id'] = tf.train.Feature(
+            bytes_list=tf.train.BytesList(value=[example.example_id.encode('utf-8')]))
         features['text'] = tf.train.Feature(int64_list=tf.train.Int64List(value=example.text))
-        features['label'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[example.label]))
+        features['label'] = tf.train.Feature(int64_list=tf.train.Int64List(value=example.label))
 
         tf_example = tf.train.Example(features=tf.train.Features(feature=features))
 
@@ -165,13 +197,12 @@ class DataProcessor:
                 max_seq_length (int): Length to pad or truncate sentences to
         """
 
-        print("Creating " + set_type + ".tf_record")
+        print("Creating " + set_type + ".tf_record...")
         # Create TFRecord writer
         writer = tf.python_io.TFRecordWriter(os.path.join(self.output_dir, set_type + ".tf_record"))
 
         # Process each example and save to file
         for example in examples:
-
             # Tokenize, convert to lowercase and remove punctuation
             sentence_tokens = tokenizer(example.text)
             sentence_tokens = [token.orth_.lower() for token in sentence_tokens if not token.is_punct]
@@ -181,10 +212,11 @@ class DataProcessor:
 
             # Convert word and label tokens to indices
             example.text = [self.vocabulary.token_to_idx[token] for token in padded_sentence]
-            example.label = self.labels.index(example.label)
+            example.label = self.to_one_hot(example.label, self.labels)
 
             # Serialize and write to TFRecord
             serialized_example = self._serialize_example(example)
+
             writer.write(serialized_example)
 
     def convert_all_examples(self):
@@ -201,6 +233,27 @@ class DataProcessor:
 
         dev_examples = self.get_dev_examples()
         self.convert_examples_to_features(dev_examples, 'dev', self.max_seq_length)
+
+    def build_dataset(self, set_type, batch_size, num_epochs, is_training=True, drop_remainder=False):
+        """Creates an iterable dataset from the specified TF Record File"""
+
+        name_to_features = {
+            "example_id": tf.FixedLenFeature([], tf.string),
+            "text": tf.FixedLenFeature([self.max_seq_length], tf.int64),
+            "label": tf.FixedLenFeature([len(self.labels)], tf.int64),
+        }
+
+        # Get the dataset from the TFRecord file
+        dataset = tf.data.TFRecordDataset(os.path.join(self.output_dir, set_type + ".tf_record"))
+
+        # For training, we want a lot of parallel reading and shuffling.
+        # For testing, we want no shuffling and parallel reading doesn't matter.
+        if is_training:
+            dataset = dataset.shuffle(buffer_size=100)
+        dataset = dataset.repeat(num_epochs)
+        dataset = dataset.map(lambda record: tf.parse_single_example(record, name_to_features))
+        dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
+        return dataset
 
     def get_embedding_matrix(self, embedding_type, embedding_source, embedding_dim):
         """Gets the specifies embedding type and creates an embedding matrix.
@@ -358,4 +411,3 @@ class FastTextEmbedding(EmbeddingProcessor):
             matrix[i] = embedding
 
         return matrix
-
