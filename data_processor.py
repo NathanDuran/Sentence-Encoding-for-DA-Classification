@@ -320,8 +320,7 @@ class DataProcessor:
         Removes punctuation if no_punct=True.
         Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
 
-        Converts tokens to indices.
-        Converts label strings to one-hot-encoding
+        Converts sentence tokens and labels to indices.
 
         Saves as TFRecord file.
 
@@ -364,19 +363,18 @@ class DataProcessor:
 
             # Convert word and label tokens to indices
             example.text = [vocabulary.token_to_idx[token] for token in tokens]
-            example.label = to_one_hot(example.label, labels)
+            example.label = [labels.index(example.label)]
 
             # Serialize and write to TFRecord
             serialized_example = _serialize_example(example)
 
             writer.write(serialized_example)
 
-    def build_dataset_from_record(self, set_type, num_classes, batch_size, repeat=None, is_training=True, drop_remainder=False):
+    def build_dataset_from_record(self, set_type, batch_size, repeat=None, is_training=True, drop_remainder=False):
         """Creates an iterable dataset from the specified TFRecord File
         
         Args:
             set_type (str): Specifies if this is the training, validation or test data
-            num_classes (int): The number of classes in the dataset
             batch_size (int): The number of examples per batch
             repeat (int): How many times the dataset with repeat untill it is exhausted, if 'None' repeats forever
             is_training (bool): Flag determines if training set is shuffled
@@ -386,16 +384,17 @@ class DataProcessor:
             dataset (TF Dataset): Iterable dataset of two tensors 'text' and 'label'
         """
 
-        feature_map = {
-            "example_id": tf.FixedLenFeature([], tf.string),
-            "text": tf.FixedLenFeature([self.max_seq_length], tf.int64),
-            "label": tf.FixedLenFeature([num_classes], tf.int64),
-        }
-
-        def _decode_single_record(serialized_example, features):
+        def _decode_single_record(serialized_example):
             """Decodes single TFRecord example into Tensors."""
+
+            feature_map = {
+                "example_id": tf.FixedLenFeature([], tf.string),
+                "text": tf.FixedLenFeature([self.max_seq_length], tf.int64),
+                "label": tf.FixedLenFeature([1], tf.int64),
+            }
+
             # Parse the serialized example into a dictionary
-            example = tf.parse_single_example(serialized_example, features)
+            example = tf.parse_single_example(serialized_example, feature_map)
 
             # Get the tensor values from the dictionary
             text = tf.cast(example['text'], tf.int32)
@@ -410,7 +409,7 @@ class DataProcessor:
         if is_training:
             dataset = dataset.shuffle(buffer_size=100)
         dataset = dataset.repeat(repeat)
-        dataset = dataset.map(lambda record: _decode_single_record(record, feature_map))
+        dataset = dataset.map(lambda record: _decode_single_record(record))
         dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
 
         return dataset
