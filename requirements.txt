@@ -1,0 +1,8 @@
+Comet-ml==2.0.6
+gluonnlp==0.7.1
+graphviz==0.11.1
+pydot==1.4.1
+Numpy==1.16.4
+spacy==2.1.7
+mxnet==1.5.0
+tensorflow-gpu==1.14.0
