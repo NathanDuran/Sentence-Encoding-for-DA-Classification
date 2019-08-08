@@ -2,6 +2,7 @@ import math
 import os
 import datetime
 import time
+import importlib
 from comet_ml import Experiment
 import data_processor
 import embedding_processor
@@ -18,10 +19,10 @@ experiment_params = {'task_name': 'swda',
                      'training': True,
                      'testing': True,
                      'load_model': False,
-                     'checkpoint_file:': 'test_best_model.h5'}
+                     'init_ckpt_file:': 'test_model_final-3220.h5'}
 
 training_params = {'batch_size': 32,
-                   'num_epochs': 3,
+                   'num_epochs': 2,
                    'evaluate_steps': 500,
                    'learning_rate': 2E-5}
 
@@ -31,13 +32,15 @@ dataset_params = {'vocab_size': 10000,
                   'embedding_type': 'glove',
                   'embedding_source': 'glove.6B.50d'}
 
+model_params = {'model_type': 'cnn'}
+
 # Task and experiment name
 task_name = experiment_params['task_name']
 experiment_name = experiment_params['experiment_name']
 training = experiment_params['training']
 testing = experiment_params['testing']
 load_model = experiment_params['load_model']
-checkpoint_file = experiment_params['checkpoint_file:']
+init_ckpt_file = experiment_params['init_ckpt_file:']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
@@ -45,9 +48,8 @@ experiment = Experiment(auto_output_logging='simple')  # TODO remove this when n
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(training_params)
-for key, value in experiment_params.items():
-    experiment.log_other(key, value)
-for key, value in dataset_params.items():
+other_params = {**experiment_params, **dataset_params, **model_params}
+for key, value in other_params.items():
     experiment.log_other(key, value)
 
 # Data source and output paths
@@ -77,10 +79,10 @@ learning_rate = training_params['learning_rate']
 
 print("------------------------------------")
 print("Using parameters...")
-print("Batch size: ", batch_size)
-print("Epochs: ", num_epochs)
-print("Evaluate every steps: ", evaluate_steps)
-print("Learning rate: ", learning_rate)
+print("Batch size: " + str(batch_size))
+print("Epochs: " + str(num_epochs))
+print("Evaluate every steps: " + str(evaluate_steps))
+print("Learning rate: " + str(learning_rate))
 
 # Data set parameters
 vocab_size = dataset_params['vocab_size']
@@ -115,64 +117,49 @@ test_steps = int(len(list(test_data)))
 
 print("------------------------------------")
 print("Created data sets and embeddings...")
-print("Maximum sequence length: ", max_seq_length)
-print("Vocabulary size: ", vocab_size)
-print("Embedding dimension: ", embedding_dim)
-print("Embedding type: ", embedding_type)
-print("Embedding source: ", embedding_source)
-print("Global steps: ", global_steps)
-print("Train steps: ", train_steps)
-print("Eval steps: ", eval_steps)
-print("Test steps: ", test_steps)
+print("Maximum sequence length: " + str(max_seq_length))
+print("Vocabulary size: " + str(vocab_size))
+print("Embedding dimension: " + str(embedding_dim))
+print("Embedding type: " + embedding_type)
+print("Embedding source: " + embedding_source)
+print("Global steps: " + str(global_steps))
+print("Train steps: " + str(train_steps))
+print("Eval steps: " + str(eval_steps))
+print("Test steps: " + str(test_steps))
 
 # Build or load the model
-if load_model and os.path.exists(os.path.join(output_dir, checkpoint_file)):
-    print("------------------------------------")
-    print("Loading model...")
-    model = tf.keras.models.load_model(os.path.join(output_dir, checkpoint_file))
+print("------------------------------------")
+print("Creating model...")
+model_type = model_params['model_type']
+model_module = getattr(importlib.import_module('models.' + model_type.lower()), model_type.upper())
+model = model_module()
 
+# Load if checkpoint set
+if load_model and os.path.exists(os.path.join(output_dir, init_ckpt_file)):
+    model.load_model(os.path.join(output_dir, init_ckpt_file))
+    print("Loaded model from " + os.path.join(output_dir, init_ckpt_file))
+# Else build with supplied parameters
 else:
-    print("------------------------------------")
-    print("Building model...")
-    model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, embedding_dim,
-                                  embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
-                                  input_length=max_seq_length, trainable=True, name='embedding_layer'),
-        tf.keras.layers.Conv1D(128, 5, activation='relu'),
-        tf.keras.layers.MaxPooling1D(5),
-        tf.keras.layers.Conv1D(128, 5, activation='relu'),
-        tf.keras.layers.GlobalMaxPooling1D(),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dense(len(labels), activation='softmax')
-    ])
+    model.build_model((max_seq_length,), len(labels), embedding_matrix)
+    print("Built model...with params{}")  # TODO enable params
 
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+# Create optimiser
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
-    # def training_step(model_graph, x, y):
-    #     with tf.GradientTape() as tape:
-    #         logits = model_graph(x)
-    #         loss = tf.losses.sparse_softmax_cross_entropy(labels=y, logits=logits)
-    #
-    #     grads = tape.gradient(loss, model.trainable_variables)
-    #     optimizer.apply_gradients(zip(grads, model.trainable_variables), global_step=tf.train.get_or_create_global_step())
-    #
-    #     predictions = tf.argmax(logits, axis=1)
-    #     return loss, predictions
-
-
-model.summary()
-# Create and save a model graph definition and image
-model_image = os.path.join(output_dir, experiment_name + '_model.png')
-tf.keras.utils.plot_model(model, to_file=model_image, show_shapes=True)
-experiment.log_image(model_image)
-experiment.set_model_graph(model.to_json())
+# Display a model summary and create/save a model graph definition and image
+current_model = model.get_model()
+current_model.summary()
+model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
+tf.keras.utils.plot_model(current_model, to_file=model_image_file, show_shapes=True)
+experiment.log_image(model_image_file)
+experiment.set_model_graph(current_model.to_json())
 
 # Train the model
 if training:
     print("------------------------------------")
     print("Training model...")
     start_time = time.time()
-    print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for", num_epochs, "epochs")
+    print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
     train_loss = tf.keras.metrics.Mean()
     train_accuracy = tf.keras.metrics.Accuracy()
@@ -188,51 +175,44 @@ if training:
             for train_step, (train_text, train_labels) in enumerate(train_data.take(train_steps)):
                 global_step += 1
 
-                with tf.GradientTape() as tape:
-                    logits = model(train_text)
-                    loss = tf.losses.sparse_softmax_cross_entropy(labels=train_labels, logits=logits)
-
-                grads = tape.gradient(loss, model.trainable_variables)
-                optimizer.apply_gradients(zip(grads, model.trainable_variables),
-                                          global_step=tf.train.get_or_create_global_step())
-
+                loss, predictions = model.training_step(optimizer, train_text, train_labels)
                 train_loss(loss)
-                train_accuracy(tf.argmax(logits, axis=1), train_labels)
+                train_accuracy(predictions, train_labels)
 
                 experiment.log_metric('loss', train_loss.result().numpy(), step=global_step)
                 experiment.log_metric('accuracy', train_accuracy.result().numpy(), step=global_step)
-                print("\rStep: {}/{} [{:10s}]".format(train_step + 1, train_steps,
-                                                      '=' * (int(math.ceil((100 / train_steps * train_step) / 10)))), end='')
 
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
                     with experiment.validate():
                         for eval_step, (eval_text, eval_labels) in enumerate(eval_data.take(eval_steps)):
-                            logits = model(eval_text)
-                            loss = tf.losses.sparse_softmax_cross_entropy(labels=eval_labels, logits=logits)
+                            loss, predictions = model.evaluation_step(eval_text, eval_labels)
                             eval_loss(loss)
-                            eval_accuracy(tf.argmax(logits, axis=1), eval_labels)
+                            eval_accuracy(predictions, eval_labels)
 
                             experiment.log_metric('loss', eval_loss.result().numpy(), step=global_step)
                             experiment.log_metric('accuracy', eval_accuracy.result().numpy(), step=global_step)
 
-            if eval_loss.result() < best_loss:
-                if os.path.exists(best_model_ckpt):
-                    os.remove(best_model_ckpt)
-                best_model_ckpt = os.path.join(output_dir, experiment_name + '_model_best-{}.h5'.format(global_step))
-                model.save(best_model_ckpt)
-            print(" - Train loss: {:.3f} - acc: {:.3f} - Eval loss: {:.3f} - acc: {:.3f}".format(train_loss.result(),
-                                                                                                 train_accuracy.result(),
-                                                                                                 eval_loss.result(),
-                                                                                                 eval_accuracy.result()))
+                    # Print current loss/accuracy
+                    result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Eval loss: {:.3f} - acc: {:.3f}"
+                    print(result_str.format((train_step + 1), train_steps,
+                                            train_loss.result(), train_accuracy.result(),
+                                            eval_loss.result(), eval_accuracy.result()))
+
+                    # Save checkpoint if metric is best so far
+                    if eval_loss.result() < best_loss:
+                        if os.path.exists(best_model_ckpt):
+                            os.remove(best_model_ckpt)
+                        best_model_ckpt = os.path.join(output_dir, experiment_name + '_model_best-{}.h5'.format(global_step))
+                        model.save_model(best_model_ckpt)
 
     end_time = time.time()
-    print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for", num_epochs, "epochs")
+    print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
 
     print("------------------------------------")
     print("Saving model...")
     final_model_ckpt = os.path.join(output_dir, experiment_name + '_model_final-{}.h5'.format(global_step))
-    model.save(final_model_ckpt)
-    experiment.log_asset(final_model_ckpt, overwrite=True)
+    model.save_model(final_model_ckpt)
+    experiment.log_asset(final_model_ckpt, overwrite=True)  # TODO just save checkpoint dir instead?
     experiment.log_asset(best_model_ckpt, overwrite=True)
 
 if testing:
@@ -240,23 +220,21 @@ if testing:
     print("------------------------------------")
     print("Testing model...")
     start_time = time.time()
-    print("Testing started: " + datetime.datetime.now().strftime("%b %d %T") + " for", test_steps, "steps")
+    print("Testing started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(test_steps) + " steps")
 
     test_loss = tf.keras.metrics.Mean()
     test_accuracy = tf.keras.metrics.Accuracy()
     with experiment.test():
         for test_step, (test_text, test_labels) in enumerate(test_data.take(test_steps)):
-            logits = model(test_text)
-            loss = tf.losses.sparse_softmax_cross_entropy(labels=test_labels, logits=logits)
+            loss, predictions = model.evaluation_step(test_text, test_labels)
             test_loss(loss)
-            test_accuracy(tf.argmax(logits, axis=1), test_labels)
+            test_accuracy(predictions, test_labels)
 
             experiment.log_metric('loss', test_loss.result().numpy(), step=test_step)
             experiment.log_metric('accuracy', test_accuracy.result().numpy(), step=test_step)
 
-        print("\rStep: {}/{} [{:10s}]".format(test_step + 1, test_steps,
-                                              '=' * (int(math.ceil((100 / test_steps * test_step) / 10)))), end='')
+        result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
+        print(result_str.format(test_steps, test_loss.result(), test_accuracy.result()))
 
-    print(" - Test loss: {:.3f} - acc: {:.3f}".format(test_loss.result(), test_accuracy.result()))
-    end_time = time.time()
-    print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for", test_steps, "steps")
+        end_time = time.time()
+        print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
