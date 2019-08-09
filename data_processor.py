@@ -36,7 +36,7 @@ class DataProcessor:
     """Converts sentences for dialogue act classification into data sets."""
 
     def __init__(self, set_name,  output_dir, max_seq_length, pad_seq=True, vocab_size=None, to_lower=True, no_punct=True, label_index=2):
-        """Constructs a DataProcessor for the specified dataset
+        """Constructs a DataProcessor for the specified dataset.
 
         Note: For MRDA data there is the option to choose which type of labelling is used.
         There are 3 different types: basic_labels, general_labels or full_labels.

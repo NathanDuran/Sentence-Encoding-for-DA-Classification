@@ -23,7 +23,7 @@ def get_embedding_processor(processor_type):
 
 
 class EmbeddingProcessor:
-    """Contains function for mapping word tokens to embedding vectors"""
+    """Contains function for mapping word tokens to embedding vectors."""
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
         """Loads embeddings and maps word tokens to embedding vectors.

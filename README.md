@@ -7,6 +7,10 @@
 - save predictions?
 
 
-- save model early stopping/ keep best checkpoint (class)
 - comet optimisation
-- models in separate classes - ADD Params for different architectures (**kwargs) + parent class to inherit from
+
+
+- models in separate classes 
+- ADD Params for different architectures (**kwargs) 
+- parent class to inherit from
+- string documentation

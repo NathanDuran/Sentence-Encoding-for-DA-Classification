@@ -1,4 +1,3 @@
-import math
 import os
 import datetime
 import time
@@ -6,6 +5,7 @@ import importlib
 from comet_ml import Experiment
 import data_processor
 import embedding_processor
+import checkpointer
 import tensorflow as tf
 
 # Suppress TensorFlow debugging
@@ -19,7 +19,7 @@ experiment_params = {'task_name': 'swda',
                      'training': True,
                      'testing': True,
                      'load_model': False,
-                     'init_ckpt_file:': 'test_model_final-3220.h5'}
+                     'init_ckpt_file:': 'test_best_ckpt-3220.h5'}
 
 training_params = {'batch_size': 32,
                    'num_epochs': 2,
@@ -44,7 +44,7 @@ init_ckpt_file = experiment_params['init_ckpt_file:']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple')  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(training_params)
@@ -52,18 +52,21 @@ other_params = {**experiment_params, **dataset_params, **model_params}
 for key, value in other_params.items():
     experiment.log_other(key, value)
 
-# Data source and output paths
-output_dir = os.path.join(task_name, experiment_name)
+# Data set and output paths
 dataset_dir = os.path.join(task_name, 'dataset')
+output_dir = os.path.join(task_name, experiment_name)
+checkpoint_dir = os.path.join(output_dir, 'checkpoints')
 embeddings_dir = 'embeddings'
 
 # Create appropriate directories if they don't exist
 if not os.path.exists(task_name):
     os.mkdir(task_name)
-if not os.path.exists(output_dir):
-    os.mkdir(output_dir)
 if not os.path.exists(dataset_dir):
     os.makedirs(dataset_dir)
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
+if not os.path.exists(checkpoint_dir):
+    os.mkdir(checkpoint_dir)
 
 print("------------------------------------")
 print("Running experiment...")
@@ -135,9 +138,9 @@ model_module = getattr(importlib.import_module('models.' + model_type.lower()), 
 model = model_module()
 
 # Load if checkpoint set
-if load_model and os.path.exists(os.path.join(output_dir, init_ckpt_file)):
-    model.load_model(os.path.join(output_dir, init_ckpt_file))
-    print("Loaded model from " + os.path.join(output_dir, init_ckpt_file))
+if load_model and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
+    model.load_model(os.path.join(checkpoint_dir, init_ckpt_file))
+    print("Loaded model from " + os.path.join(checkpoint_dir, init_ckpt_file))
 # Else build with supplied parameters
 else:
     model.build_model((max_seq_length,), len(labels), embedding_matrix)
@@ -161,13 +164,15 @@ if training:
     start_time = time.time()
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
+    # Initialise model checkpointer
+    checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, keep_best=3, minimise=True)
+
+    # Initialise train and evaluate metrics
     train_loss = tf.keras.metrics.Mean()
     train_accuracy = tf.keras.metrics.Accuracy()
     eval_loss = tf.keras.metrics.Mean()
     eval_accuracy = tf.keras.metrics.Accuracy()
     global_step = 0
-    best_loss = float('inf')
-    best_model_ckpt = ''
     for epoch in range(1, num_epochs + 1):
         print("Epoch: {}/{}".format(epoch, num_epochs))
 
@@ -175,6 +180,7 @@ if training:
             for train_step, (train_text, train_labels) in enumerate(train_data.take(train_steps)):
                 global_step += 1
 
+                # Perform training step on batch and record metrics
                 loss, predictions = model.training_step(optimizer, train_text, train_labels)
                 train_loss(loss)
                 train_accuracy(predictions, train_labels)
@@ -182,9 +188,12 @@ if training:
                 experiment.log_metric('loss', train_loss.result().numpy(), step=global_step)
                 experiment.log_metric('accuracy', train_accuracy.result().numpy(), step=global_step)
 
+                # Every evaluate_steps evaluate model on evaluation set
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
                     with experiment.validate():
                         for eval_step, (eval_text, eval_labels) in enumerate(eval_data.take(eval_steps)):
+
+                            # Perform evaluation step on batch and record metrics
                             loss, predictions = model.evaluation_step(eval_text, eval_labels)
                             eval_loss(loss)
                             eval_accuracy(predictions, eval_labels)
@@ -198,22 +207,16 @@ if training:
                                             train_loss.result(), train_accuracy.result(),
                                             eval_loss.result(), eval_accuracy.result()))
 
-                    # Save checkpoint if metric is best so far
-                    if eval_loss.result() < best_loss:
-                        if os.path.exists(best_model_ckpt):
-                            os.remove(best_model_ckpt)
-                        best_model_ckpt = os.path.join(output_dir, experiment_name + '_model_best-{}.h5'.format(global_step))
-                        model.save_model(best_model_ckpt)
+                    # Save checkpoint if checkpointer metric improves
+                    checkpointer.save_best_checkpoint(eval_loss.result(), global_step)
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
 
     print("------------------------------------")
     print("Saving model...")
-    final_model_ckpt = os.path.join(output_dir, experiment_name + '_model_final-{}.h5'.format(global_step))
-    model.save_model(final_model_ckpt)
-    experiment.log_asset(final_model_ckpt, overwrite=True)  # TODO just save checkpoint dir instead?
-    experiment.log_asset(best_model_ckpt, overwrite=True)
+    checkpointer.save_checkpoint(global_step)
+    experiment.log_asset_folder(checkpoint_dir)
 
 if testing:
     # Test the model
@@ -222,10 +225,13 @@ if testing:
     start_time = time.time()
     print("Testing started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(test_steps) + " steps")
 
+    # Initialise test metrics
     test_loss = tf.keras.metrics.Mean()
     test_accuracy = tf.keras.metrics.Accuracy()
     with experiment.test():
         for test_step, (test_text, test_labels) in enumerate(test_data.take(test_steps)):
+
+            # Perform test step on batch and record metrics
             loss, predictions = model.evaluation_step(test_text, test_labels)
             test_loss(loss)
             test_accuracy(predictions, test_labels)
