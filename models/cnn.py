@@ -41,8 +41,7 @@ class CNN:
             loss = tf.losses.sparse_softmax_cross_entropy(labels=y, logits=logits)
 
         grads = tape.gradient(loss, self.model.trainable_variables)
-        optimizer.apply_gradients(zip(grads, self.model.trainable_variables),
-                                  global_step=tf.train.get_or_create_global_step())
+        optimizer.apply_gradients(zip(grads, self.model.trainable_variables), global_step=tf.train.get_or_create_global_step())
 
         predictions = tf.argmax(logits, axis=1)
         return loss, predictions

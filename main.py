@@ -3,10 +3,12 @@ import datetime
 import time
 import importlib
 from comet_ml import Experiment
+from metrics import *
 import data_processor
 import embedding_processor
 import checkpointer
 import tensorflow as tf
+import numpy as np
 
 # Suppress TensorFlow debugging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -15,14 +17,14 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'test',
-                     'training': True,
+                     'experiment_name': 'cnn_test',
+                     'training': False,
                      'testing': True,
-                     'load_model': False,
-                     'init_ckpt_file:': 'test_best_ckpt-3220.h5'}
+                     'load_model': True,
+                     'init_ckpt_file:': 'cnn_test_ckpt-8050.h5'}
 
 training_params = {'batch_size': 32,
-                   'num_epochs': 2,
+                   'num_epochs': 5,
                    'evaluate_steps': 500,
                    'learning_rate': 2E-5}
 
@@ -44,7 +46,7 @@ init_ckpt_file = experiment_params['init_ckpt_file:']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(training_params)
@@ -228,6 +230,9 @@ if testing:
     # Initialise test metrics
     test_loss = tf.keras.metrics.Mean()
     test_accuracy = tf.keras.metrics.Accuracy()
+    # Keep a copy of all true and predicted labels for creating evaluation metrics
+    true_labels = np.empty(shape=0)
+    predicted_labels = np.empty(shape=0)
     with experiment.test():
         for test_step, (test_text, test_labels) in enumerate(test_data.take(test_steps)):
 
@@ -239,8 +244,23 @@ if testing:
             experiment.log_metric('loss', test_loss.result().numpy(), step=test_step)
             experiment.log_metric('accuracy', test_accuracy.result().numpy(), step=test_step)
 
+            # Append to lists for creating metrics
+            true_labels = np.append(true_labels, test_labels.numpy().flatten())
+            predicted_labels = np.append(predicted_labels, predictions.numpy().flatten())
+
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
         print(result_str.format(test_steps, test_loss.result(), test_accuracy.result()))
+
+        # Generate metrics and confusion matrix
+        metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)
+        experiment.log_metrics(metrics)
+        print(metric_str)
+
+        confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
+        confusion_matrix.show()
+        confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
+        confusion_matrix.savefig(confusion_matrix_file)
+        experiment.log_image(confusion_matrix_file)
 
         end_time = time.time()
         print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
