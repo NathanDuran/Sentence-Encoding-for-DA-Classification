@@ -135,7 +135,7 @@ for experiment in optimiser.get_experiments():
         print("{}: {}".format(key, value))
 
     # Create optimiser
-    optimizer = tf.train.AdamOptimizer(learning_rate=model_params['learning_rate'])
+    optimizer = tf.keras.optimizers.Adam(learning_rate=model_params['learning_rate'])
 
     # Display a model summary
     current_model = model.get_model()
@@ -171,6 +171,7 @@ for experiment in optimiser.get_experiments():
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
                     with experiment.validate():
                         for eval_step, (eval_text, eval_labels) in enumerate(eval_data.take(eval_steps)):
+
                             # Perform evaluation step on batch and record metrics
                             loss, predictions = model.evaluation_step(eval_text, eval_labels)
                             eval_loss(loss)

@@ -21,7 +21,7 @@ experiment_params = {'task_name': 'swda',
                      'experiment_name': 'cnn_test',
                      'model_name': 'cnn',
                      'training': True,
-                     'testing': True,
+                     'testing': False,
                      'load_model': False,
                      'init_ckpt_file': 'cnn_test_ckpt-8050.h5',
                      'batch_size': 32,
@@ -48,7 +48,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -152,7 +152,7 @@ else:
         print("{}: {}".format(key, value))
 
 # Create optimiser
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
 # Display a model summary and create/save a model graph definition and image
 current_model = model.get_model()
