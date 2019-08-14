@@ -1,6 +1,6 @@
 {"algorithm": "bayes",
 "spec": {
-    "maxCombo": 2,
+    "maxCombo": 100,
     "objective": "minimize",
     "metric": "validate_loss",
     "seed": 42,

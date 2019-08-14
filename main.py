@@ -18,10 +18,10 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'cnn_test',
-                     'model_name': 'cnn',
+                     'experiment_name': 'lstm_test',
+                     'model_name': 'lstm',
                      'training': True,
-                     'testing': False,
+                     'testing': True,
                      'load_model': False,
                      'init_ckpt_file': 'cnn_test_ckpt-8050.h5',
                      'batch_size': 32,
@@ -33,10 +33,14 @@ experiment_params = {'task_name': 'swda',
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
 
-# Load model params
+# Load model params if file exists
 optimiser_config_file = experiment_params['model_name'] + '_params.json'
-with open(os.path.join('models', optimiser_config_file)) as json_file:
-    model_params = json.load(json_file)
+if os.path.exists(os.path.join('models', optimiser_config_file)):
+    with open(os.path.join('models', optimiser_config_file)) as json_file:
+        model_params = json.load(json_file)
+else:
+    # Else use default parameters and learning rate
+    model_params = {'learning_rate': 2E-5}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
