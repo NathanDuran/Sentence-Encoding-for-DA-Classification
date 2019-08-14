@@ -209,7 +209,7 @@ if training:
 
                     # Print current loss/accuracy
                     result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Eval loss: {:.3f} - acc: {:.3f}"
-                    print(result_str.format((train_step + 1), train_steps,
+                    print(result_str.format(global_step, global_steps,
                                             train_loss.result(), train_accuracy.result(),
                                             eval_loss.result(), eval_accuracy.result()))
 
@@ -239,7 +239,7 @@ if testing:
     predicted_labels = np.empty(shape=0)
     with experiment.test():
         for test_step, (test_text, test_labels) in enumerate(test_data.take(test_steps)):
-            
+
             # Perform test step on batch and record metrics
             loss, predictions = model.evaluation_step(test_text, test_labels)
             test_loss(loss)
