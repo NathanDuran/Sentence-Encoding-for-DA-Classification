@@ -38,7 +38,7 @@ with open(os.path.join('models', optimiser_config_file)) as json_file:
     optimiser_config = json.load(json_file)
 
 # Set up comet optimiser
-optimiser = Optimizer(optimiser_config)  # TODO add project name
+optimiser = Optimizer(optimiser_config, project_name=experiment_params['project_name'])
 
 # Data set and output paths
 dataset_dir = os.path.join(task_name, 'dataset')
@@ -103,8 +103,8 @@ for experiment in optimiser.get_experiments():
         experiment.log_other(key, value)
 
     # Build tensorflow datasets from TFRecord files
-    # train_data = data_set.build_dataset_from_record('train', batch_size, repeat=num_epochs, is_training=True)
-    train_data = data_set.build_dataset_from_record('dev', batch_size, repeat=num_epochs, is_training=True)
+    train_data = data_set.build_dataset_from_record('train', batch_size, repeat=num_epochs, is_training=True)
+    # train_data = data_set.build_dataset_from_record('dev', batch_size, repeat=num_epochs, is_training=True)
     eval_data = data_set.build_dataset_from_record('eval', batch_size, repeat=num_epochs, is_training=False)
 
     global_steps = int(len(list(train_data)))

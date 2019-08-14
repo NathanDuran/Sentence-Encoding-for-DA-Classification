@@ -4,3 +4,5 @@
 
 - models
 
+- add embedding types
+
