@@ -1,16 +1,12 @@
 # Supervised and Semi-supervised Sentence Encoding Methods for Dialogue Act Classification
 
 # TODO
-
-- log F1 stats etc
-- log confusion matrix
-- save predictions?
-
+- add loading of params json
 
 - comet optimisation
 
-
+- add checks for existence before load/save/get models
 - models in separate classes 
-- ADD Params for different architectures (**kwargs) 
+
 - parent class to inherit from
 - string documentation

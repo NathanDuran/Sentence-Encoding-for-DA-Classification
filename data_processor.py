@@ -376,7 +376,7 @@ class DataProcessor:
         Args:
             set_type (str): Specifies if this is the training, validation or test data
             batch_size (int): The number of examples per batch
-            repeat (int): How many times the dataset with repeat untill it is exhausted, if 'None' repeats forever
+            repeat (int): How many times the dataset with repeat until it is exhausted, if 'None' repeats forever
             is_training (bool): Flag determines if training set is shuffled
             drop_remainder (bool): Flag determines if last batch is dropped if not of batch_size
             

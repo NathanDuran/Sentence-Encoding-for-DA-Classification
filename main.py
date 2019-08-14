@@ -18,23 +18,26 @@ tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'cnn_test',
-                     'training': False,
+                     'model_name': 'cnn',
+                     'training': True,
                      'testing': True,
-                     'load_model': True,
-                     'init_ckpt_file:': 'cnn_test_ckpt-8050.h5'}
+                     'load_model': False,
+                     'init_ckpt_file': 'cnn_test_ckpt-8050.h5',
+                     'batch_size': 32,
+                     'num_epochs': 3,
+                     'evaluate_steps': 500,
+                     'vocab_size': 10000,
+                     'max_seq_length': 128,
+                     'embedding_dim': 50,
+                     'embedding_type': 'glove',
+                     'embedding_source': 'glove.6B.50d'}
 
-training_params = {'batch_size': 32,
-                   'num_epochs': 5,
-                   'evaluate_steps': 500,
-                   'learning_rate': 2E-5}
-
-dataset_params = {'vocab_size': 10000,
-                  'max_seq_length': 128,
-                  'embedding_dim': 50,
-                  'embedding_type': 'glove',
-                  'embedding_source': 'glove.6B.50d'}
-
-model_params = {'model_type': 'cnn'}
+model_params = {'learning_rate': 2E-5,
+                'num_filters': 128,
+                'kernel_size': 5,
+                'pool_size': 5,
+                'dropout_rate': 0.05,
+                'dense_units': 100}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -42,16 +45,15 @@ experiment_name = experiment_params['experiment_name']
 training = experiment_params['training']
 testing = experiment_params['testing']
 load_model = experiment_params['load_model']
-init_ckpt_file = experiment_params['init_ckpt_file:']
+init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
-experiment.log_parameters(training_params)
-other_params = {**experiment_params, **dataset_params, **model_params}
-for key, value in other_params.items():
+experiment.log_parameters(model_params)
+for key, value in experiment_params.items():
     experiment.log_other(key, value)
 
 # Data set and output paths
@@ -77,10 +79,10 @@ print("Training: " + str(training))
 print("Testing: " + str(testing))
 
 # Training parameters
-batch_size = training_params['batch_size']
-num_epochs = training_params['num_epochs']
-evaluate_steps = training_params['evaluate_steps']  # Evaluate every this many steps
-learning_rate = training_params['learning_rate']
+batch_size = experiment_params['batch_size']
+num_epochs = experiment_params['num_epochs']
+evaluate_steps = experiment_params['evaluate_steps']  # Evaluate every this many steps
+learning_rate = model_params['learning_rate']
 
 print("------------------------------------")
 print("Using parameters...")
@@ -90,11 +92,11 @@ print("Evaluate every steps: " + str(evaluate_steps))
 print("Learning rate: " + str(learning_rate))
 
 # Data set parameters
-vocab_size = dataset_params['vocab_size']
-max_seq_length = dataset_params['max_seq_length']
-embedding_dim = dataset_params['embedding_dim']
-embedding_type = dataset_params['embedding_type']
-embedding_source = dataset_params['embedding_source']
+vocab_size = experiment_params['vocab_size']
+max_seq_length = experiment_params['max_seq_length']
+embedding_dim = experiment_params['embedding_dim']
+embedding_type = experiment_params['embedding_type']
+embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset and embedding processor
 data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size)
@@ -135,18 +137,20 @@ print("Test steps: " + str(test_steps))
 # Build or load the model
 print("------------------------------------")
 print("Creating model...")
-model_type = model_params['model_type']
-model_module = getattr(importlib.import_module('models.' + model_type.lower()), model_type.upper())
+model_name = experiment_params['model_name']
+model_module = getattr(importlib.import_module('models.' + model_name.lower()), model_name.upper())
 model = model_module()
 
 # Load if checkpoint set
 if load_model and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
     model.load_model(os.path.join(checkpoint_dir, init_ckpt_file))
-    print("Loaded model from " + os.path.join(checkpoint_dir, init_ckpt_file))
+    print("Loaded model from: " + os.path.join(checkpoint_dir, init_ckpt_file))
 # Else build with supplied parameters
 else:
-    model.build_model((max_seq_length,), len(labels), embedding_matrix)
-    print("Built model...with params{}")  # TODO enable params
+    model.build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
+    print("Built model using parameters:")
+    for key, value in model_params.items():
+        print("{}: {}".format(key, value))
 
 # Create optimiser
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
@@ -235,7 +239,7 @@ if testing:
     predicted_labels = np.empty(shape=0)
     with experiment.test():
         for test_step, (test_text, test_labels) in enumerate(test_data.take(test_steps)):
-
+            
             # Perform test step on batch and record metrics
             loss, predictions = model.evaluation_step(test_text, test_labels)
             test_loss(loss)
