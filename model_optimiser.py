@@ -2,6 +2,7 @@ import os
 import datetime
 import time
 import importlib
+import json
 from comet_ml import Optimizer
 import data_processor
 import embedding_processor
@@ -13,36 +14,11 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
 
-optimiser_config = {'algorithm': 'bayes',
-                    'spec': {
-                        'maxCombo': 5,
-                        'objective': 'minimize',
-                        'metric': 'validate_loss',
-                        'seed': 42,
-                        'gridSize': 10,
-                        'minSampleSize': 100,
-                        'retryLimit': 20,
-                        'retryAssignLimit': 0,
-                    },
-                    'parameters': {
-                        'learning_rate': {'type': 'float', 'scalingType': 'uniform', 'min': 0.00002, 'max': 0.05},
-                        'num_filters': {'type': 'integer', 'scalingType': 'uniform', 'min': 64, 'max': 256},
-                        'kernel_size': {'type': 'integer', 'scalingType': 'uniform', 'min': 3, 'max': 10},
-                        'pool_size': {'type': 'integer', 'scalingType': 'uniform', 'min': 3, 'max': 10},
-                        'dropout_rate': {'type': 'float', 'scalingType': 'uniform', 'min': 0.01, 'max': 0.2},
-                        'dense_units': {'type': 'integer', 'scalingType': 'uniform', 'min': 32, 'max': 256},
-                    },
-                    'name': 'My Bayesian Search',
-                    'trials': 1,
-                    }
 
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'cnn_opt',
                      'model_name': 'cnn',
-                     'training': True,
-                     'testing': True,
-                     'load_model': False,
-                     'init_ckpt_file': '',
+                     'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 3,
                      'evaluate_steps': 500,
@@ -56,8 +32,13 @@ experiment_params = {'task_name': 'swda',
 task_name = experiment_params['task_name']
 experiment_name = experiment_params['experiment_name']
 
+# Load optimiser config
+optimiser_config_file = experiment_params['model_name'] + '_opt_config.json'
+with open(os.path.join('models', optimiser_config_file)) as json_file:
+    optimiser_config = json.load(json_file)
+
 # Set up comet optimiser
-optimiser = Optimizer(optimiser_config)
+optimiser = Optimizer(optimiser_config)  # TODO add project name
 
 # Data set and output paths
 dataset_dir = os.path.join(task_name, 'dataset')
@@ -190,7 +171,6 @@ for experiment in optimiser.get_experiments():
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
                     with experiment.validate():
                         for eval_step, (eval_text, eval_labels) in enumerate(eval_data.take(eval_steps)):
-
                             # Perform evaluation step on batch and record metrics
                             loss, predictions = model.evaluation_step(eval_text, eval_labels)
                             eval_loss(loss)

@@ -1,0 +1,22 @@
+{"algorithm": "bayes",
+"spec": {
+    "maxCombo": 2,
+    "objective": "minimize",
+    "metric": "validate_loss",
+    "seed": 42,
+    "gridSize": 10,
+    "minSampleSize": 100,
+    "retryLimit": 20,
+    "retryAssignLimit": 0
+},
+"parameters": {
+    "learning_rate": {"type": "float", "scalingType": "uniform", "min": 0.00002, "max": 0.05},
+    "num_filters": {"type": "integer", "scalingType": "uniform", "min": 64, "max": 256},
+    "kernel_size": {"type": "integer", "scalingType": "uniform", "min": 3, "max": 10},
+    "pool_size": {"type": "integer", "scalingType": "uniform", "min": 3, "max": 10},
+    "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.01, "max": 0.2},
+    "dense_units": {"type": "integer", "scalingType": "uniform", "min": 32, "max": 256}
+},
+"name": "Bayesian Search",
+"trials": 1
+}

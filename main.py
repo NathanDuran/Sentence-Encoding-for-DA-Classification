@@ -2,6 +2,7 @@ import os
 import datetime
 import time
 import importlib
+import json
 from comet_ml import Experiment
 from metrics import *
 import data_processor
@@ -32,12 +33,10 @@ experiment_params = {'task_name': 'swda',
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
 
-model_params = {'learning_rate': 2E-5,
-                'num_filters': 128,
-                'kernel_size': 5,
-                'pool_size': 5,
-                'dropout_rate': 0.05,
-                'dense_units': 100}
+# Load model params
+optimiser_config_file = experiment_params['model_name'] + '_params.json'
+with open(os.path.join('models', optimiser_config_file)) as json_file:
+    model_params = json.load(json_file)
 
 # Task and experiment name
 task_name = experiment_params['task_name']
