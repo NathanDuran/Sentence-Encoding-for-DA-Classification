@@ -18,12 +18,13 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_test',
-                     'model_name': 'lstm',
+                     'experiment_name': 'cnn_test',
+                     'model_name': 'cnn',
                      'training': True,
                      'testing': True,
+                     'save_model': False,
                      'load_model': False,
-                     'init_ckpt_file': 'cnn_test_ckpt-8050.h5',
+                     'init_ckpt_file': '',
                      'batch_size': 32,
                      'num_epochs': 3,
                      'evaluate_steps': 500,
@@ -47,6 +48,7 @@ task_name = experiment_params['task_name']
 experiment_name = experiment_params['experiment_name']
 training = experiment_params['training']
 testing = experiment_params['testing']
+save_model = experiment_params['save_model']
 load_model = experiment_params['load_model']
 init_ckpt_file = experiment_params['init_ckpt_file']
 
@@ -174,7 +176,7 @@ if training:
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
     # Initialise model checkpointer
-    checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, keep_best=3, minimise=True)
+    checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, save_model=save_model, keep_best=1, minimise=True)
 
     # Initialise train and evaluate metrics
     train_loss = tf.keras.metrics.Mean()
@@ -264,7 +266,6 @@ if testing:
         print(metric_str)
 
         confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
-        confusion_matrix.show()
         confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
         confusion_matrix.savefig(confusion_matrix_file)
         experiment.log_image(confusion_matrix_file)
