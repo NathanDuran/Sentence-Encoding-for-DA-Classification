@@ -7,6 +7,7 @@ from comet_ml import Experiment
 from metrics import *
 import data_processor
 import embedding_processor
+import optimisers
 import checkpointer
 import tensorflow as tf
 import numpy as np
@@ -18,8 +19,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_test',
-                     'model_name': 'lstm',
+                     'experiment_name': 'cnn_test',
+                     'model_name': 'cnn',
                      'training': True,
                      'testing': True,
                      'save_model': True,
@@ -34,14 +35,12 @@ experiment_params = {'task_name': 'swda',
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
 
-# Load model params if file exists
+# Load model params if file exists otherwise defaults will be used
+model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
 optimiser_config_file = experiment_params['model_name'] + '_params.json'
 if os.path.exists(os.path.join('models', optimiser_config_file)):
     with open(os.path.join('models', optimiser_config_file)) as json_file:
         model_params = json.load(json_file)
-else:
-    # Else use default parameters and learning rate
-    model_params = {'learning_rate': 0.001}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -87,6 +86,7 @@ print("Testing: " + str(testing))
 batch_size = experiment_params['batch_size']
 num_epochs = experiment_params['num_epochs']
 evaluate_steps = experiment_params['evaluate_steps']  # Evaluate every this many steps
+optimiser_type = model_params['optimiser']
 learning_rate = model_params['learning_rate']
 
 print("------------------------------------")
@@ -94,6 +94,7 @@ print("Using parameters...")
 print("Batch size: " + str(batch_size))
 print("Epochs: " + str(num_epochs))
 print("Evaluate every steps: " + str(evaluate_steps))
+print("Optimiser: " + optimiser_type)
 print("Learning rate: " + str(learning_rate))
 
 # Data set parameters
@@ -157,9 +158,10 @@ else:
         print("{}: {}".format(key, value))
 
 # Create optimiser
-optimizer = tf.keras.optimizers.RMSprop(learning_rate=learning_rate)
+optimiser = optimisers.get_optimiser(optimiser_type=optimiser_type, lr=learning_rate, **model_params)
 
-model.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+# Compile the model
+model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
 
 # Display a model summary and create/save a model graph definition and image
 model.summary()

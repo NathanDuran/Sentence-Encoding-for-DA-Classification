@@ -8,7 +8,10 @@ class LSTM(Model):
         self.name = name
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+
         # Unpack key word arguments
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'sigmoid'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 128
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -30,11 +33,10 @@ class LSTM(Model):
         #                               return_sequences=True)(x)
         x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(dense_units))(x)
         x = tf.keras.layers.GlobalMaxPooling1D(name='global_pool')(x)
-        x = tf.keras.layers.Dense(dense_units, activation='relu', name='dense_1')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
-
         return model

@@ -1,6 +1,9 @@
-{"learning_rate": 2E-5,
-"num_filters": 128,
-"kernel_size": 5,
-"pool_size": 5,
-"dropout_rate": 0.05,
-"dense_units": 100}
+{
+  "learning_rate": 0.001,
+  "optimiser": "adam",
+  "num_filters": 128,
+  "kernel_size": 5,
+  "pool_size": 5,
+  "dropout_rate": 0.05,
+  "dense_units": 100
+}

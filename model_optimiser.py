@@ -6,6 +6,7 @@ import json
 from comet_ml import Optimizer
 import data_processor
 import embedding_processor
+import optimisers
 import tensorflow as tf
 
 # Suppress TensorFlow debugging
@@ -38,7 +39,7 @@ with open(os.path.join('models', optimiser_config_file)) as json_file:
     optimiser_config = json.load(json_file)
 
 # Set up comet optimiser
-optimiser = Optimizer(optimiser_config, project_name=experiment_params['project_name'])
+model_optimiser = Optimizer(optimiser_config, project_name=experiment_params['project_name'])
 
 # Data set and output paths
 dataset_dir = os.path.join(task_name, 'dataset')
@@ -87,7 +88,7 @@ vocabulary, labels = data_set.load_metadata()
 embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
 # Loop over each experiment in the optimiser
-for experiment in optimiser.get_experiments():
+for experiment in model_optimiser.get_experiments():
 
     # Set up comet experiment
     experiment.set_name(experiment_name)
@@ -133,10 +134,10 @@ for experiment in optimiser.get_experiments():
         print("{}: {}".format(key, value))
 
     # Create optimiser
-    optimizer = tf.keras.optimizers.Adam(learning_rate=model_params['learning_rate'])
+    optimiser = optimisers.get_optimiser(optimiser_type=model_params['optimiser'], lr=model_params['learning_rate'], **model_params)
 
     # Compile the model
-    model.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
 
     # Display a model summary
     model.summary()
