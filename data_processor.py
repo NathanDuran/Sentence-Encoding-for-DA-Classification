@@ -103,8 +103,8 @@ class DataProcessor:
                 lines = [line.rstrip('\r\n') for line in file.readlines()]
         return self._get_examples(lines, "train")
 
-    def get_eval_examples(self):
-        """Gets the Evaluation set from Github repository. Used to evaluate training.
+    def get_val_examples(self):
+        """Gets the Validation set from Github repository. Used to evaluate training.
 
         Returns:
              examples (list): A list of InputExamples for the training set
@@ -115,13 +115,13 @@ class DataProcessor:
             temp_file = os.path.join(tmp_dir, 'temp')
 
             # Get the file from Github repo
-            url = self.base_url + 'eval_set.txt'
+            url = self.base_url + 'val_set.txt'
             urllib.request.urlretrieve(url, filename=temp_file)
 
             # Read lines and get examples
             with open(temp_file) as file:
                 lines = [line.rstrip('\r\n') for line in file.readlines()]
-        return self._get_examples(lines, "eval")
+        return self._get_examples(lines, "val")
 
     def get_test_examples(self):
         """Gets the Test set from Github repository. Used to make predictions.
@@ -164,11 +164,11 @@ class DataProcessor:
         return self._get_examples(lines, "dev")
 
     def _get_examples(self, lines, set_type):
-        """Gets examples for the training, eval and test sets from plain text files.
+        """Gets examples for the training, val and test sets from plain text files.
 
         Args:
             lines (list): List of str in the format <speaker>|<sentence>|<da-label>
-            set_type (str): Specifies if this is the train, test or eval dataset
+            set_type (str): Specifies if this is the train, test or val dataset
 
         Returns:
             examples (list): A list of InputExamples
@@ -226,6 +226,8 @@ class DataProcessor:
                         sentence_tokens = [token for token in sentence_tokens if not token.is_punct]
                     if self.to_lower:
                         sentence_tokens = [token.orth_.lower() for token in sentence_tokens]
+                    else:
+                        sentence_tokens = [token.orth_ for token in sentence_tokens]
 
                     tokenized_utterances.append(sentence_tokens)
 
@@ -306,8 +308,8 @@ class DataProcessor:
         test_examples = self.get_test_examples()
         self.convert_examples_to_record('test', test_examples, vocabulary, labels)
 
-        eval_examples = self.get_eval_examples()
-        self.convert_examples_to_record('eval', eval_examples, vocabulary, labels)
+        val_examples = self.get_val_examples()
+        self.convert_examples_to_record('val', val_examples, vocabulary, labels)
 
         dev_examples = self.get_dev_examples()
         self.convert_examples_to_record('dev', dev_examples, vocabulary, labels)
@@ -356,6 +358,8 @@ class DataProcessor:
                 tokens = [token for token in tokens if not token.is_punct]
             if self.to_lower:
                 tokens = [token.orth_.lower() for token in tokens]
+            else:
+                tokens = [token.orth_ for token in tokens]
 
             # Pad/truncate sequences to max_sequence_length (0 = <unk> token in vocabulary)
             if self.pad_seq:
@@ -407,7 +411,7 @@ class DataProcessor:
         # For training, we want a lot of parallel reading and shuffling.
         # For testing, we want no shuffling and parallel reading doesn't matter.
         if is_training:
-            dataset = dataset.shuffle(buffer_size=100)
+            dataset = dataset.shuffle(buffer_size=1000)
         dataset = dataset.repeat(repeat)
         dataset = dataset.map(lambda record: _decode_single_record(record))
         dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)

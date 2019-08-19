@@ -6,7 +6,6 @@ class CNN(Model):
     def __init__(self, name='CNN'):
         super().__init__(name)
         self.name = name
-        self.model = None
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
 
@@ -33,32 +32,6 @@ class CNN(Model):
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
-        # Create keras model and set as this models parameter
+        # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
-        self.model = model
         return model
-
-    def training_step(self, optimizer, x, y):
-
-        with tf.GradientTape() as tape:
-            # Forward pass and calculate loss
-            logits = self.model(x, training=True)
-            loss = tf.losses.sparse_softmax_cross_entropy(labels=y, logits=logits)
-
-        # Backward pass (apply gradients)
-        grads = tape.gradient(loss, self.model.trainable_variables)
-        optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
-
-        # Get predictions
-        predictions = tf.argmax(logits, axis=1)
-        return loss, predictions
-
-    def evaluation_step(self, x, y):
-
-        # Forward pass and calculate loss
-        logits = self.model(x, training=False)
-        loss = tf.losses.sparse_softmax_cross_entropy(labels=y, logits=logits)
-
-        # Get predictions
-        predictions = tf.argmax(logits, axis=1)
-        return loss, predictions

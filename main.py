@@ -18,13 +18,13 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'cnn_test',
-                     'model_name': 'cnn',
+                     'experiment_name': 'lstm_test',
+                     'model_name': 'lstm',
                      'training': True,
                      'testing': True,
-                     'save_model': False,
+                     'save_model': True,
                      'load_model': False,
-                     'init_ckpt_file': '',
+                     'init_ckpt_file': 'lstm_test_ckpt-18039.h5',
                      'batch_size': 32,
                      'num_epochs': 3,
                      'evaluate_steps': 500,
@@ -41,7 +41,7 @@ if os.path.exists(os.path.join('models', optimiser_config_file)):
         model_params = json.load(json_file)
 else:
     # Else use default parameters and learning rate
-    model_params = {'learning_rate': 2E-5}
+    model_params = {'learning_rate': 0.001}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -54,7 +54,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -118,13 +118,13 @@ vocabulary, labels = data_set.load_metadata()
 embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
 # Build tensorflow datasets from TFRecord files
-# train_data = data_set.build_dataset_from_record('train', batch_size, repeat=num_epochs, is_training=True)
-train_data = data_set.build_dataset_from_record('dev', batch_size, repeat=num_epochs, is_training=True)
-eval_data = data_set.build_dataset_from_record('eval', batch_size, repeat=num_epochs, is_training=False)
+train_data = data_set.build_dataset_from_record('train', batch_size, repeat=num_epochs, is_training=True)
+# train_data = data_set.build_dataset_from_record('dev', batch_size, repeat=num_epochs, is_training=True)
+val_data = data_set.build_dataset_from_record('val', batch_size, repeat=num_epochs, is_training=False)
 test_data = data_set.build_dataset_from_record('test', batch_size, repeat=1, is_training=False)
 global_steps = int(len(list(train_data)))
 train_steps = int(len(list(train_data)) / num_epochs)
-eval_steps = int(len(list(eval_data)) / num_epochs)
+val_steps = int(len(list(val_data)) / num_epochs)
 test_steps = int(len(list(test_data)))
 
 print("------------------------------------")
@@ -136,37 +136,37 @@ print("Embedding type: " + embedding_type)
 print("Embedding source: " + embedding_source)
 print("Global steps: " + str(global_steps))
 print("Train steps: " + str(train_steps))
-print("Eval steps: " + str(eval_steps))
+print("Val steps: " + str(val_steps))
 print("Test steps: " + str(test_steps))
 
 # Build or load the model
 print("------------------------------------")
 print("Creating model...")
-model_name = experiment_params['model_name']
-model_module = getattr(importlib.import_module('models.' + model_name.lower()), model_name.upper())
-model = model_module()
 
 # Load if checkpoint set
 if load_model and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
-    model.load_model(os.path.join(checkpoint_dir, init_ckpt_file))
+    model = tf.keras.models.load_model(os.path.join(checkpoint_dir, init_ckpt_file))
     print("Loaded model from: " + os.path.join(checkpoint_dir, init_ckpt_file))
 # Else build with supplied parameters
 else:
-    model.build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
+    model_name = experiment_params['model_name']
+    model_class = getattr(importlib.import_module('models.' + model_name.lower()), model_name.upper())
+    model = model_class().build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
 
 # Create optimiser
-optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+optimizer = tf.keras.optimizers.RMSprop(learning_rate=learning_rate)
+
+model.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
 # Display a model summary and create/save a model graph definition and image
-current_model = model.get_model()
-current_model.summary()
+model.summary()
 model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
-tf.keras.utils.plot_model(current_model, to_file=model_image_file, show_shapes=True)
+tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
 experiment.log_image(model_image_file)
-experiment.set_model_graph(current_model.to_json())
+experiment.set_model_graph(model.to_json())
 
 # Train the model
 if training:
@@ -176,13 +176,13 @@ if training:
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
     # Initialise model checkpointer
-    checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, save_model=save_model, keep_best=1, minimise=True)
+    checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
 
-    # Initialise train and evaluate metrics
+    # Initialise train and validation metrics
     train_loss = tf.keras.metrics.Mean()
-    train_accuracy = tf.keras.metrics.Accuracy()
-    eval_loss = tf.keras.metrics.Mean()
-    eval_accuracy = tf.keras.metrics.Accuracy()
+    train_accuracy = tf.keras.metrics.Mean()
+    val_loss = tf.keras.metrics.Mean()
+    val_accuracy = tf.keras.metrics.Mean()
     global_step = 0
     for epoch in range(1, num_epochs + 1):
         print("Epoch: {}/{}".format(epoch, num_epochs))
@@ -192,34 +192,34 @@ if training:
                 global_step += 1
 
                 # Perform training step on batch and record metrics
-                loss, predictions = model.training_step(optimizer, train_text, train_labels)
+                loss, accuracy = model.train_on_batch(train_text, train_labels)
                 train_loss(loss)
-                train_accuracy(predictions, train_labels)
+                train_accuracy(accuracy)
 
                 experiment.log_metric('loss', train_loss.result().numpy(), step=global_step)
                 experiment.log_metric('accuracy', train_accuracy.result().numpy(), step=global_step)
 
-                # Every evaluate_steps evaluate model on evaluation set
+                # Every evaluate_steps evaluate model on validation set
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
                     with experiment.validate():
-                        for eval_step, (eval_text, eval_labels) in enumerate(eval_data.take(eval_steps)):
+                        for val_step, (val_text, val_labels) in enumerate(val_data.take(val_steps)):
 
                             # Perform evaluation step on batch and record metrics
-                            loss, predictions = model.evaluation_step(eval_text, eval_labels)
-                            eval_loss(loss)
-                            eval_accuracy(predictions, eval_labels)
+                            loss, accuracy = model.test_on_batch(val_text, val_labels)
+                            val_loss(loss)
+                            val_accuracy(accuracy)
 
-                            experiment.log_metric('loss', eval_loss.result().numpy(), step=global_step)
-                            experiment.log_metric('accuracy', eval_accuracy.result().numpy(), step=global_step)
+                            experiment.log_metric('loss', val_loss.result().numpy(), step=global_step)
+                            experiment.log_metric('accuracy', val_accuracy.result().numpy(), step=global_step)
 
                     # Print current loss/accuracy
-                    result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Eval loss: {:.3f} - acc: {:.3f}"
+                    result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Val loss: {:.3f} - acc: {:.3f}"
                     print(result_str.format(global_step, global_steps,
                                             train_loss.result(), train_accuracy.result(),
-                                            eval_loss.result(), eval_accuracy.result()))
+                                            val_loss.result(), val_accuracy.result()))
 
                     # Save checkpoint if checkpointer metric improves
-                    checkpointer.save_best_checkpoint(eval_loss.result(), global_step)
+                    checkpointer.save_best_checkpoint(val_loss.result(), global_step)
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
@@ -238,7 +238,7 @@ if testing:
 
     # Initialise test metrics
     test_loss = tf.keras.metrics.Mean()
-    test_accuracy = tf.keras.metrics.Accuracy()
+    test_accuracy = tf.keras.metrics.Mean()
     # Keep a copy of all true and predicted labels for creating evaluation metrics
     true_labels = np.empty(shape=0)
     predicted_labels = np.empty(shape=0)
@@ -246,16 +246,17 @@ if testing:
         for test_step, (test_text, test_labels) in enumerate(test_data.take(test_steps)):
 
             # Perform test step on batch and record metrics
-            loss, predictions = model.evaluation_step(test_text, test_labels)
+            loss, accuracy = model.test_on_batch(test_text, test_labels)
+            predictions = model.predict_on_batch(test_text)
             test_loss(loss)
-            test_accuracy(predictions, test_labels)
+            test_accuracy(accuracy)
 
             experiment.log_metric('loss', test_loss.result().numpy(), step=test_step)
             experiment.log_metric('accuracy', test_accuracy.result().numpy(), step=test_step)
 
             # Append to lists for creating metrics
             true_labels = np.append(true_labels, test_labels.numpy().flatten())
-            predicted_labels = np.append(predicted_labels, predictions.numpy().flatten())
+            predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
 
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
         print(result_str.format(test_steps, test_loss.result(), test_accuracy.result()))
