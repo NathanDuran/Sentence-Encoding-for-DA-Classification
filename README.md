@@ -3,5 +3,8 @@
 # TODO
 
 - models
+- Add time distributed to lstm?
 
 - add embedding types
+
+- Save train/test history + predictions

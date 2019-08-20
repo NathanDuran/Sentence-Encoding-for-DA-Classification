@@ -17,7 +17,7 @@ def get_optimiser(optimiser_type='sgd', lr=0.01, **kwargs):
     """
 
     # List of valid optimisers and default learning rates
-    optimisers = {'adadelta': 0.001,
+    optimisers = {'adadelta': 1.0,
                   'adagrad': 0.001,
                   'adam': 0.001,
                   'adamax': 0.001,
@@ -43,14 +43,30 @@ def get_optimiser(optimiser_type='sgd', lr=0.01, **kwargs):
 
 
 def adadelta(lr, clip_args, **kwargs):
-    # Unpack key word arguments
+    """Adadelta optimization is a stochastic gradient descent method that is based on adaptive learning rate per
+     dimension to address two drawbacks:
+     1) the continual decay of learning rates throughout training
+     2) the need for a manually selected global learning rate
+
+    Two accumulation steps are required:
+    1) the accumulation of gradients squared,
+    2) the accumulation of updates squared.
+
+    Adadelta is a more robust extension of Adagrad that adapts learning rates based on a moving window of gradient
+    updates, instead of accumulating all past gradients.
+    This way, Adadelta continues learning even when many updates have been done.
+    Compared to Adagrad, in the original version of Adadelta you don't have to set an initial learning rate.
+    In this version, initial learning rate can be set, as in most other Keras optimizers.
+    """
     rho = kwargs['rho'] if 'rho' in kwargs.keys() else 0.95
     epsilon = kwargs['epsilon'] if 'epsilon' in kwargs.keys() else 1e-07
     return tf.keras.optimizers.Adadelta(learning_rate=lr, rho=rho, epsilon=epsilon, **clip_args)
 
 
 def adagrad(lr, clip_args, **kwargs):
-    # Unpack key word arguments
+    """Adagrad is an optimizer with parameter-specific learning rates, which are adapted relative to how frequently
+     a parameter gets updated during training. The more updates a parameter receives, the smaller the updates.
+     """
     initial_accum_value = kwargs['initial_accumulator_value'] if 'initial_accumulator_value' in kwargs.keys() else 0.1
     epsilon = kwargs['epsilon'] if 'epsilon' in kwargs.keys() else 1e-07
     return tf.keras.optimizers.Adagrad(learning_rate=lr, initial_accumulator_value=initial_accum_value,
@@ -58,7 +74,11 @@ def adagrad(lr, clip_args, **kwargs):
 
 
 def adam(lr, clip_args, **kwargs):
-    # Unpack key word arguments
+    """Adam optimization is a stochastic gradient descent method that is based on adaptive estimation of first-order
+     and second-order moments. According to the paper Adam: A Method for Stochastic Optimization.Kingma et al., 2014,
+     the method is "computationally efficient, has little memory requirement,invariant to diagonal rescaling of
+      gradients, and is well suited for problems that are large in terms of data/parameters".
+    """
     beta_1 = kwargs['beta_1'] if 'beta_1' in kwargs.keys() else 0.9
     beta_2 = kwargs['beta_2'] if 'beta_2' in kwargs.keys() else 0.999
     epsilon = kwargs['epsilon'] if 'epsilon' in kwargs.keys() else 1e-07
@@ -68,7 +88,9 @@ def adam(lr, clip_args, **kwargs):
 
 
 def adamax(lr, clip_args, **kwargs):
-    # Unpack key word arguments
+    """It is a variant of Adam based on the infinity norm. Default parameters follow those provided in the paper.
+    Adamax is sometimes superior to adam, specially in models with embeddings.
+    """
     beta_1 = kwargs['beta_1'] if 'beta_1' in kwargs.keys() else 0.9
     beta_2 = kwargs['beta_2'] if 'beta_2' in kwargs.keys() else 0.999
     epsilon = kwargs['epsilon'] if 'epsilon' in kwargs.keys() else 1e-07
@@ -77,7 +99,7 @@ def adamax(lr, clip_args, **kwargs):
 
 
 def rmsprop(lr, clip_args, **kwargs):
-    # Unpack key word arguments
+    """This optimizer is usually a good choice for recurrent neural networks."""
     rho = kwargs['rho'] if 'rho' in kwargs.keys() else 0.9
     momentum = kwargs['momentum'] if 'momentum' in kwargs.keys() else 0.0
     epsilon = kwargs['epsilon'] if 'epsilon' in kwargs.keys() else 1e-07
@@ -86,7 +108,6 @@ def rmsprop(lr, clip_args, **kwargs):
 
 
 def sgd(lr, clip_args, **kwargs):
-    # Unpack key word arguments
     momentum = kwargs['momentum'] if 'momentum' in kwargs.keys() else 0.0
     nesterov = kwargs['nesterov'] if 'nesterov' in kwargs.keys() else False
     return tf.keras.optimizers.SGD(learning_rate=lr, momentum=momentum, nesterov=nesterov, **clip_args)

@@ -1,4 +1,4 @@
-{"algorithm": "grid",
+{"algorithm": "bayes",
 "spec": {
     "maxCombo": 100,
     "objective": "minimize",
@@ -10,16 +10,14 @@
     "retryAssignLimit": 0
 },
 "parameters": {
-    "optimiser": {"type": "categorical", "values": ["adadelta", "adagrad", "adam", "adamax", "rmsprop"]},
-    "learning_rate": {"type": "float", "min": 0.0001, "max": 0.05},
-    "conv_activation": {"type": "categorical", "values": ["elu", "selu", "relu", "tanh", "sigmoid"]},
-    "dense_activation": {"type": "categorical", "values": ["elu", "selu", "relu", "tanh", "sigmoid"]},
+    "optimiser": {"type": "categorical", "values": ["adam"]},
+    "learning_rate": {"type": "float", "scalingType": "uniform", "min": 0.0001, "max": 0.05},
     "num_filters": {"type": "integer", "scalingType": "uniform", "min": 64, "max": 256},
     "kernel_size": {"type": "integer", "scalingType": "uniform", "min": 3, "max": 10},
     "pool_size": {"type": "integer", "scalingType": "uniform", "min": 3, "max": 10},
-    "dropout_rate": {"type": "float", "min": 0.001, "max": 0.3},
+    "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.3},
     "dense_units": {"type": "integer", "scalingType": "uniform", "min": 32, "max": 256}
 },
-"name": "Grid Search",
+"name": "Bayes Search",
 "trials": 1
 }

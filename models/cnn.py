@@ -11,7 +11,7 @@ class CNN(Model):
 
         # Unpack key word arguments
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'relu'
-        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'sigmoid'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 128
         kernel_size = kwargs['kernel_size'] if 'kernel_size' in kwargs.keys() else 5
         pool_size = kwargs['pool_size'] if 'pool_size' in kwargs.keys() else 5

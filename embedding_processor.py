@@ -11,7 +11,8 @@ def get_embedding_processor(processor_type):
     Returns:
         processor (EmbeddingProcessor): An instance of the selected EmbeddingProcessor
     """
-    embeddings = {'glove': GloveEmbedding(),
+    embeddings = {'random': RandomEmbedding(),
+                  'glove': GloveEmbedding(),
                   'word2vec': Word2VecEmbedding(),
                   'fasttext': FastTextEmbedding()}
 
@@ -40,6 +41,17 @@ class EmbeddingProcessor:
         raise NotImplementedError()
 
 
+class RandomEmbedding(EmbeddingProcessor):
+    """Generates random embeddings matrix."""
+
+    def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
+        np.random.seed(42)
+        # Generate random numpy matrix of shape (vocabulary_size, embedding_dim) in range [-10, 10]
+        matrix = 20 * np.random.random_sample((len(vocabulary), embedding_dim)) - 10
+
+        return matrix
+
+
 class GloveEmbedding(EmbeddingProcessor):
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
@@ -60,7 +72,7 @@ class GloveEmbedding(EmbeddingProcessor):
             raise Exception("The given embedding source file: '" + embedding_source + "' is not valid!\n" +
                             "Please select one from: " + str(valid_source_files))
 
-        # Get the specifies embedding file
+        # Get the specified embedding file
         glove = nlp.embedding.GloVe(source=embedding_source, embedding_root=embedding_dir)
         # Attach embeddings to the vocabulary
         vocabulary.set_embedding(glove)
@@ -99,7 +111,7 @@ class Word2VecEmbedding(EmbeddingProcessor):
             raise Exception("The given embedding source file: '" + embedding_source + "' is not valid!\n" +
                             "Please select one from: " + str(valid_source_files))
 
-        # Get the specifies embedding file
+        # Get the specified embedding file
         word2vec = nlp.embedding.Word2Vec(source=embedding_source, embedding_root=embedding_dir)
         # Attach embeddings to the vocabulary
         vocabulary.set_embedding(word2vec)
@@ -136,7 +148,7 @@ class FastTextEmbedding(EmbeddingProcessor):
             raise Exception("The given embedding source file: '" + embedding_source + "' is not valid!\n" +
                             "Please select one from: " + str(valid_source_files))
 
-        # Get the specifies embedding file
+        # Get the specified embedding file
         fastext = nlp.embedding.FastText(source=embedding_source, embedding_root=embedding_dir)
         # Attach embeddings to the vocabulary
         vocabulary.set_embedding(fastext)
