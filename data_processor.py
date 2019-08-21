@@ -35,7 +35,7 @@ class InputExample(object):
 class DataProcessor:
     """Converts sentences for dialogue act classification into data sets."""
 
-    def __init__(self, set_name,  output_dir, max_seq_length, pad_seq=True, vocab_size=None, to_lower=True, no_punct=False, label_index=2):
+    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, pad_seq=True, to_lower=True, no_punct=False, label_index=2):
         """Constructs a DataProcessor for the specified dataset.
 
         Note: For MRDA data there is the option to choose which type of labelling is used.
@@ -47,8 +47,9 @@ class DataProcessor:
             set_name (str): The name of this dataset can be any string but MUST include a substring from valid_set_names
             output_dir (str): Directory to save the processed data
             max_seq_length (int): Length to pad or truncate sentences to
-            pad_seq (bool): Flag for padding sequences to max_seq_length
             vocab_size (int): Specifies the size of the datasets vocabulary to use, if 'None' uses all words
+            to_tokens (bool): Flag for tokenising input sentences, if false returns full sentence strings
+            pad_seq (bool): Flag for padding sequences to max_seq_length
             to_lower (bool): Flag to convert words to lowercase
             no_punct (bool): Flag to remove punctuation from sentences
             label_index (int): Determines the label type is used if there is more than one type
@@ -62,8 +63,9 @@ class DataProcessor:
         self.set_name = set_name
         self.output_dir = output_dir
         self.max_seq_length = max_seq_length
-        self.pad_seq = pad_seq
         self.vocab_size = vocab_size
+        self.to_tokens = to_tokens
+        self.pad_seq = pad_seq
         self.to_lower = to_lower
         self.no_punct = no_punct
         self.label_index = label_index
@@ -317,12 +319,14 @@ class DataProcessor:
     def convert_examples_to_record(self, set_type, examples, vocabulary, labels):
         """Converts InputExamples to features and saves as TFRecord file.
 
-        Tokenizes all text and strips whitespace.
-        Converts to lowercase if to_lower=True.
-        Removes punctuation if no_punct=True.
-        Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
+        if to_tokens is True
+            Tokenizes all text and strips whitespace.
+            Converts to lowercase if to_lower=True.
+            Removes punctuation if no_punct=True.
+            Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
+            Converts sentence tokens to indices.
 
-        Converts sentence tokens and labels to indices.
+        Converts labels to indices.
 
         Saves as TFRecord file.
 
@@ -337,8 +341,11 @@ class DataProcessor:
             """Converts an InputExample into a serialized format for TFRecords"""
             features = collections.OrderedDict()
             # Strings must be encoded to bytes
-            features['example_id'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=[example_to_serialize.example_id.encode('utf-8')]))
-            features['text'] = tf.train.Feature(int64_list=tf.train.Int64List(value=example_to_serialize.text))
+            features['example_id'] = tf.train.Feature(
+                bytes_list=tf.train.BytesList(value=[example_to_serialize.example_id.encode('utf-8')]))
+            features['text'] = tf.train.Feature(
+                int64_list=tf.train.Int64List(value=example_to_serialize.text)) if self.to_tokens else tf.train.Feature(
+                bytes_list=tf.train.BytesList(value=[example_to_serialize.text.encode('utf-8')]))
             features['label'] = tf.train.Feature(int64_list=tf.train.Int64List(value=example_to_serialize.label))
 
             tf_example = tf.train.Example(features=tf.train.Features(feature=features))
@@ -352,21 +359,24 @@ class DataProcessor:
         # Process each example and save to file
         for example in examples:
 
-            # Tokenize, convert to lowercase and remove punctuation
-            tokens = tokenizer(example.text)
-            if self.no_punct:
-                tokens = [token for token in tokens if not token.is_punct]
-            if self.to_lower:
-                tokens = [token.orth_.lower() for token in tokens]
-            else:
-                tokens = [token.orth_ for token in tokens]
+            if self.to_tokens:
+                # Tokenize, convert to lowercase and remove punctuation
+                tokens = tokenizer(example.text)
+                if self.no_punct:
+                    tokens = [token for token in tokens if not token.is_punct]
+                if self.to_lower:
+                    tokens = [token.orth_.lower() for token in tokens]
+                else:
+                    tokens = [token.orth_ for token in tokens]
 
-            # Pad/truncate sequences to max_sequence_length (0 = <unk> token in vocabulary)
-            if self.pad_seq:
-                tokens = [tokens[i] if i < len(tokens) else '<unk>' for i in range(self.max_seq_length)]
+                # Pad/truncate sequences to max_sequence_length (0 = <unk> token in vocabulary)
+                if self.pad_seq:
+                    tokens = [tokens[i] if i < len(tokens) else '<unk>' for i in range(self.max_seq_length)]
 
-            # Convert word and label tokens to indices
-            example.text = [vocabulary.token_to_idx[token] for token in tokens]
+                # Convert word and label tokens to indices
+                example.text = [vocabulary.token_to_idx[token] for token in tokens]
+
+            # Convert labels to indices
             example.label = [labels.index(example.label)]
 
             # Serialize and write to TFRecord
@@ -391,17 +401,16 @@ class DataProcessor:
         def _decode_single_record(serialized_example):
             """Decodes single TFRecord example into Tensors."""
 
-            feature_map = {
-                "example_id": tf.FixedLenFeature([], tf.string),
-                "text": tf.FixedLenFeature([self.max_seq_length], tf.int64),
-                "label": tf.FixedLenFeature([1], tf.int64),
-            }
+            feature_map = {'example_id': tf.FixedLenFeature([], tf.string),
+                           'text': tf.FixedLenFeature([self.max_seq_length], tf.int64)
+                           if self.to_tokens else tf.FixedLenFeature([], tf.string),
+                           'label': tf.FixedLenFeature([1], tf.int64)}
 
             # Parse the serialized example into a dictionary
             example = tf.parse_single_example(serialized_example, feature_map)
 
             # Get the tensor values from the dictionary
-            text = tf.cast(example['text'], tf.int32)
+            text = tf.cast(example['text'], tf.int32) if self.to_tokens else example['text']
             label = tf.cast(example['label'], tf.int32)
             return text, label
 
