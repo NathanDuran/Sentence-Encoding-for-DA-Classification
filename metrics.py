@@ -50,7 +50,7 @@ def precision_recall_f1(true_labels, predicted_labels, labels):
 
     # Need to remove labels that are not present in the test set at all
     for i in range(len(labels)):
-        if i not in true_labels:
+        if i not in true_labels and i not in predicted_labels:
             del labels[i]
     # Generate classification report for each label/totals
     metric_str = classification_report(true_labels, predicted_labels, target_names=labels)

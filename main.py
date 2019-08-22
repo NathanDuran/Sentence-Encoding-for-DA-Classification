@@ -1,9 +1,9 @@
 import os
 import datetime
 import time
-import importlib
 import json
 from comet_ml import Experiment
+from models import models
 from metrics import *
 import data_processor
 import embedding_processor
@@ -15,17 +15,19 @@ import numpy as np
 # Suppress TensorFlow debugging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.logging.set_verbosity(tf.logging.ERROR)
+# Disable GPU
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'cnn_test',
+                     'experiment_name': 'cnn_test_opt_2',
                      'model_name': 'cnn',
                      'training': True,
                      'testing': True,
-                     'save_model': True,
+                     'save_model': False,
                      'load_model': False,
-                     'init_ckpt_file': 'lstm_test_ckpt-18039.h5',
+                     'init_ckpt_file': '',
                      'batch_size': 32,
                      'num_epochs': 3,
                      'evaluate_steps': 500,
@@ -37,10 +39,10 @@ experiment_params = {'task_name': 'swda',
 
 # Load model params if file exists otherwise defaults will be used
 model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
-optimiser_config_file = experiment_params['model_name'] + '_params.json'
-if os.path.exists(os.path.join('models', optimiser_config_file)):
-    with open(os.path.join('models', optimiser_config_file)) as json_file:
-        model_params = json.load(json_file)
+model_param_file = 'model_params.json'
+if os.path.exists(model_param_file):
+    with open(model_param_file) as json_file:
+        model_params = json.load(json_file)[experiment_params['model_name']]
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -105,7 +107,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset and embedding processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=True, vocab_size=vocab_size)
 embedding = embedding_processor.get_embedding_processor(embedding_type)
 
 # If dataset folder is empty get the metadata and datasets to TFRecords
@@ -150,9 +152,8 @@ if load_model and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
     print("Loaded model from: " + os.path.join(checkpoint_dir, init_ckpt_file))
 # Else build with supplied parameters
 else:
-    model_name = experiment_params['model_name']
-    model_class = getattr(importlib.import_module('models.' + model_name.lower()), model_name.upper())
-    model = model_class().build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
+    model_class = models.get_model(experiment_params['model_name'])
+    model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))

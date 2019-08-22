@@ -12,11 +12,11 @@ class CNN(Model):
         # Unpack key word arguments
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'relu'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
-        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 128
+        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 64
         kernel_size = kwargs['kernel_size'] if 'kernel_size' in kwargs.keys() else 5
-        pool_size = kwargs['pool_size'] if 'pool_size' in kwargs.keys() else 5
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
-        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 100
+        pool_size = kwargs['pool_size'] if 'pool_size' in kwargs.keys() else 8
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.27
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 225
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape, name='input_layer')

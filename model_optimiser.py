@@ -4,6 +4,7 @@ import time
 import importlib
 import json
 from comet_ml import Optimizer
+from models import models
 import data_processor
 import embedding_processor
 import optimisers
@@ -17,8 +18,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'cnn_opt',
-                     'model_name': 'cnn',
+                     'experiment_name': 'lstm_opt',
+                     'model_name': 'lstm',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
@@ -34,9 +35,9 @@ task_name = experiment_params['task_name']
 experiment_name = experiment_params['experiment_name']
 
 # Load optimiser config
-optimiser_config_file = experiment_params['model_name'] + '_opt_config.json'
-with open(os.path.join('models', optimiser_config_file)) as json_file:
-    optimiser_config = json.load(json_file)
+optimiser_config_file = 'optimiser_config.json'
+with open(optimiser_config_file) as json_file:
+    optimiser_config = json.load(json_file)[experiment_params['model_name']]
 
 # Set up comet optimiser
 model_optimiser = Optimizer(optimiser_config, project_name=experiment_params['project_name'])
@@ -126,9 +127,8 @@ for experiment in model_optimiser.get_experiments():
     # Build the model
     print("------------------------------------")
     print("Creating model...")
-    model_name = experiment_params['model_name']
-    model_class = getattr(importlib.import_module('models.' + model_name.lower()), model_name.upper())
-    model = model_class().build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
+    model_class = models.get_model(experiment_params['model_name'])
+    model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
