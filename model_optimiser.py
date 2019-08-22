@@ -35,7 +35,7 @@ task_name = experiment_params['task_name']
 experiment_name = experiment_params['experiment_name']
 
 # Load optimiser config
-optimiser_config_file = 'optimiser_config.json'
+optimiser_config_file = 'model_optimiser_config.json'
 with open(optimiser_config_file) as json_file:
     optimiser_config = json.load(json_file)[experiment_params['model_name']]
 

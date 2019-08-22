@@ -16,13 +16,13 @@ import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.logging.set_verbosity(tf.logging.ERROR)
 # Disable GPU
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'cnn_test_opt_2',
-                     'model_name': 'cnn',
+                     'experiment_name': 'text_cnn',
+                     'model_name': 'text_cnn',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -38,11 +38,13 @@ experiment_params = {'task_name': 'swda',
                      'embedding_source': 'glove.6B.50d'}
 
 # Load model params if file exists otherwise defaults will be used
-model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
 model_param_file = 'model_params.json'
-if os.path.exists(model_param_file):
-    with open(model_param_file) as json_file:
-        model_params = json.load(json_file)[experiment_params['model_name']]
+with open(model_param_file) as json_file:
+    params_dict = json.load(json_file)
+    if experiment_params['model_name'] in params_dict.keys():
+        model_params = [experiment_params['model_name']]
+    else:
+        model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -55,7 +57,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
