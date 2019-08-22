@@ -1,5 +1,5 @@
 {
-  "cnn": {
+    "cnn": {
     "learning_rate": 0.002,
     "optimiser": "adam",
     "num_filters": 64,
@@ -8,13 +8,31 @@
     "dropout_rate": 0.27,
     "dense_units": 225
   },
-  "lstm": {
-  "learning_rate": 0.001,
-  "optimiser": "rmsprop",
-  "lstm_units": 128,
-  "lstm_dropout": 0.001,
-  "recurrent_dropout": 0.001,
-  "dropout_rate": 0.05,
-  "dense_units": 100
-}
+    "text_cnn": {
+    "learning_rate": 0.002,
+    "optimiser": "adam",
+    "num_filters": 64,
+    "kernel_size": [1, 2, 3, 5],
+    "pool_size": 8,
+    "dropout_rate": 0.1,
+    "dense_units": 128
+  },
+    "lstm": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "lstm_units": 128,
+    "lstm_dropout": 0.001,
+    "recurrent_dropout": 0.001,
+    "dropout_rate": 0.05,
+    "dense_units": 100
+  },
+    "bi_lstm": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "lstm_units": 128,
+    "lstm_dropout": 0.001,
+    "recurrent_dropout": 0.001,
+    "dropout_rate": 0.05,
+    "dense_units": 100
+  }
 }

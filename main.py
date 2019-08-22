@@ -3,8 +3,8 @@ import datetime
 import time
 import json
 from comet_ml import Experiment
-from models import models
 from metrics import *
+import models
 import data_processor
 import embedding_processor
 import optimisers
@@ -21,8 +21,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'text_cnn',
-                     'model_name': 'text_cnn',
+                     'experiment_name': 'bi_lstm',
+                     'model_name': 'bi_lstm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -42,7 +42,7 @@ model_param_file = 'model_params.json'
 with open(model_param_file) as json_file:
     params_dict = json.load(json_file)
     if experiment_params['model_name'] in params_dict.keys():
-        model_params = [experiment_params['model_name']]
+        model_params = params_dict[experiment_params['model_name']]
     else:
         model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
 
