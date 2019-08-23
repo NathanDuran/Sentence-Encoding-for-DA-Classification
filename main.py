@@ -21,21 +21,21 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'bi_lstm',
-                     'model_name': 'bi_lstm',
+                     'experiment_name': 'deep_lstm_10',
+                     'model_name': 'deep_lstm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
                      'load_model': False,
                      'init_ckpt_file': '',
                      'batch_size': 32,
-                     'num_epochs': 3,
+                     'num_epochs': 5,
                      'evaluate_steps': 500,
                      'vocab_size': 10000,
                      'max_seq_length': 128,
-                     'embedding_dim': 50,
-                     'embedding_type': 'glove',
-                     'embedding_source': 'glove.6B.50d'}
+                     'embedding_dim': 300,
+                     'embedding_type': 'word2vec',
+                     'embedding_source': 'GoogleNews-vectors-negative300'}
 
 # Load model params if file exists otherwise defaults will be used
 model_param_file = 'model_params.json'

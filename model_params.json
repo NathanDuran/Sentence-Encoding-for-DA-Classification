@@ -20,11 +20,30 @@
     "lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
-    "lstm_units": 128,
+    "lstm_units": 256,
     "lstm_dropout": 0.001,
     "recurrent_dropout": 0.001,
     "dropout_rate": 0.05,
-    "dense_units": 100
+    "dense_units": 128
+  },
+    "lstm_attn": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "lstm_units": 256,
+    "lstm_dropout": 0.001,
+    "recurrent_dropout": 0.001,
+    "dropout_rate": 0.05,
+    "dense_units": 128
+  },
+    "deep_lstm": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "num_lstm_layers": 3,
+    "lstm_units": 256,
+    "lstm_dropout": 0.001,
+    "recurrent_dropout": 0.001,
+    "dropout_rate": 0.05,
+    "dense_units": 128
   },
     "bi_lstm": {
     "learning_rate": 0.001,
