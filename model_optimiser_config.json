@@ -37,8 +37,6 @@
             "optimiser": {"type": "categorical", "values": ["rmsprop"]},
             "learning_rate": {"type": "float", "scalingType": "uniform", "min": 0.0001, "max": 0.05},
             "lstm_units": {"type": "integer", "scalingType": "uniform", "min": 64, "max": 256},
-            "lstm_dropout": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.3},
-            "recurrent_dropout": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.3},
             "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.3},
             "dense_units": {"type": "integer", "scalingType": "uniform", "min": 32, "max": 256}
         },

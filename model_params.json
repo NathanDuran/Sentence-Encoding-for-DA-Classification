@@ -21,8 +21,8 @@
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
     "lstm_units": 256,
-    "lstm_dropout": 0.001,
-    "recurrent_dropout": 0.001,
+    "lstm_dropout": 0.0,
+    "recurrent_dropout": 0.0,
     "dropout_rate": 0.05,
     "dense_units": 128
   },
@@ -30,8 +30,8 @@
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
     "lstm_units": 256,
-    "lstm_dropout": 0.001,
-    "recurrent_dropout": 0.001,
+    "lstm_dropout": 0.0,
+    "recurrent_dropout": 0.0,
     "dropout_rate": 0.05,
     "dense_units": 128
   },
@@ -40,8 +40,8 @@
     "optimiser": "rmsprop",
     "num_lstm_layers": 3,
     "lstm_units": 256,
-    "lstm_dropout": 0.001,
-    "recurrent_dropout": 0.001,
+    "lstm_dropout": 0.0,
+    "recurrent_dropout": 0.0,
     "dropout_rate": 0.05,
     "dense_units": 128
   },
@@ -49,8 +49,17 @@
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
     "lstm_units": 128,
-    "lstm_dropout": 0.001,
-    "recurrent_dropout": 0.001,
+    "lstm_dropout": 0.0,
+    "recurrent_dropout": 0.0,
+    "dropout_rate": 0.05,
+    "dense_units": 100
+  },
+    "bi_lstm_attn": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "lstm_units": 128,
+    "lstm_dropout": 0.0,
+    "recurrent_dropout": 0.0,
     "dropout_rate": 0.05,
     "dense_units": 100
   }

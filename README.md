@@ -4,7 +4,8 @@
 
 - models
 - Add time distributed to lstm?
+- Deep bi lstm
 
 - add embedding types
 
-- Save train/test history + predictions
+- Save train/test history + predictions?
