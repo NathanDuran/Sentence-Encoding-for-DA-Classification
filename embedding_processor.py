@@ -1,3 +1,8 @@
+import os
+import bz2
+import gzip
+import shutil
+import tempfile
 import gluonnlp as nlp
 import numpy as np
 
@@ -14,7 +19,9 @@ def get_embedding_processor(processor_type):
     embeddings = {'random': RandomEmbedding(),
                   'glove': GloveEmbedding(),
                   'word2vec': Word2VecEmbedding(),
-                  'fasttext': FastTextEmbedding()}
+                  'fasttext': FastTextEmbedding(),
+                  'numberbatch': Numberbatch(),
+                  'deps': Dependency()}
 
     if processor_type.lower() not in embeddings.keys():
         raise Exception("The given embedding processor type: '" + processor_type + "' is not valid!\n" +
@@ -165,5 +172,108 @@ class FastTextEmbedding(EmbeddingProcessor):
         for i in range(len(vocabulary)):
             embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
             matrix[i] = embedding
+
+        return matrix
+
+
+class Numberbatch(EmbeddingProcessor):
+    """Generates ConceptNet Numberbatch embeddings matrix.
+    Speer, R., Chin, J., & Havasi, C. (2016). ConceptNet 5.5: An Open Multilingual Graph of General Knowledge.
+    Proceedings of the Thirty-First AAAI Conference on Artificial Intelligence (AAAI-17) ConceptNet, 4444–4451.
+
+    Embedding source available from: https://github.com/commonsense/conceptnet-numberbatch
+
+    Valid FastText source files:
+    'numberbatch-en'
+    """
+
+    def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
+
+        valid_source_files = ['numberbatch-en']
+
+        source_file = os.path.join(embedding_dir, 'numberbatch', embedding_source + '-19.08.gz')
+
+        # Check source file is valid
+        if embedding_source not in valid_source_files or not os.path.exists(source_file):
+            raise Exception("The given embedding source file: '" + embedding_source + "' is not valid!\n" +
+                            "Please select one from: " + str(valid_source_files))
+
+        # Create a temporary directory
+        with tempfile.TemporaryDirectory(dir=embedding_dir) as tmp_dir:
+            temp_file = os.path.join(tmp_dir, 'temp')
+
+            # Unzip and copy to temp directory
+            with gzip.open(source_file, 'rb') as file_in:
+                with open(temp_file, 'wb') as file_out:
+                    shutil.copyfileobj(file_in, file_out)
+
+            # Get the specified embedding file
+            numberbatch = nlp.embedding.TokenEmbedding.from_file(file_path=temp_file, elem_delim=' ')
+            # Attach embeddings to the vocabulary
+            vocabulary.set_embedding(numberbatch)
+
+            # Check desired embedding dimensions is valid
+            if len(vocabulary.embedding[0]) != embedding_dim:
+                raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
+                                 "' does not match specified embedding dimensions: '" + str(embedding_dim) + "'.")
+
+            # Generate empty numpy matrix of shape (vocabulary_size, embedding_dim)
+            matrix = np.empty((len(vocabulary), embedding_dim), dtype='float32')
+
+            # Copy vocabulary embeddings into matrix
+            for i in range(len(vocabulary)):
+                embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
+                matrix[i] = embedding
+
+        return matrix
+
+
+class Dependency(EmbeddingProcessor):
+    """Generates Dependency-based embeddings matrix.
+    Levy, O., & Goldberg, Y. (2014). Dependency-Based Word Embeddings.
+    Proceedings Ofthe 52nd Annual Meeting Ofthe Association for Computational Linguistics, 302–308.
+
+    Embedding source available from: https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/
+
+    Valid FastText source files:
+    'deps'
+    """
+
+    def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
+
+        valid_source_files = ['deps']
+
+        source_file = os.path.join(embedding_dir, 'dependency', embedding_source + '.words.bz2')
+
+        # Check source file is valid
+        if embedding_source not in valid_source_files or not os.path.exists(source_file):
+            raise Exception("The given embedding source file: '" + embedding_source + "' is not valid!\n" +
+                            "Please select one from: " + str(valid_source_files))
+
+        # Create a temporary directory
+        with tempfile.TemporaryDirectory(dir=embedding_dir) as tmp_dir:
+            temp_file = os.path.join(tmp_dir, 'temp')
+
+            # Unzip and copy to temp directory
+            with bz2.BZ2File(source_file) as file_in, open(temp_file, "wb") as file_out:
+                shutil.copyfileobj(file_in, file_out)
+
+            # Get the specified embedding file
+            dependency = nlp.embedding.TokenEmbedding.from_file(file_path=temp_file, elem_delim=' ')
+            # Attach embeddings to the vocabulary
+            vocabulary.set_embedding(dependency)
+
+            # Check desired embedding dimensions is valid
+            if len(vocabulary.embedding[0]) != embedding_dim:
+                raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
+                                 "' does not match specified embedding dimensions: '" + str(embedding_dim) + "'.")
+
+            # Generate empty numpy matrix of shape (vocabulary_size, embedding_dim)
+            matrix = np.empty((len(vocabulary), embedding_dim), dtype='float32')
+
+            # Copy vocabulary embeddings into matrix
+            for i in range(len(vocabulary)):
+                embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
+                matrix[i] = embedding
 
         return matrix
