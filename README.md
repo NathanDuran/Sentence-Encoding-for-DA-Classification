@@ -3,10 +3,15 @@
 # TODO
 
 - models
-- Add second dense layer to classification layers???
+- Add second dense layer to classification layers??? Time distributed?
 - could half units in lstm and train for longer?
 
-- Deep bi lstm
+- GRU?
+- Recurrent convolutional
+- rnnlm
+- document context language model
+- elmo
+- bert
 
-
+- Visualising attention layers
 - Save train/test history + predictions?

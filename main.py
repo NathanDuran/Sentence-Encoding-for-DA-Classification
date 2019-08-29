@@ -16,14 +16,14 @@ import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.logging.set_verbosity(tf.logging.ERROR)
 # Disable GPU
-# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm',
-                     'model_name': 'lstm',
+                     'experiment_name': 'bi_lstm_attn',
+                     'model_name': 'bi_lstm_attn',
                      'training': True,
                      'testing': True,
                      'save_model': False,

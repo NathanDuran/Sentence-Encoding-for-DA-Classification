@@ -1,6 +1,5 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-from layers import attention_with_context
 
 
 def get_model(model_name):
@@ -19,8 +18,11 @@ def get_model(model_name):
               'lstm': LSTM(),
               'lstm_attn': LSTMAttn(),
               'deep_lstm': DeepLSTM(),
+              'deep_lstm_attn': DeepLSTMAttn(),
               'bi_lstm': BiLSTM(),
               'bi_lstm_attn': BiLSTMAttn(),
+              'deep_bi_lstm': DeepBiLSTM(),
+              'deep_bi_lstm_attn': DeepBiLSTMAttn(),
               'nnlm': NeuralNetworkLanguageModel()}
 
     if model_name.lower() not in models.keys():
@@ -340,37 +342,109 @@ class DeepLSTM(Model):
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
         # Define model
-        inputs = tf.keras.Input(shape=input_shape, name='input_layer')
+        inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
-                                      trainable=train_embeddings,
-                                      name='embedding_layer')(inputs)
+                                      trainable=train_embeddings)(inputs)
 
-        # for i in range(num_lstm_layers):
-        #     # If a GPU is available use the CUDA layer
-        #     if tf.test.is_gpu_available():
-        #         x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(x)
-        #     else:
-        #         x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
-        #                                           dropout=lstm_dropout,
-        #                                           recurrent_dropout=recurrent_dropout,
-        #                                           return_sequences=True)(x)
+        for i in range(num_lstm_layers):
+            # If a GPU is available use the CUDA layer
+            if tf.test.is_gpu_available():
+                x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(x)
+            else:
+                x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                         dropout=lstm_dropout,
+                                         recurrent_dropout=recurrent_dropout,
+                                         return_sequences=True)(x)
 
-        l1, h1, c1 = tf.keras.layers.CuDNNLSTM(128, return_sequences=True, return_state=True)(x)
-        l2, h2, c2 = tf.keras.layers.CuDNNLSTM(128, return_sequences=True, return_state=True)(l1)
-        l3, h3, c3 = tf.keras.layers.CuDNNLSTM(128, return_sequences=True, return_state=True)(l2)
+        x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
-        x = tf.keras.layers.GlobalMaxPooling1D(name='global_pool')(l3)
-        c = tf.keras.layers.Concatenate()([x, h1, h2, h3])
-        d = tf.keras.layers.Dense(256, activation=dense_activation, name='dense_1')(c)
-        d = tf.keras.layers.Dropout(dropout_rate)(d)
-        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(d)
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+        return model
+
+
+class DeepLSTMAttn(Model):
+    def __init__(self, name='DeepLSTMAttn'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 3
+        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
+        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Determine attention type
+        if attention_type is 'dot':
+            attention_layer = tf.keras.layers.Attention()
+        else:
+            attention_layer = tf.keras.layers.AdditiveAttention()
+
+        # Define lstm encoder model
+        lstm_input = tf.keras.Input(shape=(input_shape[0], embedding_matrix.shape[1]))
+        # Create the first lstm layer, if a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available():
+            lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(lstm_input)
+        else:
+            lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                              dropout=lstm_dropout,
+                                              recurrent_dropout=recurrent_dropout,
+                                              return_sequences=True)(lstm_input)
+        for i in range(num_lstm_layers):
+            if tf.test.is_gpu_available():
+                lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(lstm_layer)
+            else:
+                lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                                  dropout=lstm_dropout,
+                                                  recurrent_dropout=recurrent_dropout,
+                                                  return_sequences=True)(lstm_layer)
+        lstm_layers = tf.keras.Model(inputs=lstm_input, outputs=lstm_layer, name='lstm_layers')
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              input_length=input_shape[0],  # Max seq length
+                                              trainable=train_embeddings)
+
+        # Create query and value embeddings
+        query_embedding = embedding(inputs)
+        value_embeddings = embedding(inputs)
+
+        # Pass through encoding layer
+        query_seq_encoding = lstm_layers(query_embedding)
+        value_seq_encoding = lstm_layers(value_embeddings)
+
+        # Query-value attention
+        query_value_attention_seq = attention_layer([query_seq_encoding, value_seq_encoding])
+
+        # Pool attention and encoder outputs
+        query_encoding = tf.keras.layers.GlobalAveragePooling1D()(query_seq_encoding)
+        query_value_attention = tf.keras.layers.GlobalAveragePooling1D()(query_value_attention_seq)
+
+        # Concatenate query and encodings
+        concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
@@ -383,14 +457,13 @@ class BiLSTM(Model):
         self.name = name
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
-
         # Unpack key word arguments
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
         # If a GPU is available use the CUDA layer
@@ -403,15 +476,14 @@ class BiLSTM(Model):
                                               return_sequences=True)
 
         # Define model
-        inputs = tf.keras.Input(shape=input_shape, name='input_layer')
+        inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
-                                      trainable=train_embeddings,
-                                      name='embedding_layer')(inputs)
+                                      trainable=train_embeddings)(inputs)
         x = tf.keras.layers.Bidirectional(lstm_layer)(x)
-        x = tf.keras.layers.GlobalMaxPooling1D(name='global_pool')(x)
+        x = tf.keras.layers.GlobalMaxPooling1D()(x)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -422,19 +494,85 @@ class BiLSTM(Model):
 
 
 class BiLSTMAttn(Model):
-    def __init__(self, name='BiLSTM'):
+    def __init__(self, name='BiLSTMAttn'):
         super().__init__(name)
         self.name = name
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
-
         # Unpack key word arguments
+        attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Determine attention type
+        if attention_type is 'dot':
+            attention_layer = tf.keras.layers.Attention()
+        else:
+            attention_layer = tf.keras.layers.AdditiveAttention()
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available():
+            lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True))
+        else:
+            lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                                                            dropout=lstm_dropout,
+                                                                            recurrent_dropout=recurrent_dropout,
+                                                                            return_sequences=True))
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              input_length=input_shape[0],  # Max seq length
+                                              trainable=train_embeddings)
+
+        # Create query and value embeddings
+        query_embedding = embedding(inputs)
+        value_embeddings = embedding(inputs)
+
+        # Pass through encoding layer
+        query_seq_encoding = lstm_layer(query_embedding)
+        value_seq_encoding = lstm_layer(value_embeddings)
+
+        # Query-value attention
+        query_value_attention_seq = attention_layer([query_seq_encoding, value_seq_encoding])
+
+        # Pool attention and encoder outputs
+        query_encoding = tf.keras.layers.GlobalAveragePooling1D()(query_seq_encoding)
+        query_value_attention = tf.keras.layers.GlobalAveragePooling1D()(query_value_attention_seq)
+
+        # Concatenate query and encodings
+        concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+        return model
+
+
+class DeepBiLSTM(Model):
+    def __init__(self, name='DeepBiLSTM'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 3
+        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
+        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
         # If a GPU is available use the CUDA layer
@@ -447,16 +585,99 @@ class BiLSTMAttn(Model):
                                               return_sequences=True)
 
         # Define model
-        inputs = tf.keras.Input(shape=input_shape, name='input_layer')
+        inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
-                                      trainable=train_embeddings,
-                                      name='embedding_layer')(inputs)
-        x = tf.keras.layers.Bidirectional(lstm_layer)(x)
-        x = attention_with_context.AttentionWithContext(name='attention')(x)
+                                      trainable=train_embeddings)(inputs)
+
+        for i in range(num_lstm_layers):
+            x = tf.keras.layers.Bidirectional(lstm_layer)(x)
+
+        x = tf.keras.layers.GlobalMaxPooling1D()(x)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+        return model
+
+
+class DeepBiLSTMAttn(Model):
+    def __init__(self, name='DeepBiLSTMAttn'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 3
+        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
+        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Determine attention type
+        if attention_type is 'dot':
+            attention_layer = tf.keras.layers.Attention()
+        else:
+            attention_layer = tf.keras.layers.AdditiveAttention()
+
+        # Define lstm encoder model
+        lstm_input = tf.keras.Input(shape=(input_shape[0], embedding_matrix.shape[1]))
+        # Create the first lstm layer, if a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available():
+            lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNLSTM(lstm_units,
+                                                                                 return_sequences=True))(lstm_input)
+        else:
+            lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                                                            dropout=lstm_dropout,
+                                                                            recurrent_dropout=recurrent_dropout,
+                                                                            return_sequences=True))(lstm_input)
+        for i in range(num_lstm_layers):
+            # If a GPU is available use the CUDA layer
+            if tf.test.is_gpu_available():
+                lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNLSTM(lstm_units,
+                                                                                     return_sequences=True))(lstm_layer)
+            else:
+                lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                                                                dropout=lstm_dropout,
+                                                                                recurrent_dropout=recurrent_dropout,
+                                                                                return_sequences=True))(lstm_layer)
+        lstm_layers = tf.keras.Model(inputs=lstm_input, outputs=lstm_layer, name='lstm_layers')
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              input_length=input_shape[0],  # Max seq length
+                                              trainable=train_embeddings)
+
+        # Create query and value embeddings
+        query_embedding = embedding(inputs)
+        value_embeddings = embedding(inputs)
+
+        # Pass through encoding layer
+        query_seq_encoding = lstm_layers(query_embedding)
+        value_seq_encoding = lstm_layers(value_embeddings)
+
+        # Query-value attention
+        query_value_attention_seq = attention_layer([query_seq_encoding, value_seq_encoding])
+
+        # Pool attention and encoder outputs
+        query_encoding = tf.keras.layers.GlobalAveragePooling1D()(query_seq_encoding)
+        query_value_attention = tf.keras.layers.GlobalAveragePooling1D()(query_value_attention_seq)
+
+        # Concatenate query and encodings
+        concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 

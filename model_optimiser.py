@@ -17,8 +17,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_opt',
-                     'model_name': 'lstm',
+                     'experiment_name': 'cnn_attn_opt',
+                     'model_name': 'cnn_attn',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,

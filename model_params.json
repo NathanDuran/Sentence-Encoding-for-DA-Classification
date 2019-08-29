@@ -22,7 +22,7 @@
     "learning_rate": 0.002,
     "optimiser": "adam",
     "num_filters": 64,
-    "kernel_size": [1, 2, 3, 5],
+    "kernel_size": [1, 2, 3, 4, 5],
     "pool_size": 8,
     "dropout_rate": 0.1,
     "dense_units": 128
@@ -51,27 +51,60 @@
     "optimiser": "rmsprop",
     "num_lstm_layers": 3,
     "lstm_units": 256,
-    "lstm_dropout": 0.0,
-    "recurrent_dropout": 0.0,
-    "dropout_rate": 0.05,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
+    "dense_units": 128
+  },
+    "deep_lstm_attn": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "attention_type": "add",
+    "num_lstm_layers": 3,
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
     "dense_units": 128
   },
     "bi_lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
-    "lstm_units": 128,
-    "lstm_dropout": 0.0,
-    "recurrent_dropout": 0.0,
-    "dropout_rate": 0.05,
-    "dense_units": 100
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
+    "dense_units": 128
   },
     "bi_lstm_attn": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
-    "lstm_units": 128,
-    "lstm_dropout": 0.0,
-    "recurrent_dropout": 0.0,
-    "dropout_rate": 0.05,
-    "dense_units": 100
+    "attention_type": "add",
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
+    "dense_units": 128
+  },
+  "deep_bi_lstm": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "num_lstm_layers": 3,
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
+    "dense_units": 128
+  },
+    "deep_bi_lstm_attn": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "attention_type": "add",
+    "num_lstm_layers": 3,
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
+    "dense_units": 128
   }
 }
