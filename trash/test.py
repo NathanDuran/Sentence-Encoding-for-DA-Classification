@@ -78,29 +78,52 @@ import numpy as np
 #         (str(x) for x in message_embedding[:3]))
 #     print("Embedding: [{}, ...]\n".format(message_embedding_snippet))
 
-tf.enable_eager_execution()
-sentences = ["A long sentence.", "single-word", "http://example.com"]
-sent_tensors = tf.convert_to_tensor(sentences)
+# tf.enable_eager_execution()
+# sentences = ["A long sentence.", "single-word", "http://example.com"]
+# sent_tensors = tf.convert_to_tensor(sentences)
+#
+# # module_url = "https://tfhub.dev/google/universal-sentence-encoder-large/3"
+# # hub_module = hub.load(module_url, tags=[])
+# # embed = hub.KerasLayer(hub_module.signatures["default"], input_shape=[], dtype=tf.string, trainable=False)
+#
+# module_url = "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
+# embed = hub.KerasLayer(module_url, input_shape=[], dtype=tf.string, trainable=False)
+#
+# embeddings = embed(sentences)
+# print(embeddings.shape)  # (3,128)
+#
+# model = tf.keras.Sequential()
+# model.add(embed)
+# model.add(tf.keras.layers.Dense(16, activation='relu'))
+# model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
+#
+# model.summary()
+#
+# model.compile(optimizer='adam',
+#               loss='binary_crossentropy',
+#               metrics=['accuracy'])
+#
+# model.fit(x=sent_tensors, y=[1,0,1], epochs=2)
 
-# module_url = "https://tfhub.dev/google/universal-sentence-encoder-large/3"
-# hub_module = hub.load(module_url, tags=[])
-# embed = hub.KerasLayer(hub_module.signatures["default"], input_shape=[], dtype=tf.string, trainable=False)
+from bert_embedding import BertEmbedding
+sentences = ["This is a sentences.", "This is also a sentence.", "This different."]
+bert_embedding = BertEmbedding()
+result = bert_embedding(sentences)
 
-module_url = "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
-embed = hub.KerasLayer(module_url, input_shape=[], dtype=tf.string, trainable=False)
+first_sentence = np.asarray(result[0])
+second_sentence = np.asarray(result[1])
 
-embeddings = embed(sentences)
-print(embeddings.shape)  # (3,128)
+print(first_sentence.shape)
+print(len(first_sentence[1]))
+# print(first_sentence[0])
 
-model = tf.keras.Sequential()
-model.add(embed)
-model.add(tf.keras.layers.Dense(16, activation='relu'))
-model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
+first_token_in_first_sentence = first_sentence[1][0]
+first_token_in_second_sentence = second_sentence[1][0]
+print(first_sentence[0][0])
+print(second_sentence[0][0])
+if np.array_equal(first_token_in_first_sentence, first_token_in_second_sentence):
+    print("!!!Equal")
+print(first_token_in_first_sentence)
+print(first_token_in_second_sentence)
 
-model.summary()
 
-model.compile(optimizer='adam',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
-
-model.fit(x=sent_tensors, y=[1,0,1], epochs=2)

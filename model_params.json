@@ -6,7 +6,17 @@
     "kernel_size": 5,
     "pool_size": 8,
     "dropout_rate": 0.27,
-    "dense_units": 225
+    "dense_units": 224
+  },
+    "cnn_attn": {
+    "learning_rate": 0.002,
+    "optimiser": "adam",
+    "attention_type": "add",
+    "num_filters": 64,
+    "kernel_size": 5,
+    "pool_size": 8,
+    "dropout_rate": 0.27,
+    "dense_units": 224
   },
     "text_cnn": {
     "learning_rate": 0.002,
@@ -21,18 +31,19 @@
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
     "lstm_units": 256,
-    "lstm_dropout": 0.0,
-    "recurrent_dropout": 0.0,
-    "dropout_rate": 0.05,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
     "dense_units": 128
   },
     "lstm_attn": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
+    "attention_type": "add",
     "lstm_units": 256,
-    "lstm_dropout": 0.0,
-    "recurrent_dropout": 0.0,
-    "dropout_rate": 0.05,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
     "dense_units": 128
   },
     "deep_lstm": {

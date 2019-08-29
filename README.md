@@ -3,9 +3,10 @@
 # TODO
 
 - models
-- Add time distributed to lstm?
+- Add second dense layer to classification layers???
+- could half units in lstm and train for longer?
+
 - Deep bi lstm
 
-- add embedding types
 
 - Save train/test history + predictions?

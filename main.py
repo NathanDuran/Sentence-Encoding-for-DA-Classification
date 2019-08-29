@@ -17,11 +17,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.logging.set_verbosity(tf.logging.ERROR)
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_deps',
+                     'experiment_name': 'lstm',
                      'model_name': 'lstm',
                      'training': True,
                      'testing': True,
@@ -33,9 +34,9 @@ experiment_params = {'task_name': 'swda',
                      'evaluate_steps': 500,
                      'vocab_size': 10000,
                      'max_seq_length': 128,
-                     'embedding_dim': 300,
-                     'embedding_type': 'deps',
-                     'embedding_source': 'deps'}
+                     'embedding_dim': 50,
+                     'embedding_type': 'glove',
+                     'embedding_source': 'glove.6B.50d'}
 
 # Load model params if file exists otherwise defaults will be used
 model_param_file = 'model_params.json'
