@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from keras import backend as K
 import keras.layers as layers
-from keras.models import Model, load_model
+from keras.models import Model
 from layers.elmo_embedding_layer import ElmoEmbeddingLayer
 
 
@@ -37,7 +37,7 @@ def get_model(model_name):
         return models[model_name]
 
 
-class ModelWrapper(object):
+class BaseModel(object):
     """Model abstract class."""
 
     def __init__(self, name='model'):
@@ -84,7 +84,7 @@ class ModelWrapper(object):
         raise NotImplementedError()
 
 
-class CNN(ModelWrapper):
+class CNN(BaseModel):
     def __init__(self, name='CNN_1D'):
         super().__init__(name)
         self.name = name
@@ -119,7 +119,7 @@ class CNN(ModelWrapper):
         return model
 
 
-class CNNAttn(ModelWrapper):
+class CNNAttn(BaseModel):
     def __init__(self, name='CNN_1D'):
         super().__init__(name)
         self.name = name
@@ -183,7 +183,7 @@ class CNNAttn(ModelWrapper):
         return model
 
 
-class TextCNN(ModelWrapper):
+class TextCNN(BaseModel):
     """Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
     Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)
     """
@@ -227,7 +227,7 @@ class TextCNN(ModelWrapper):
         return model
 
 
-class LSTM(ModelWrapper):
+class LSTM(BaseModel):
     def __init__(self, name='LSTM'):
         super().__init__(name)
         self.name = name
@@ -268,7 +268,7 @@ class LSTM(ModelWrapper):
         return model
 
 
-class LSTMAttn(ModelWrapper):
+class LSTMAttn(BaseModel):
     def __init__(self, name='LSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -334,7 +334,7 @@ class LSTMAttn(ModelWrapper):
         return model
 
 
-class DeepLSTM(ModelWrapper):
+class DeepLSTM(BaseModel):
     def __init__(self, name='DeepLSTM'):
         super().__init__(name)
         self.name = name
@@ -378,7 +378,7 @@ class DeepLSTM(ModelWrapper):
         return model
 
 
-class DeepLSTMAttn(ModelWrapper):
+class DeepLSTMAttn(BaseModel):
     def __init__(self, name='DeepLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -456,7 +456,7 @@ class DeepLSTMAttn(ModelWrapper):
         return model
 
 
-class BiLSTM(ModelWrapper):
+class BiLSTM(BaseModel):
     def __init__(self, name='BiLSTM'):
         super().__init__(name)
         self.name = name
@@ -498,7 +498,7 @@ class BiLSTM(ModelWrapper):
         return model
 
 
-class BiLSTMAttn(ModelWrapper):
+class BiLSTMAttn(BaseModel):
     def __init__(self, name='BiLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -564,7 +564,7 @@ class BiLSTMAttn(ModelWrapper):
         return model
 
 
-class DeepBiLSTM(ModelWrapper):
+class DeepBiLSTM(BaseModel):
     def __init__(self, name='DeepBiLSTM'):
         super().__init__(name)
         self.name = name
@@ -610,7 +610,7 @@ class DeepBiLSTM(ModelWrapper):
         return model
 
 
-class DeepBiLSTMAttn(ModelWrapper):
+class DeepBiLSTMAttn(BaseModel):
     def __init__(self, name='DeepBiLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -691,9 +691,8 @@ class DeepBiLSTMAttn(ModelWrapper):
         return model
 
 
-class Elmo(ModelWrapper):
-    """ Uses an elmo embedding layer from tensorflow hub.
-
+class Elmo(BaseModel):
+    """ Uses an elmo from tensorflow hub as embedding layer from:
     https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb
     """
 
@@ -708,7 +707,7 @@ class Elmo(ModelWrapper):
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
-        inputs = layers.Input(shape=(1,), dtype="string")
+        inputs = layers.Input(shape=input_shape, dtype="string")
         embedding = ElmoEmbeddingLayer()(inputs)
         x = layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = layers.Dropout(dropout_rate)(x)
@@ -717,8 +716,7 @@ class Elmo(ModelWrapper):
         model = Model(inputs=[inputs], outputs=outputs)
         return model
 
-
-class NeuralNetworkLanguageModel(ModelWrapper):
+class NeuralNetworkLanguageModel(BaseModel):
     """Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
     Journal of Machine Learning Research, 3:1137-1155, 2003.
     """

@@ -6,10 +6,9 @@ from comet_ml import Experiment
 from metrics import *
 import models
 import data_processor
-import embedding_processor
-import optimisers
 import checkpointer
 import tensorflow as tf
+import keras
 import numpy as np
 
 # Suppress TensorFlow debugging
@@ -59,7 +58,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -159,10 +158,10 @@ else:
         print("{}: {}".format(key, value))
 
 # Create optimiser
-optimiser = optimisers.get_optimiser(optimiser_type=optimiser_type, lr=learning_rate, **model_params)
+optimiser = keras.optimizers.Adam(lr=learning_rate)
 
 # Compile the model
-model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
 
 # Display a model summary and create/save a model graph definition and image
 model.summary()
