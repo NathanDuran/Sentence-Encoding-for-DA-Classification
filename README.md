@@ -10,7 +10,7 @@
 - Recurrent convolutional
 - rnnlm
 - document context language model
-- elmo
+- elmo (try 'elmo' instead of deafult?) + elmo attention? More layers?
 - bert
 
 - Visualising attention layers

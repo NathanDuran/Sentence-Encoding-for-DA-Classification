@@ -299,22 +299,26 @@ class DataProcessor:
             metadata = pickle.load(file)
         return metadata['vocabulary']
 
-    def get_dataset(self):
+    def get_dataset(self, to_numpy=False):
         """Helper function. Gets the metadata and all datasets from the Github repository and saves to file."""
 
         vocabulary, labels = self.get_metadata()
 
         train_examples = self.get_train_examples()
-        self.convert_examples_to_record('train', train_examples, vocabulary, labels)
-
         test_examples = self.get_test_examples()
-        self.convert_examples_to_record('test', test_examples, vocabulary, labels)
-
         val_examples = self.get_val_examples()
-        self.convert_examples_to_record('val', val_examples, vocabulary, labels)
-
         dev_examples = self.get_dev_examples()
-        self.convert_examples_to_record('dev', dev_examples, vocabulary, labels)
+
+        if to_numpy:
+            self.convert_examples_to_numpy('train', train_examples, vocabulary, labels)
+            self.convert_examples_to_numpy('test', test_examples, vocabulary, labels)
+            self.convert_examples_to_numpy('val', val_examples, vocabulary, labels)
+            self.convert_examples_to_numpy('dev', dev_examples, vocabulary, labels)
+        else:
+            self.convert_examples_to_record('train', train_examples, vocabulary, labels)
+            self.convert_examples_to_record('test', test_examples, vocabulary, labels)
+            self.convert_examples_to_record('val', val_examples, vocabulary, labels)
+            self.convert_examples_to_record('dev', dev_examples, vocabulary, labels)
 
     def convert_examples_to_record(self, set_type, examples, vocabulary, labels):
         """Converts InputExamples to features and saves as TFRecord file.
@@ -384,6 +388,62 @@ class DataProcessor:
 
             writer.write(serialized_example)
 
+    def convert_examples_to_numpy(self, set_type, examples, vocabulary, labels):
+        """Converts InputExamples to features and saves as .npz file.
+
+        if to_tokens is True
+            Tokenizes all text and strips whitespace.
+            Converts to lowercase if to_lower=True.
+            Removes punctuation if no_punct=True.
+            Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
+            Converts sentence tokens to indices.
+
+        Converts labels to indices.
+
+        Saves as .npz file.
+
+         Args:
+            set_type (str): Specifies if this is the training, validation or test data
+            examples (list): List of InputExamples
+            vocabulary (Gluonnlp Vocab): Datasets vocabulary
+            labels (list): Datasets labels list
+        """
+
+        print("Creating " + set_type + ".npz...")
+        examples_text = []
+        examples_labels = []
+        # Process each example and save to file
+        for example in examples:
+
+            if self.to_tokens:
+                # Tokenize, convert to lowercase and remove punctuation
+                tokens = tokenizer(example.text)
+                if self.no_punct:
+                    tokens = [token for token in tokens if not token.is_punct]
+                if self.to_lower:
+                    tokens = [token.orth_.lower() for token in tokens]
+                else:
+                    tokens = [token.orth_ for token in tokens]
+
+                # Pad/truncate sequences to max_sequence_length (0 = <unk> token in vocabulary)
+                if self.pad_seq:
+                    tokens = [tokens[i] if i < len(tokens) else '<unk>' for i in range(self.max_seq_length)]
+
+                # Convert word and label tokens to indices
+                example.text = [vocabulary.token_to_idx[token] for token in tokens]
+
+            # Convert labels to indices
+            example.label = [labels.index(example.label)]
+
+            # convert to numpy
+            examples_text.append(example.text)
+            examples_labels.append(example.label)
+
+        # Save to npz
+        examples_text = np.asarray(examples_text)
+        examples_labels = np.asarray(examples_labels)
+        np.savez_compressed(os.path.join(self.output_dir, set_type), text=examples_text, labels=examples_labels)
+
     def build_dataset_from_record(self, set_type, batch_size, repeat=None, is_training=True, drop_remainder=False):
         """Creates an iterable dataset from the specified TFRecord File
         
@@ -417,8 +477,7 @@ class DataProcessor:
         # Get the dataset from the TFRecord file
         dataset = tf.data.TFRecordDataset(os.path.join(self.output_dir, set_type + ".tf_record"))
 
-        # For training, we want a lot of parallel reading and shuffling.
-        # For testing, we want no shuffling and parallel reading doesn't matter.
+        # For training, shuffle the data
         if is_training:
             dataset = dataset.shuffle(buffer_size=1000)
         dataset = dataset.repeat(repeat)
@@ -426,6 +485,45 @@ class DataProcessor:
         dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
 
         return dataset
+
+    def build_dataset_from_numpy(self, set_type, batch_size, is_training=True):
+        """Creates an numpy dataset from the specified .npz File
+
+        Args:
+            set_type (str): Specifies if this is the training, validation or test data
+            batch_size (int): The number of examples per batch
+            is_training (bool): Flag determines if training set is shuffled
+
+        Returns:
+            text (np.array): Numpy array of input text
+            labels (np.array: Numpy array of target labels
+        """
+
+        # Get the dataset from the .npz file
+        dataset = np.load(os.path.join(self.output_dir, set_type + ".npz"))
+        text = dataset['text']
+        labels = dataset['labels']
+
+        # For training, shuffle the data
+        if is_training:
+            combined = list(zip(text, labels))
+            np.random.shuffle(combined)
+            text, labels = zip(*combined)
+            text = np.asarray(text)
+            labels = np.asarray(labels)
+
+        def batch(input_arr, n):
+            """Yield successive n-size chunks from input_arr."""
+            for i in range(0, len(input_arr), n):
+                yield input_arr[i:i + n]
+
+        # Batch data
+        text = list(batch(text, batch_size))
+        labels = list(batch(labels, batch_size))
+        text = np.asarray(text)
+        labels = np.asarray(labels)
+
+        return text, labels
 
 
 def to_one_hot(label, labels):

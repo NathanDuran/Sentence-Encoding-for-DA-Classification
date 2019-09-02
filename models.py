@@ -1,5 +1,9 @@
 import tensorflow as tf
 import tensorflow_hub as hub
+from keras import backend as K
+import keras.layers as layers
+from keras.models import Model, load_model
+from layers.elmo_embedding_layer import ElmoEmbeddingLayer
 
 
 def get_model(model_name):
@@ -23,6 +27,7 @@ def get_model(model_name):
               'bi_lstm_attn': BiLSTMAttn(),
               'deep_bi_lstm': DeepBiLSTM(),
               'deep_bi_lstm_attn': DeepBiLSTMAttn(),
+              'elmo': Elmo(),
               'nnlm': NeuralNetworkLanguageModel()}
 
     if model_name.lower() not in models.keys():
@@ -32,7 +37,7 @@ def get_model(model_name):
         return models[model_name]
 
 
-class Model(object):
+class ModelWrapper(object):
     """Model abstract class."""
 
     def __init__(self, name='model'):
@@ -79,7 +84,7 @@ class Model(object):
         raise NotImplementedError()
 
 
-class CNN(Model):
+class CNN(ModelWrapper):
     def __init__(self, name='CNN_1D'):
         super().__init__(name)
         self.name = name
@@ -114,7 +119,7 @@ class CNN(Model):
         return model
 
 
-class CNNAttn(Model):
+class CNNAttn(ModelWrapper):
     def __init__(self, name='CNN_1D'):
         super().__init__(name)
         self.name = name
@@ -178,7 +183,7 @@ class CNNAttn(Model):
         return model
 
 
-class TextCNN(Model):
+class TextCNN(ModelWrapper):
     """Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
     Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)
     """
@@ -222,7 +227,7 @@ class TextCNN(Model):
         return model
 
 
-class LSTM(Model):
+class LSTM(ModelWrapper):
     def __init__(self, name='LSTM'):
         super().__init__(name)
         self.name = name
@@ -263,7 +268,7 @@ class LSTM(Model):
         return model
 
 
-class LSTMAttn(Model):
+class LSTMAttn(ModelWrapper):
     def __init__(self, name='LSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -329,7 +334,7 @@ class LSTMAttn(Model):
         return model
 
 
-class DeepLSTM(Model):
+class DeepLSTM(ModelWrapper):
     def __init__(self, name='DeepLSTM'):
         super().__init__(name)
         self.name = name
@@ -338,7 +343,7 @@ class DeepLSTM(Model):
         # Unpack key word arguments
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
-        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 3
+        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -373,7 +378,7 @@ class DeepLSTM(Model):
         return model
 
 
-class DeepLSTMAttn(Model):
+class DeepLSTMAttn(ModelWrapper):
     def __init__(self, name='DeepLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -383,7 +388,7 @@ class DeepLSTMAttn(Model):
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
-        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 3
+        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -451,7 +456,7 @@ class DeepLSTMAttn(Model):
         return model
 
 
-class BiLSTM(Model):
+class BiLSTM(ModelWrapper):
     def __init__(self, name='BiLSTM'):
         super().__init__(name)
         self.name = name
@@ -493,7 +498,7 @@ class BiLSTM(Model):
         return model
 
 
-class BiLSTMAttn(Model):
+class BiLSTMAttn(ModelWrapper):
     def __init__(self, name='BiLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -559,7 +564,7 @@ class BiLSTMAttn(Model):
         return model
 
 
-class DeepBiLSTM(Model):
+class DeepBiLSTM(ModelWrapper):
     def __init__(self, name='DeepBiLSTM'):
         super().__init__(name)
         self.name = name
@@ -568,7 +573,7 @@ class DeepBiLSTM(Model):
         # Unpack key word arguments
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
-        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 3
+        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -605,7 +610,7 @@ class DeepBiLSTM(Model):
         return model
 
 
-class DeepBiLSTMAttn(Model):
+class DeepBiLSTMAttn(ModelWrapper):
     def __init__(self, name='DeepBiLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -615,7 +620,7 @@ class DeepBiLSTMAttn(Model):
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
-        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 3
+        num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -686,7 +691,34 @@ class DeepBiLSTMAttn(Model):
         return model
 
 
-class NeuralNetworkLanguageModel(Model):
+class Elmo(ModelWrapper):
+    """ Uses an elmo embedding layer from tensorflow hub.
+
+    https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb
+    """
+
+    def __init__(self, name='Elmo'):
+        super().__init__(name)
+        self.name = name
+        self.module_url = "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
+
+        inputs = layers.Input(shape=(1,), dtype="string")
+        embedding = ElmoEmbeddingLayer()(inputs)
+        x = layers.Dense(dense_units, activation=dense_activation)(embedding)
+        x = layers.Dropout(dropout_rate)(x)
+        outputs = layers.Dense(output_shape, activation='sigmoid')(x)
+
+        model = Model(inputs=[inputs], outputs=outputs)
+        return model
+
+
+class NeuralNetworkLanguageModel(ModelWrapper):
     """Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
     Journal of Machine Learning Research, 3:1137-1155, 2003.
     """

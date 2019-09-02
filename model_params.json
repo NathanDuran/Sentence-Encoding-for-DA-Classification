@@ -49,7 +49,7 @@
     "deep_lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
-    "num_lstm_layers": 3,
+    "num_lstm_layers": 2,
     "lstm_units": 256,
     "lstm_dropout": 0.2,
     "recurrent_dropout": 0.1,
@@ -60,7 +60,7 @@
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
     "attention_type": "add",
-    "num_lstm_layers": 3,
+    "num_lstm_layers": 2,
     "lstm_units": 256,
     "lstm_dropout": 0.2,
     "recurrent_dropout": 0.1,
@@ -89,7 +89,7 @@
   "deep_bi_lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
-    "num_lstm_layers": 3,
+    "num_lstm_layers": 2,
     "lstm_units": 256,
     "lstm_dropout": 0.2,
     "recurrent_dropout": 0.1,
@@ -100,11 +100,17 @@
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
     "attention_type": "add",
-    "num_lstm_layers": 3,
+    "num_lstm_layers": 2,
     "lstm_units": 256,
     "lstm_dropout": 0.2,
     "recurrent_dropout": 0.1,
     "dropout_rate": 0.02,
     "dense_units": 128
+  },
+  "elmo": {
+    "learning_rate": 0.001,
+    "optimiser": "adam",
+    "dropout_rate": 0.02,
+    "dense_units": 256
   }
 }
