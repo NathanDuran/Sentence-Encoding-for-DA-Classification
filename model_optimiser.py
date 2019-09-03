@@ -20,8 +20,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_attn_opt',
-                     'model_name': 'lstm_attn',
+                     'experiment_name': 'deep_lstm_attn_opt',
+                     'model_name': 'deep_lstm_attn',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
@@ -121,7 +121,7 @@ for experiment in model_optimiser.get_experiments():
     print("Created data sets and embeddings...")
     print("Vocabulary size: " + str(vocab_size))
     print("Maximum sequence length: " + str(max_seq_length))
-    print("Using sequence tokens: " + to_tokens)
+    print("Using sequence tokens: " + str(to_tokens))
     print("Embedding dimension: " + str(embedding_dim))
     print("Embedding type: " + embedding_type)
     print("Embedding source: " + embedding_source)

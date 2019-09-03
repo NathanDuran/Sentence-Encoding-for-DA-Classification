@@ -19,12 +19,12 @@ class BertLayer(tf.keras.layers.Layer):
         # Sequence: output every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
         # Mean Sequence: Averaged sequence outpout with shape [batch_size, hidden_size]
         if self.pooling not in ["pool", "sequence", "mean_sequence"]:
-            raise NameError(f"BERT pooling type (must be either pool, sequence or mean_sequence but is {self.pooling}")
+            raise NameError("BERT pooling type (must be either pool, sequence or mean_sequence but is" + self.pooling)
 
         super(BertLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.bert = hub.Module(self.bert_path, trainable=self.trainable, name=f"{self.name}_module")
+        self.bert = hub.Module(self.bert_path, trainable=self.trainable, name="{}_module".format(self.name))
 
         # Remove unused layers_t
         trainable_vars = self.bert.variables
@@ -36,11 +36,11 @@ class BertLayer(tf.keras.layers.Layer):
             trainable_vars = [var for var in trainable_vars if not "/cls/" in var.name and not "/pooler/" in var.name]
             trainable_layers = []
         else:
-            raise NameError(f"BERT pooling type (must be either pool, sequence or mean_sequence but is {self.pooling}")
+            raise NameError("BERT pooling type (must be either pool, sequence or mean_sequence but is" + self.pooling)
 
         # Select how many layers_t to fine tune
         for i in range(self.n_fine_tune_layers):
-            trainable_layers.append(f"encoder/layer_{str(11 - i)}")
+            trainable_layers.append("encoder/layer_{}".format(str(11 - i)))
 
         # Update trainable vars to contain only the specified layers_t
         trainable_vars = [var for var in trainable_vars if any([l in var.name for l in trainable_layers])]
@@ -72,7 +72,7 @@ class BertLayer(tf.keras.layers.Layer):
             input_mask = tf.cast(input_mask, tf.float32)
             result = masked_reduce_mean(sequence, input_mask)
         else:
-            raise NameError(f"BERT pooling type (must be either pool, sequence or mean_sequence but is {self.pooling}")
+            raise NameError("BERT pooling type (must be either pool, sequence or mean_sequence but is" + self.pooling)
 
         return result
 
