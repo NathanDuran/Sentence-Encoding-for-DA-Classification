@@ -11,7 +11,7 @@
 - rnnlm
 - document context language model
 - elmo (try 'elmo' instead of default?) + elmo attention? More layers? 
-- bert
+- bert + attention? Different layers? 
 
 - Visualising attention layers
 - Save train/test history + predictions?

@@ -12,19 +12,23 @@ import tensorflow as tf
 # Suppress TensorFlow debugging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.logging.set_verbosity(tf.logging.ERROR)
+# Disable GPU
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'cnn_attn_opt',
-                     'model_name': 'cnn_attn',
+                     'experiment_name': 'lstm_attn_opt',
+                     'model_name': 'lstm_attn',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
                      'evaluate_steps': 500,
                      'vocab_size': 10000,
                      'max_seq_length': 128,
+                     'to_tokens': True,
                      'embedding_dim': 50,
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
@@ -42,7 +46,8 @@ with open(optimiser_config_file) as json_file:
 model_optimiser = Optimizer(optimiser_config, project_name=experiment_params['project_name'])
 
 # Data set and output paths
-dataset_dir = os.path.join(task_name, 'dataset')
+dataset_name = 'token_dataset' if experiment_params['to_tokens'] else 'text_dataset'
+dataset_dir = os.path.join(task_name, dataset_name)
 embeddings_dir = 'embeddings'
 
 # Create appropriate directories if they don't exist
@@ -69,12 +74,13 @@ print("Evaluate every steps: " + str(evaluate_steps))
 # Data set parameters
 vocab_size = experiment_params['vocab_size']
 max_seq_length = experiment_params['max_seq_length']
+to_tokens = experiment_params['to_tokens']
 embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset and embedding processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 embedding = embedding_processor.get_embedding_processor(embedding_type)
 
 # If dataset folder is empty get the metadata and datasets to TFRecords
@@ -103,19 +109,19 @@ for experiment in model_optimiser.get_experiments():
     for key, value in experiment_params.items():
         experiment.log_other(key, value)
 
-    # Build tensorflow datasets from TFRecord files
-    train_data = data_set.build_dataset_from_record('train', batch_size, repeat=num_epochs, is_training=True)
-    # train_data = data_set.build_dataset_from_record('dev', batch_size, repeat=num_epochs, is_training=True)
-    val_data = data_set.build_dataset_from_record('val', batch_size, repeat=num_epochs, is_training=False)
-
-    global_steps = int(len(list(train_data)))
-    train_steps = int(len(list(train_data)) / num_epochs)
-    val_steps = int(len(list(val_data)) / num_epochs)
+    # Build tensorflow datasets from .npz files
+    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
+    # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
+    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)
+    global_steps = int(len(list(train_text)) * num_epochs)
+    train_steps = int(len(list(train_text)))
+    val_steps = int(len(list(val_text)))
 
     print("------------------------------------")
     print("Created data sets and embeddings...")
-    print("Maximum sequence length: " + str(max_seq_length))
     print("Vocabulary size: " + str(vocab_size))
+    print("Maximum sequence length: " + str(max_seq_length))
+    print("Using sequence tokens: " + to_tokens)
     print("Embedding dimension: " + str(embedding_dim))
     print("Embedding type: " + embedding_type)
     print("Embedding source: " + embedding_source)
@@ -156,11 +162,11 @@ for experiment in model_optimiser.get_experiments():
         print("Epoch: {}/{}".format(epoch, num_epochs))
 
         with experiment.train():
-            for train_step, (train_text, train_labels) in enumerate(train_data.take(train_steps)):
+            for train_step in range(train_steps):
                 global_step += 1
 
                 # Perform training step on batch and record metrics
-                loss, accuracy = model.train_on_batch(train_text, train_labels)
+                loss, accuracy = model.train_on_batch(train_text[train_step], train_labels[train_step])
                 train_loss(loss)
                 train_accuracy(accuracy)
 
@@ -170,10 +176,10 @@ for experiment in model_optimiser.get_experiments():
                 # Every evaluate_steps evaluate model on validation set
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
                     with experiment.validate():
-                        for val_step, (val_text, val_labels) in enumerate(val_data.take(val_steps)):
+                        for val_step in range(val_steps):
 
                             # Perform evaluation step on batch and record metrics
-                            loss, accuracy = model.test_on_batch(val_text, val_labels)
+                            loss, accuracy = model.test_on_batch(val_text[val_step], val_labels[val_step])
                             val_loss(loss)
                             val_accuracy(accuracy)
 

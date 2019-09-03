@@ -35,6 +35,7 @@ experiment_params = {'task_name': 'swda',
                      'evaluate_steps': 500,
                      'vocab_size': 10000,
                      'max_seq_length': 128,
+                     'to_tokens': False,
                      'embedding_dim': 768,
                      'embedding_type': 'bert',
                      'embedding_source': 'bert'}
@@ -67,7 +68,8 @@ for key, value in experiment_params.items():
     experiment.log_other(key, value)
 
 # Data set and output paths
-dataset_dir = os.path.join(task_name, 'numpy_dataset')
+dataset_name = 'token_dataset' if experiment_params['to_tokens'] else 'text_dataset'
+dataset_dir = os.path.join(task_name, dataset_name)
 output_dir = os.path.join(task_name, experiment_name)
 checkpoint_dir = os.path.join(output_dir, 'checkpoints')
 embeddings_dir = 'embeddings'
@@ -106,12 +108,13 @@ print("Learning rate: " + str(learning_rate))
 # Data set parameters
 vocab_size = experiment_params['vocab_size']
 max_seq_length = experiment_params['max_seq_length']
+to_tokens = experiment_params['to_tokens']
 embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset and embedding processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=False, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 
 # Get the BERT vocab file and casing info from the Hub module
 bert_module = hub.Module("https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1")
@@ -121,7 +124,7 @@ tokenizer = FullTokenizer(vocab_file=vocab_file, do_lower_case=do_lower_case)
 
 # If dataset folder is empty get the metadata and datasets to TFRecords
 if not os.listdir(dataset_dir):
-    data_set.get_dataset(to_numpy=True)
+    data_set.get_dataset()
 
 # Load the metadata
 vocabulary, labels = data_set.load_metadata()
@@ -138,8 +141,9 @@ test_steps = int(len(list(test_input_ids)))
 
 print("------------------------------------")
 print("Created data sets and embeddings...")
-print("Maximum sequence length: " + str(max_seq_length))
 print("Vocabulary size: " + str(vocab_size))
+print("Maximum sequence length: " + str(max_seq_length))
+print("Using sequence tokens: " + to_tokens)
 print("Embedding dimension: " + str(embedding_dim))
 print("Embedding type: " + embedding_type)
 print("Embedding source: " + embedding_source)
@@ -168,7 +172,7 @@ else:
 optimiser = optimisers.get_optimiser(optimiser_type=optimiser_type, lr=learning_rate, **model_params)
 
 # Compile the model
-model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
 
 # Display a model summary and create/save a model graph definition and image
 model.summary()

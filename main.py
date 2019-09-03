@@ -22,18 +22,19 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'deep_lstm',
-                     'model_name': 'deep_lstm',
+                     'experiment_name': 'lstm_test_numpy',
+                     'model_name': 'lstm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
                      'load_model': False,
                      'init_ckpt_file': '',
                      'batch_size': 32,
-                     'num_epochs': 10,
+                     'num_epochs': 3,
                      'evaluate_steps': 500,
                      'vocab_size': 10000,
                      'max_seq_length': 128,
+                     'to_tokens': True,
                      'embedding_dim': 50,
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
@@ -58,7 +59,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -66,7 +67,8 @@ for key, value in experiment_params.items():
     experiment.log_other(key, value)
 
 # Data set and output paths
-dataset_dir = os.path.join(task_name, 'dataset')
+dataset_name = 'token_dataset' if experiment_params['to_tokens'] else 'text_dataset'
+dataset_dir = os.path.join(task_name, dataset_name)
 output_dir = os.path.join(task_name, experiment_name)
 checkpoint_dir = os.path.join(output_dir, 'checkpoints')
 embeddings_dir = 'embeddings'
@@ -105,12 +107,13 @@ print("Learning rate: " + str(learning_rate))
 # Data set parameters
 vocab_size = experiment_params['vocab_size']
 max_seq_length = experiment_params['max_seq_length']
+to_tokens = experiment_params['to_tokens']
 embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset and embedding processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=True, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 embedding = embedding_processor.get_embedding_processor(embedding_type)
 
 # If dataset folder is empty get the metadata and datasets to TFRecords
@@ -123,20 +126,21 @@ vocabulary, labels = data_set.load_metadata()
 # Generate the embedding matrix
 embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
-# Build tensorflow datasets from TFRecord files
-train_data = data_set.build_dataset_from_record('train', batch_size, repeat=num_epochs, is_training=True)
-# train_data = data_set.build_dataset_from_record('dev', batch_size, repeat=num_epochs, is_training=True)
-val_data = data_set.build_dataset_from_record('val', batch_size, repeat=num_epochs, is_training=False)
-test_data = data_set.build_dataset_from_record('test', batch_size, repeat=1, is_training=False)
-global_steps = int(len(list(train_data)))
-train_steps = int(len(list(train_data)) / num_epochs)
-val_steps = int(len(list(val_data)) / num_epochs)
-test_steps = int(len(list(test_data)))
+# Build tensorflow datasets from .npz files
+train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
+# train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
+val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)
+test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False)
+global_steps = int(len(list(train_text)) * num_epochs)
+train_steps = int(len(list(train_text)))
+val_steps = int(len(list(val_text)))
+test_steps = int(len(list(test_text)))
 
 print("------------------------------------")
 print("Created data sets and embeddings...")
-print("Maximum sequence length: " + str(max_seq_length))
 print("Vocabulary size: " + str(vocab_size))
+print("Maximum sequence length: " + str(max_seq_length))
+print("Using sequence tokens: " + to_tokens)
 print("Embedding dimension: " + str(embedding_dim))
 print("Embedding type: " + embedding_type)
 print("Embedding source: " + embedding_source)
@@ -194,11 +198,11 @@ if training:
         print("Epoch: {}/{}".format(epoch, num_epochs))
 
         with experiment.train():
-            for train_step, (train_text, train_labels) in enumerate(train_data.take(train_steps)):
+            for train_step in range(train_steps):
                 global_step += 1
 
                 # Perform training step on batch and record metrics
-                loss, accuracy = model.train_on_batch(train_text, train_labels)
+                loss, accuracy = model.train_on_batch(train_text[train_step], train_labels[train_step])
                 train_loss(loss)
                 train_accuracy(accuracy)
 
@@ -208,10 +212,10 @@ if training:
                 # Every evaluate_steps evaluate model on validation set
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
                     with experiment.validate():
-                        for val_step, (val_text, val_labels) in enumerate(val_data.take(val_steps)):
+                        for val_step in range(val_steps):
 
                             # Perform evaluation step on batch and record metrics
-                            loss, accuracy = model.test_on_batch(val_text, val_labels)
+                            loss, accuracy = model.test_on_batch(val_text[val_step], val_labels[val_step])
                             val_loss(loss)
                             val_accuracy(accuracy)
 
@@ -249,11 +253,11 @@ if testing:
     true_labels = np.empty(shape=0)
     predicted_labels = np.empty(shape=0)
     with experiment.test():
-        for test_step, (test_text, test_labels) in enumerate(test_data.take(test_steps)):
+        for test_step in range(test_steps):
 
             # Perform test step on batch and record metrics
-            loss, accuracy = model.test_on_batch(test_text, test_labels)
-            predictions = model.predict_on_batch(test_text)
+            loss, accuracy = model.test_on_batch(test_text[test_step], test_labels[test_step])
+            predictions = model.predict_on_batch(test_text[test_step])
             test_loss(loss)
             test_accuracy(accuracy)
 
@@ -261,7 +265,7 @@ if testing:
             experiment.log_metric('accuracy', test_accuracy.result().numpy(), step=test_step)
 
             # Append to lists for creating metrics
-            true_labels = np.append(true_labels, test_labels.numpy().flatten())
+            true_labels = np.append(true_labels, test_labels[test_step].flatten())
             predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
 
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"

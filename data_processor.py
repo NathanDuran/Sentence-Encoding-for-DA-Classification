@@ -299,7 +299,7 @@ class DataProcessor:
             metadata = pickle.load(file)
         return metadata['vocabulary']
 
-    def get_dataset(self, to_numpy=False):
+    def get_dataset(self):
         """Helper function. Gets the metadata and all datasets from the Github repository and saves to file.
 
         Args:
@@ -313,84 +313,10 @@ class DataProcessor:
         val_examples = self.get_val_examples()
         dev_examples = self.get_dev_examples()
 
-        if to_numpy:
-            self.convert_examples_to_numpy('train', train_examples, vocabulary, labels)
-            self.convert_examples_to_numpy('test', test_examples, vocabulary, labels)
-            self.convert_examples_to_numpy('val', val_examples, vocabulary, labels)
-            self.convert_examples_to_numpy('dev', dev_examples, vocabulary, labels)
-        else:
-            self.convert_examples_to_record('train', train_examples, vocabulary, labels)
-            self.convert_examples_to_record('test', test_examples, vocabulary, labels)
-            self.convert_examples_to_record('val', val_examples, vocabulary, labels)
-            self.convert_examples_to_record('dev', dev_examples, vocabulary, labels)
-
-    def convert_examples_to_record(self, set_type, examples, vocabulary, labels):
-        """Converts InputExamples to features and saves as TFRecord file.
-
-        if to_tokens is True
-            Tokenizes all text and strips whitespace.
-            Converts to lowercase if to_lower=True.
-            Removes punctuation if no_punct=True.
-            Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
-            Converts sentence tokens to indices.
-
-        Converts labels to indices.
-
-        Saves as TFRecord file.
-
-         Args:
-            set_type (str): Specifies if this is the training, validation or test data
-            examples (list): List of InputExamples
-            vocabulary (Gluonnlp Vocab): Datasets vocabulary
-            labels (list): Datasets labels list
-        """
-
-        def _serialize_example(example_to_serialize):
-            """Converts an InputExample into a serialized format for TFRecords"""
-            features = collections.OrderedDict()
-            # Strings must be encoded to bytes
-            features['example_id'] = tf.train.Feature(
-                bytes_list=tf.train.BytesList(value=[example_to_serialize.example_id.encode('utf-8')]))
-            features['text'] = tf.train.Feature(
-                int64_list=tf.train.Int64List(value=example_to_serialize.text)) if self.to_tokens else tf.train.Feature(
-                bytes_list=tf.train.BytesList(value=[example_to_serialize.text.encode('utf-8')]))
-            features['label'] = tf.train.Feature(int64_list=tf.train.Int64List(value=example_to_serialize.label))
-
-            tf_example = tf.train.Example(features=tf.train.Features(feature=features))
-
-            return tf_example.SerializeToString()
-
-        print("Creating " + set_type + ".tf_record...")
-        # Create TFRecord writer
-        writer = tf.python_io.TFRecordWriter(os.path.join(self.output_dir, set_type + ".tf_record"))
-
-        # Process each example and save to file
-        for example in examples:
-
-            if self.to_tokens:
-                # Tokenize, convert to lowercase and remove punctuation
-                tokens = tokenizer(example.text)
-                if self.no_punct:
-                    tokens = [token for token in tokens if not token.is_punct]
-                if self.to_lower:
-                    tokens = [token.orth_.lower() for token in tokens]
-                else:
-                    tokens = [token.orth_ for token in tokens]
-
-                # Pad/truncate sequences to max_sequence_length (0 = <unk> token in vocabulary)
-                if self.pad_seq:
-                    tokens = [tokens[i] if i < len(tokens) else '<unk>' for i in range(self.max_seq_length)]
-
-                # Convert word and label tokens to indices
-                example.text = [vocabulary.token_to_idx[token] for token in tokens]
-
-            # Convert labels to indices
-            example.label = [labels.index(example.label)]
-
-            # Serialize and write to TFRecord
-            serialized_example = _serialize_example(example)
-
-            writer.write(serialized_example)
+        self.convert_examples_to_numpy('train', train_examples, vocabulary, labels)
+        self.convert_examples_to_numpy('test', test_examples, vocabulary, labels)
+        self.convert_examples_to_numpy('val', val_examples, vocabulary, labels)
+        self.convert_examples_to_numpy('dev', dev_examples, vocabulary, labels)
 
     def convert_examples_to_numpy(self, set_type, examples, vocabulary, labels):
         """Converts InputExamples to features and saves as .npz file.
@@ -447,48 +373,6 @@ class DataProcessor:
         examples_text = np.asarray(examples_text)
         examples_labels = np.asarray(examples_labels)
         np.savez_compressed(os.path.join(self.output_dir, set_type), text=examples_text, labels=examples_labels)
-
-    def build_dataset_from_record(self, set_type, batch_size, repeat=None, is_training=True, drop_remainder=False):
-        """Creates an iterable dataset from the specified TFRecord File
-        
-        Args:
-            set_type (str): Specifies if this is the training, validation or test data
-            batch_size (int): The number of examples per batch
-            repeat (int): How many times the dataset with repeat until it is exhausted, if 'None' repeats forever
-            is_training (bool): Flag determines if training set is shuffled
-            drop_remainder (bool): Flag determines if last batch is dropped if not of batch_size
-            
-        Returns:
-            dataset (TF Dataset): Iterable dataset of two tensors 'text' and 'label'
-        """
-
-        def _decode_single_record(serialized_example):
-            """Decodes single TFRecord example into Tensors."""
-
-            feature_map = {'example_id': tf.FixedLenFeature([], tf.string),
-                           'text': tf.FixedLenFeature([self.max_seq_length], tf.int64)
-                           if self.to_tokens else tf.FixedLenFeature([], tf.string),
-                           'label': tf.FixedLenFeature([1], tf.int64)}
-
-            # Parse the serialized example into a dictionary
-            example = tf.parse_single_example(serialized_example, feature_map)
-
-            # Get the tensor values from the dictionary
-            text = tf.cast(example['text'], tf.int32) if self.to_tokens else example['text']
-            label = tf.cast(example['label'], tf.int32)
-            return text, label
-
-        # Get the dataset from the TFRecord file
-        dataset = tf.data.TFRecordDataset(os.path.join(self.output_dir, set_type + ".tf_record"))
-
-        # For training, shuffle the data
-        if is_training:
-            dataset = dataset.shuffle(buffer_size=1000)
-        dataset = dataset.repeat(repeat)
-        dataset = dataset.map(lambda record: _decode_single_record(record))
-        dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
-
-        return dataset
 
     def build_dataset_from_numpy(self, set_type, batch_size, is_training=True):
         """Creates an numpy dataset from the specified .npz File
@@ -605,6 +489,116 @@ class DataProcessor:
         labels = list(batch(labels, batch_size))
 
         return np.asarray(input_ids), np.asarray(input_masks), np.asarray(segment_ids), np.asarray(labels)
+
+    def convert_examples_to_record(self, set_type, examples, vocabulary, labels):
+        """Converts InputExamples to features and saves as TFRecord file.
+
+        if to_tokens is True
+            Tokenizes all text and strips whitespace.
+            Converts to lowercase if to_lower=True.
+            Removes punctuation if no_punct=True.
+            Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
+            Converts sentence tokens to indices.
+
+        Converts labels to indices.
+
+        Saves as TFRecord file.
+
+         Args:
+            set_type (str): Specifies if this is the training, validation or test data
+            examples (list): List of InputExamples
+            vocabulary (Gluonnlp Vocab): Datasets vocabulary
+            labels (list): Datasets labels list
+        """
+
+        def _serialize_example(example_to_serialize):
+            """Converts an InputExample into a serialized format for TFRecords"""
+            features = collections.OrderedDict()
+            # Strings must be encoded to bytes
+            features['example_id'] = tf.train.Feature(
+                bytes_list=tf.train.BytesList(value=[example_to_serialize.example_id.encode('utf-8')]))
+            features['text'] = tf.train.Feature(
+                int64_list=tf.train.Int64List(value=example_to_serialize.text)) if self.to_tokens else tf.train.Feature(
+                bytes_list=tf.train.BytesList(value=[example_to_serialize.text.encode('utf-8')]))
+            features['label'] = tf.train.Feature(int64_list=tf.train.Int64List(value=example_to_serialize.label))
+
+            tf_example = tf.train.Example(features=tf.train.Features(feature=features))
+
+            return tf_example.SerializeToString()
+
+        print("Creating " + set_type + ".tf_record...")
+        # Create TFRecord writer
+        writer = tf.python_io.TFRecordWriter(os.path.join(self.output_dir, set_type + ".tf_record"))
+
+        # Process each example and save to file
+        for example in examples:
+
+            if self.to_tokens:
+                # Tokenize, convert to lowercase and remove punctuation
+                tokens = tokenizer(example.text)
+                if self.no_punct:
+                    tokens = [token for token in tokens if not token.is_punct]
+                if self.to_lower:
+                    tokens = [token.orth_.lower() for token in tokens]
+                else:
+                    tokens = [token.orth_ for token in tokens]
+
+                # Pad/truncate sequences to max_sequence_length (0 = <unk> token in vocabulary)
+                if self.pad_seq:
+                    tokens = [tokens[i] if i < len(tokens) else '<unk>' for i in range(self.max_seq_length)]
+
+                # Convert word and label tokens to indices
+                example.text = [vocabulary.token_to_idx[token] for token in tokens]
+
+            # Convert labels to indices
+            example.label = [labels.index(example.label)]
+
+            # Serialize and write to TFRecord
+            serialized_example = _serialize_example(example)
+
+            writer.write(serialized_example)
+
+    def build_dataset_from_record(self, set_type, batch_size, repeat=None, is_training=True, drop_remainder=False):
+        """Creates an iterable dataset from the specified TFRecord File
+        
+        Args:
+            set_type (str): Specifies if this is the training, validation or test data
+            batch_size (int): The number of examples per batch
+            repeat (int): How many times the dataset with repeat until it is exhausted, if 'None' repeats forever
+            is_training (bool): Flag determines if training set is shuffled
+            drop_remainder (bool): Flag determines if last batch is dropped if not of batch_size
+            
+        Returns:
+            dataset (TF Dataset): Iterable dataset of two tensors 'text' and 'label'
+        """
+
+        def _decode_single_record(serialized_example):
+            """Decodes single TFRecord example into Tensors."""
+
+            feature_map = {'example_id': tf.FixedLenFeature([], tf.string),
+                           'text': tf.FixedLenFeature([self.max_seq_length], tf.int64)
+                           if self.to_tokens else tf.FixedLenFeature([], tf.string),
+                           'label': tf.FixedLenFeature([1], tf.int64)}
+
+            # Parse the serialized example into a dictionary
+            example = tf.parse_single_example(serialized_example, feature_map)
+
+            # Get the tensor values from the dictionary
+            text = tf.cast(example['text'], tf.int32) if self.to_tokens else example['text']
+            label = tf.cast(example['label'], tf.int32)
+            return text, label
+
+        # Get the dataset from the TFRecord file
+        dataset = tf.data.TFRecordDataset(os.path.join(self.output_dir, set_type + ".tf_record"))
+
+        # For training, shuffle the data
+        if is_training:
+            dataset = dataset.shuffle(buffer_size=1000)
+        dataset = dataset.repeat(repeat)
+        dataset = dataset.map(lambda record: _decode_single_record(record))
+        dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
+
+        return dataset
 
 
 def batch(input_arr, batch_size):
