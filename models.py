@@ -1,10 +1,9 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-from keras import backend as K
 import keras.layers as layers
 from keras.models import Model
 from layers.elmo_embedding_layer import ElmoEmbeddingLayer
-
+from layers.bert_layer import BertLayer
 
 def get_model(model_name):
     """Utility function for returning a Model.
@@ -28,6 +27,7 @@ def get_model(model_name):
               'deep_bi_lstm': DeepBiLSTM(),
               'deep_bi_lstm_attn': DeepBiLSTMAttn(),
               'elmo': Elmo(),
+              'bert': BERT(),
               'nnlm': NeuralNetworkLanguageModel()}
 
     if model_name.lower() not in models.keys():
@@ -715,6 +715,39 @@ class Elmo(BaseModel):
 
         model = Model(inputs=[inputs], outputs=outputs)
         return model
+
+
+class BERT(BaseModel):
+    """ Uses an BERT from tensorflow hub as embedding layer from:
+    https://github.com/strongio/keras-bert/blob/master/keras-bert.py
+    """
+
+    def __init__(self, name='Elmo'):
+        super().__init__(name)
+        self.name = name
+        self.module_url = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        num_fine_tune_layers = kwargs['num_fine_tune_layers'] if 'num_fine_tune_layers' in kwargs.keys() else 3
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'mean_sequence'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
+
+        in_id = tf.keras.layers.Input(shape=input_shape, name="input_ids")
+        in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks")
+        in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids")
+        bert_inputs = [in_id, in_mask, in_segment]
+
+        bert_output = BertLayer(n_fine_tune_layers=num_fine_tune_layers, pooling=pooling)(bert_inputs)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(bert_output)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid')(x)
+
+        model = tf.keras.models.Model(inputs=bert_inputs, outputs=outputs)
+        return model
+
 
 class NeuralNetworkLanguageModel(BaseModel):
     """Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.

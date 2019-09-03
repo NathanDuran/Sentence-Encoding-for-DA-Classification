@@ -300,7 +300,11 @@ class DataProcessor:
         return metadata['vocabulary']
 
     def get_dataset(self, to_numpy=False):
-        """Helper function. Gets the metadata and all datasets from the Github repository and saves to file."""
+        """Helper function. Gets the metadata and all datasets from the Github repository and saves to file.
+
+        Args:
+            to_numpy (bool): Wheather to save dataset as numpy arrays or TFRecord files
+        """
 
         vocabulary, labels = self.get_metadata()
 
@@ -512,11 +516,6 @@ class DataProcessor:
             text = np.asarray(text)
             labels = np.asarray(labels)
 
-        def batch(input_arr, n):
-            """Yield successive n-size chunks from input_arr."""
-            for i in range(0, len(input_arr), n):
-                yield input_arr[i:i + n]
-
         # Batch data
         text = list(batch(text, batch_size))
         labels = list(batch(labels, batch_size))
@@ -524,6 +523,94 @@ class DataProcessor:
         labels = np.asarray(labels)
 
         return text, labels
+
+    def build_dataset_for_bert(self, set_type, bert_tokenizer, batch_size, is_training=True):
+        """Creates an numpy dataset for BERT from the specified .npz File
+
+        Args:
+            set_type (str): Specifies if this is the training, validation or test data
+            bert_tokenizer (FullTokeniser): The BERT tokeniser
+            batch_size (int): The number of examples per batch
+            is_training (bool): Flag determines if training set is shuffled
+
+        Returns:
+            input_ids (np.array): Numpy array of BERT input ids
+            input_masks (np.array): Numpy array of BERT input masks
+            segment_ids (np.array): Numpy array of BERT segment ids
+            labels (np.array): Numpy array of target labels
+        """
+
+        def _convert_single_example(bert_tokenizer, example_text, max_seq_length):
+            """Converts a single sentence into BERT features."""
+
+            text_tokens = bert_tokenizer.tokenize(example_text)
+            if len(text_tokens) > max_seq_length - 2:
+                text_tokens = text_tokens[0: (max_seq_length - 2)]
+
+            tokens = []
+            segment_ids = []
+            tokens.append("[CLS]")
+            segment_ids.append(0)
+            for token in text_tokens:
+                tokens.append(token)
+                segment_ids.append(0)
+            tokens.append("[SEP]")
+            segment_ids.append(0)
+
+            input_ids = bert_tokenizer.convert_tokens_to_ids(tokens)
+
+            # The mask has 1 for real tokens and 0 for padding tokens. Only real
+            # tokens are attended to.
+            input_mask = [1] * len(input_ids)
+
+            # Zero-pad up to the sequence length.
+            while len(input_ids) < max_seq_length:
+                input_ids.append(0)
+                input_mask.append(0)
+                segment_ids.append(0)
+
+            assert len(input_ids) == max_seq_length
+            assert len(input_mask) == max_seq_length
+            assert len(segment_ids) == max_seq_length
+
+            return input_ids, input_mask, segment_ids
+        """Converts a single sentence of text to BERT input features."""
+        # Get the dataset from the .npz file
+        dataset = np.load(os.path.join(self.output_dir, set_type + ".npz"))
+        text = dataset['text']
+        labels = dataset['labels']
+
+        # Create BERT input features
+        input_ids, input_masks, segment_ids = [], [], []
+        for i in range(len(text)):
+            input_id, input_mask, segment_id = _convert_single_example(bert_tokenizer, text[i], self.max_seq_length)
+            input_ids.append(input_id)
+            input_masks.append(input_mask)
+            segment_ids.append(segment_id)
+
+        # For training, shuffle the data
+        if is_training:
+            combined = list(zip(input_ids, input_masks, segment_ids, labels))
+            np.random.shuffle(combined)
+            input_ids, input_masks, segment_ids, labels = zip(*combined)
+            input_ids = np.asarray(input_ids)
+            input_masks = np.asarray(input_masks)
+            segment_ids = np.asarray(segment_ids)
+            labels = np.asarray(labels)
+
+        # Batch data
+        input_ids = list(batch(input_ids, batch_size))
+        input_masks = list(batch(input_masks, batch_size))
+        segment_ids = list(batch(segment_ids, batch_size))
+        labels = list(batch(labels, batch_size))
+
+        return np.asarray(input_ids), np.asarray(input_masks), np.asarray(segment_ids), np.asarray(labels)
+
+
+def batch(input_arr, batch_size):
+    """Yield successive batch_size chunks from input_arr."""
+    for i in range(0, len(input_arr), batch_size):
+        yield input_arr[i:i + batch_size]
 
 
 def to_one_hot(label, labels):

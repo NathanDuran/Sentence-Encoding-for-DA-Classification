@@ -112,5 +112,13 @@
     "optimiser": "adam",
     "dropout_rate": 0.02,
     "dense_units": 256
+  },
+    "bert": {
+    "learning_rate": 0.001,
+    "optimiser": "adam",
+    "num_fine_tune_layers": 3,
+    "pooling": "mean_sequence",
+    "dropout_rate": 0.02,
+    "dense_units": 256
   }
 }
