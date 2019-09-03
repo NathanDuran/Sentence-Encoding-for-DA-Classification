@@ -14,13 +14,13 @@ class ElmoEmbeddingLayer(tf.keras.layers.Layer):
 
         if self.trainable:
             self._trainable_weights.extend(tf.trainable_variables(scope="^{}_module/.*".format(self.name)))
-        # Changed assuming trainable weights might be set using
+
         super(ElmoEmbeddingLayer, self).build(input_shape)
 
     def call(self, x, mask=None):
         result = self.elmo(tf.keras.backend.squeeze(tf.keras.backend.cast(x, tf.string), axis=1),
                            as_dict=True,
-                           signature='default', )['default']
+                           signature='default')['default']
         return result
 
     def compute_mask(self, inputs, mask=None):

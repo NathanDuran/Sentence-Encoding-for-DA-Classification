@@ -86,7 +86,7 @@
     "dropout_rate": 0.02,
     "dense_units": 128
   },
-  "deep_bi_lstm": {
+    "deep_bi_lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
     "num_lstm_layers": 2,
@@ -107,7 +107,7 @@
     "dropout_rate": 0.02,
     "dense_units": 128
   },
-  "elmo": {
+    "elmo": {
     "learning_rate": 0.001,
     "optimiser": "adam",
     "dropout_rate": 0.02,
@@ -118,6 +118,18 @@
     "optimiser": "adam",
     "num_fine_tune_layers": 3,
     "pooling": "mean_sequence",
+    "dropout_rate": 0.02,
+    "dense_units": 256
+  },
+    "use": {
+    "learning_rate": 0.001,
+    "optimiser": "adam",
+    "dropout_rate": 0.02,
+    "dense_units": 256
+  },
+    "nnlm": {
+    "learning_rate": 0.001,
+    "optimiser": "adam",
     "dropout_rate": 0.02,
     "dense_units": 256
   }

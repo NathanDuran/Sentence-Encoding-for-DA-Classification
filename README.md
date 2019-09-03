@@ -9,7 +9,6 @@
 - GRU?
 - Recurrent convolutional
 - rnnlm
-- document context language model
 - elmo (try 'elmo' instead of default?) + elmo attention? More layers? 
 - bert + attention? Different layers? 
 

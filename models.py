@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-from layers import ElmoEmbeddingLayer, BertLayer
+from layers import ElmoEmbeddingLayer, BertLayer, UniversalSentenceEncoderLayer
 
 
 def get_model(model_name):
@@ -26,6 +26,7 @@ def get_model(model_name):
               'deep_bi_lstm_attn': DeepBiLSTMAttn(),
               'elmo': Elmo(),
               'bert': BERT(),
+              'use': UniversalSentenceEncoder(),
               'nnlm': NeuralNetworkLanguageModel()}
 
     if model_name.lower() not in models.keys():
@@ -108,7 +109,7 @@ class CNN(Model):
         x = tf.keras.layers.MaxPooling1D(pool_size)(x)
         x = tf.keras.layers.Conv1D(num_filters, kernel_size, activation=conv_activation, name='conv_2')(x)
         x = tf.keras.layers.GlobalMaxPooling1D()(x)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -172,7 +173,7 @@ class CNNAttn(Model):
         # Concatenate query and encodings
         concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
 
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -216,7 +217,7 @@ class TextCNN(Model):
 
         x = tf.keras.layers.Concatenate(axis=1)(maxpool_pool)
         x = tf.keras.layers.Flatten()(x)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -257,7 +258,7 @@ class LSTM(Model):
                                       trainable=train_embeddings)(inputs)
         x = lstm_layer(x)
         x = tf.keras.layers.GlobalMaxPooling1D()(x)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -323,7 +324,7 @@ class LSTMAttn(Model):
         # Concatenate query and encodings
         concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
 
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -367,7 +368,7 @@ class DeepLSTM(Model):
                                          return_sequences=True)(x)
 
         x = tf.keras.layers.GlobalMaxPooling1D()(x)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -445,7 +446,7 @@ class DeepLSTMAttn(Model):
         # Concatenate query and encodings
         concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
 
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -487,7 +488,7 @@ class BiLSTM(Model):
                                       trainable=train_embeddings)(inputs)
         x = tf.keras.layers.Bidirectional(lstm_layer)(x)
         x = tf.keras.layers.GlobalMaxPooling1D()(x)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -553,7 +554,7 @@ class BiLSTMAttn(Model):
         # Concatenate query and encodings
         concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
 
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -599,7 +600,7 @@ class DeepBiLSTM(Model):
             x = tf.keras.layers.Bidirectional(lstm_layer)(x)
 
         x = tf.keras.layers.GlobalMaxPooling1D()(x)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -680,7 +681,7 @@ class DeepBiLSTMAttn(Model):
         # Concatenate query and encodings
         concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
 
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1')(concat)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -690,14 +691,18 @@ class DeepBiLSTMAttn(Model):
 
 
 class Elmo(Model):
-    """ Uses an elmo from tensorflow hub as embedding layer from:
+    """ Uses an elmo from Tensorflow Hub as embedding layer from:
     https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb
+
+    Matthew E. Peters, Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, Luke Zettlemoyer.
+    Deep contextualized word representations. arXiv preprint arXiv:1802.05365, 2018.
+
+    Module url: "https://tfhub.dev/google/elmo/2"
     """
 
     def __init__(self, name='Elmo'):
         super().__init__(name)
         self.name = name
-        self.module_url = "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
@@ -709,21 +714,26 @@ class Elmo(Model):
         embedding = ElmoEmbeddingLayer()(inputs)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
-        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid')(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
         model = tf.keras.models.Model(inputs=[inputs], outputs=outputs)
         return model
 
 
 class BERT(Model):
-    """ Uses an BERT from tensorflow hub as embedding layer from:
+    """ Uses an BERT from Tensorflow Hub as embedding layer from:
     https://github.com/strongio/keras-bert/blob/master/keras-bert.py
+
+    Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova.
+    BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.
+    arXiv preprint arXiv:1810.04805, 2018.
+
+    Module url: "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
     """
 
-    def __init__(self, name='Elmo'):
+    def __init__(self, name='BERT'):
         super().__init__(name)
         self.name = name
-        self.module_url = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
@@ -741,15 +751,49 @@ class BERT(Model):
         bert_output = BertLayer(n_fine_tune_layers=num_fine_tune_layers, pooling=pooling)(bert_inputs)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(bert_output)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
-        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid')(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
         model = tf.keras.models.Model(inputs=bert_inputs, outputs=outputs)
         return model
 
 
+class UniversalSentenceEncoder(Model):
+    """ Uses an Universal Sentence Encoder from Tensorflow Hub as embedding layer.
+
+    Daniel Cer, Yinfei Yang, Sheng-yi Kong, Nan Hua, Nicole Limtiaco, Rhomni St. John, Noah Constant,
+    Mario Guajardo-Céspedes, Steve Yuan, Chris Tar, Yun-Hsuan Sung, Brian Strope, Ray Kurzweil.
+    Universal Sentence Encoder. arXiv:1803.11175, 2018.
+
+    Module url: "https://tfhub.dev/google/universal-sentence-encoder-large/3"
+    """
+
+    def __init__(self, name='UniversalSentenceEncoder'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
+
+        inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
+        embedding = UniversalSentenceEncoderLayer()(inputs)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
+
+        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs)
+        return model
+
+
 class NeuralNetworkLanguageModel(Model):
-    """Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
+    """ Uses Neural Network Language Model from Tensorflow Hub.
+    
+    Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
     Journal of Machine Learning Research, 3:1137-1155, 2003.
+
+    Module url: "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
     """
 
     def __init__(self, name='NeuralNetworkLanguageModel'):
@@ -760,8 +804,8 @@ class NeuralNetworkLanguageModel(Model):
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
-        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         model = tf.keras.Sequential([
             hub.KerasLayer(self.module_url, input_shape=[], dtype=tf.string, trainable=True),
