@@ -26,7 +26,7 @@ class BertLayer(tf.keras.layers.Layer):
     def build(self, input_shape):
         self.bert = hub.Module(self.bert_path, trainable=self.trainable, name=f"{self.name}_module")
 
-        # Remove unused layers
+        # Remove unused layers_t
         trainable_vars = self.bert.variables
         if self.pooling == "pool":
             trainable_vars = [var for var in trainable_vars if not "/cls/" in var.name]
@@ -38,11 +38,11 @@ class BertLayer(tf.keras.layers.Layer):
         else:
             raise NameError(f"BERT pooling type (must be either pool, sequence or mean_sequence but is {self.pooling}")
 
-        # Select how many layers to fine tune
+        # Select how many layers_t to fine tune
         for i in range(self.n_fine_tune_layers):
             trainable_layers.append(f"encoder/layer_{str(11 - i)}")
 
-        # Update trainable vars to contain only the specified layers
+        # Update trainable vars to contain only the specified layers_t
         trainable_vars = [var for var in trainable_vars if any([l in var.name for l in trainable_layers])]
 
         # Add to trainable weights

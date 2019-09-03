@@ -1,9 +1,7 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-import keras.layers as layers
-from keras.models import Model
-from layers.elmo_embedding_layer import ElmoEmbeddingLayer
-from layers.bert_layer import BertLayer
+from layers import ElmoEmbeddingLayer, BertLayer
+
 
 def get_model(model_name):
     """Utility function for returning a Model.
@@ -37,7 +35,7 @@ def get_model(model_name):
         return models[model_name]
 
 
-class BaseModel(object):
+class Model(object):
     """Model abstract class."""
 
     def __init__(self, name='model'):
@@ -57,15 +55,15 @@ class BaseModel(object):
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape, name='input_layer')
-        x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+        x = tf.keras.layers_t.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
                                       trainable=train_embeddings,
                                       name='embedding_layer')(inputs)
-        x = tf.keras.layers.GlobalMaxPooling1D(name='global_pool')(x)
-        x = tf.keras.layers.Dense(dense_units, activation='relu', name='dense_1')(x)
-        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+        x = tf.keras.layers_t.GlobalMaxPooling1D(name='global_pool')(x)
+        x = tf.keras.layers_t.Dense(dense_units, activation='relu', name='dense_1')(x)
+        outputs = tf.keras.layers_t.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
         # Create and return keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
@@ -84,7 +82,7 @@ class BaseModel(object):
         raise NotImplementedError()
 
 
-class CNN(BaseModel):
+class CNN(Model):
     def __init__(self, name='CNN_1D'):
         super().__init__(name)
         self.name = name
@@ -119,7 +117,7 @@ class CNN(BaseModel):
         return model
 
 
-class CNNAttn(BaseModel):
+class CNNAttn(Model):
     def __init__(self, name='CNN_1D'):
         super().__init__(name)
         self.name = name
@@ -183,7 +181,7 @@ class CNNAttn(BaseModel):
         return model
 
 
-class TextCNN(BaseModel):
+class TextCNN(Model):
     """Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
     Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)
     """
@@ -227,7 +225,7 @@ class TextCNN(BaseModel):
         return model
 
 
-class LSTM(BaseModel):
+class LSTM(Model):
     def __init__(self, name='LSTM'):
         super().__init__(name)
         self.name = name
@@ -268,7 +266,7 @@ class LSTM(BaseModel):
         return model
 
 
-class LSTMAttn(BaseModel):
+class LSTMAttn(Model):
     def __init__(self, name='LSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -334,7 +332,7 @@ class LSTMAttn(BaseModel):
         return model
 
 
-class DeepLSTM(BaseModel):
+class DeepLSTM(Model):
     def __init__(self, name='DeepLSTM'):
         super().__init__(name)
         self.name = name
@@ -378,7 +376,7 @@ class DeepLSTM(BaseModel):
         return model
 
 
-class DeepLSTMAttn(BaseModel):
+class DeepLSTMAttn(Model):
     def __init__(self, name='DeepLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -456,7 +454,7 @@ class DeepLSTMAttn(BaseModel):
         return model
 
 
-class BiLSTM(BaseModel):
+class BiLSTM(Model):
     def __init__(self, name='BiLSTM'):
         super().__init__(name)
         self.name = name
@@ -498,7 +496,7 @@ class BiLSTM(BaseModel):
         return model
 
 
-class BiLSTMAttn(BaseModel):
+class BiLSTMAttn(Model):
     def __init__(self, name='BiLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -564,7 +562,7 @@ class BiLSTMAttn(BaseModel):
         return model
 
 
-class DeepBiLSTM(BaseModel):
+class DeepBiLSTM(Model):
     def __init__(self, name='DeepBiLSTM'):
         super().__init__(name)
         self.name = name
@@ -610,7 +608,7 @@ class DeepBiLSTM(BaseModel):
         return model
 
 
-class DeepBiLSTMAttn(BaseModel):
+class DeepBiLSTMAttn(Model):
     def __init__(self, name='DeepBiLSTMAttn'):
         super().__init__(name)
         self.name = name
@@ -691,7 +689,7 @@ class DeepBiLSTMAttn(BaseModel):
         return model
 
 
-class Elmo(BaseModel):
+class Elmo(Model):
     """ Uses an elmo from tensorflow hub as embedding layer from:
     https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb
     """
@@ -707,17 +705,17 @@ class Elmo(BaseModel):
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
-        inputs = layers.Input(shape=input_shape, dtype="string")
+        inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
         embedding = ElmoEmbeddingLayer()(inputs)
-        x = layers.Dense(dense_units, activation=dense_activation)(embedding)
-        x = layers.Dropout(dropout_rate)(x)
-        outputs = layers.Dense(output_shape, activation='sigmoid')(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid')(x)
 
-        model = Model(inputs=[inputs], outputs=outputs)
+        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs)
         return model
 
 
-class BERT(BaseModel):
+class BERT(Model):
     """ Uses an BERT from tensorflow hub as embedding layer from:
     https://github.com/strongio/keras-bert/blob/master/keras-bert.py
     """
@@ -749,7 +747,7 @@ class BERT(BaseModel):
         return model
 
 
-class NeuralNetworkLanguageModel(BaseModel):
+class NeuralNetworkLanguageModel(Model):
     """Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
     Journal of Machine Learning Research, 3:1137-1155, 2003.
     """

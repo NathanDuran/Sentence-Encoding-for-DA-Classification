@@ -6,9 +6,9 @@ from comet_ml import Experiment
 from metrics import *
 import models
 import data_processor
+import optimisers
 import checkpointer
 import tensorflow as tf
-import keras
 import numpy as np
 
 # Suppress TensorFlow debugging
@@ -19,7 +19,6 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 
 # Enable Tensorflow eager execution
 sess = tf.Session()
-tf.keras.backend.set_session(sess)
 
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'elmo_full',
@@ -158,7 +157,7 @@ else:
         print("{}: {}".format(key, value))
 
 # Create optimiser
-optimiser = keras.optimizers.Adam(lr=learning_rate)
+optimiser = optimisers.get_optimiser(optimiser_type=optimiser_type, lr=learning_rate, **model_params)
 
 # Compile the model
 model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
@@ -169,6 +168,11 @@ model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
 tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
 experiment.log_image(model_image_file)
 experiment.set_model_graph(model.to_json())
+
+# Initialise variables
+sess.run(tf.local_variables_initializer())
+sess.run(tf.global_variables_initializer())
+tf.keras.backend.set_session(sess)
 
 # Train the model
 if training:

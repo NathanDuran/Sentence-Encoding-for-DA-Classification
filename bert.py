@@ -177,6 +177,7 @@ tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
 experiment.log_image(model_image_file)
 experiment.set_model_graph(model.to_json())
 
+# Initialise variables
 sess.run(tf.local_variables_initializer())
 sess.run(tf.global_variables_initializer())
 sess.run(tf.tables_initializer())

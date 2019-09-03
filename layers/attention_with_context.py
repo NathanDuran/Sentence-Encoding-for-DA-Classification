@@ -75,7 +75,7 @@ class AttentionWithContext(tf.keras.layers.Layer):
         super(AttentionWithContext, self).build(input_shape)
 
     def compute_mask(self, input, input_mask=None):
-        # do not pass the mask to the next layers
+        # do not pass the mask to the next layers_t
         return None
 
     def call(self, x, mask=None):
