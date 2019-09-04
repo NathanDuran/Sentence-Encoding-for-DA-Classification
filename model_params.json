@@ -47,7 +47,7 @@
     "dense_units": 128
   },
     "deep_lstm": {
-    "learning_rate": 0.001,
+    "learning_rate": 0.00075,
     "optimiser": "rmsprop",
     "num_lstm_layers": 2,
     "lstm_units": 256,
@@ -57,7 +57,7 @@
     "dense_units": 128
   },
     "deep_lstm_attn": {
-    "learning_rate": 0.001,
+    "learning_rate": 0.00075,
     "optimiser": "rmsprop",
     "attention_type": "add",
     "num_lstm_layers": 2,

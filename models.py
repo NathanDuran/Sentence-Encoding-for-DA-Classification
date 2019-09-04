@@ -196,7 +196,7 @@ class TextCNN(Model):
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'elu'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 36
-        kernel_sizes = kwargs['kernel_sizes'] if 'kernel_sizes' in kwargs.keys() else [1, 2, 3, 5]
+        kernel_sizes = kwargs['kernel_sizes'] if 'kernel_sizes' in kwargs.keys() else [1, 2, 3, 4, 5]
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.1
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -471,13 +471,13 @@ class BiLSTM(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
         # If a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available():
-            lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
-        else:
-            lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
-                                              dropout=lstm_dropout,
-                                              recurrent_dropout=recurrent_dropout,
-                                              return_sequences=True)
+        # if tf.test.is_gpu_available():
+        #     lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
+        # else:
+        lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                          dropout=lstm_dropout,
+                                          recurrent_dropout=recurrent_dropout,
+                                          return_sequences=True)
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
