@@ -73,7 +73,7 @@ class DataProcessor:
         self.metadata_file = os.path.join(self.output_dir, 'metadata.pkl')
 
         # Check the set name is valid
-        self.valid_set_names = ['swda', 'mrda', 'maptask']
+        self.valid_set_names = ['swda', 'mrda', 'maptask', 'oasis']
         if not any(substring in self.set_name.lower() for substring in self.valid_set_names):
             raise Exception("Specified dataset name: " + self.set_name + " is not valid! "
                             "Must contain a name from the following list: " + str(self.valid_set_names))
@@ -86,6 +86,8 @@ class DataProcessor:
             self.base_url = 'https://raw.github.com/NathanDuran/MRDA-Corpus/master/mrda_data/'
         elif 'maptask' in self.set_name.lower():
             self.base_url = 'https://raw.github.com/NathanDuran/Maptask-Corpus/master/maptask_data/'
+        elif 'oasis' in self.set_name.lower():
+            self.base_url = 'https://raw.github.com/NathanDuran/BT-Oasis-Corpus/master/oasis_data/'
 
     def get_train_examples(self):
         """Gets the Training set from Github repository.
