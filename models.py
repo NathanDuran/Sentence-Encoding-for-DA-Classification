@@ -233,6 +233,7 @@ class LSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
@@ -242,7 +243,7 @@ class LSTM(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
         # If a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available():
+        if tf.test.is_gpu_available() and use_gpu:
             lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
         else:
             lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
@@ -274,6 +275,7 @@ class LSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -290,7 +292,7 @@ class LSTMAttn(Model):
             attention_layer = tf.keras.layers.AdditiveAttention()
 
         # If a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available():
+        if tf.test.is_gpu_available() and use_gpu:
             lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
         else:
             lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
@@ -340,6 +342,7 @@ class DeepLSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
         num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
@@ -359,7 +362,7 @@ class DeepLSTM(Model):
 
         for i in range(num_lstm_layers):
             # If a GPU is available use the CUDA layer
-            if tf.test.is_gpu_available():
+            if tf.test.is_gpu_available() and use_gpu:
                 x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(x)
             else:
                 x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
@@ -384,6 +387,7 @@ class DeepLSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -403,7 +407,7 @@ class DeepLSTMAttn(Model):
         # Define lstm encoder model
         lstm_input = tf.keras.Input(shape=(input_shape[0], embedding_matrix.shape[1]))
         # Create the first lstm layer, if a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available():
+        if tf.test.is_gpu_available() and use_gpu:
             lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(lstm_input)
         else:
             lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
@@ -462,6 +466,7 @@ class BiLSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
@@ -471,13 +476,13 @@ class BiLSTM(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
         # If a GPU is available use the CUDA layer
-        # if tf.test.is_gpu_available():
-        #     lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
-        # else:
-        lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
-                                          dropout=lstm_dropout,
-                                          recurrent_dropout=recurrent_dropout,
-                                          return_sequences=True)
+        if tf.test.is_gpu_available() and use_gpu:
+            lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
+        else:
+            lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                              dropout=lstm_dropout,
+                                              recurrent_dropout=recurrent_dropout,
+                                              return_sequences=True)
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
@@ -504,6 +509,7 @@ class BiLSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -520,7 +526,7 @@ class BiLSTMAttn(Model):
             attention_layer = tf.keras.layers.AdditiveAttention()
 
         # If a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available():
+        if tf.test.is_gpu_available() and use_gpu:
             lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True))
         else:
             lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
@@ -570,6 +576,7 @@ class DeepBiLSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
         num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
@@ -580,7 +587,7 @@ class DeepBiLSTM(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
         # If a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available():
+        if tf.test.is_gpu_available() and use_gpu:
             lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
         else:
             lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
@@ -616,6 +623,7 @@ class DeepBiLSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -635,7 +643,7 @@ class DeepBiLSTMAttn(Model):
         # Define lstm encoder model
         lstm_input = tf.keras.Input(shape=(input_shape[0], embedding_matrix.shape[1]))
         # Create the first lstm layer, if a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available():
+        if tf.test.is_gpu_available() and use_gpu:
             lstm_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNLSTM(lstm_units,
                                                                                  return_sequences=True))(lstm_input)
         else:
