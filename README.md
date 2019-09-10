@@ -20,6 +20,7 @@
 - use + attention?
 
 - Add truncating word vectors to embedding dim
+- Try saving trained embeddings?
 
 - Change test to only log final values?
 - Add experiment params to model? (so can compare max_seq_length, embedding_dim etc)

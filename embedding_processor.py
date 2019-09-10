@@ -55,7 +55,9 @@ class RandomEmbedding(EmbeddingProcessor):
         np.random.seed(42)
         # Generate random numpy matrix of shape (vocabulary_size, embedding_dim) in range [-10, 10]
         matrix = 20 * np.random.random_sample((len(vocabulary), embedding_dim)) - 10
-
+        # Set first two rows to 0, for <unk> and <pad> tokens
+        matrix[0] = np.zeros(embedding_dim)
+        matrix[1] = np.zeros(embedding_dim)
         return matrix
 
 

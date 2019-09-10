@@ -237,12 +237,9 @@ class DataProcessor:
 
                     tokenized_utterances.append(sentence_tokens)
 
-            # Count the word frequencies and generate vocabulary with vocabulary_size (-1 to account for <unk>)
+            # Count the word frequencies and generate vocabulary with vocab_size (-2 to account for <unk> and <pad>)
             vocab_counter = nlp.data.count_tokens(list(itertools.chain(*tokenized_utterances)))
-            vocabulary = nlp.Vocab(vocab_counter, self.vocab_size - 1,
-                                   padding_token=None,
-                                   bos_token=None,
-                                   eos_token=None)
+            vocabulary = nlp.Vocab(vocab_counter, self.vocab_size - 2, bos_token=None, eos_token=None)
 
             # Create and sort the labels counter
             label_counter = Counter(label_counter)
@@ -359,9 +356,9 @@ class DataProcessor:
                 else:
                     tokens = [token.orth_ for token in tokens]
 
-                # Pad/truncate sequences to max_sequence_length (0 = <unk> token in vocabulary)
+                # Pad/truncate sequences to max_sequence_length (1 = <pad> token in vocabulary)
                 if self.pad_seq:
-                    tokens = [tokens[i] if i < len(tokens) else '<unk>' for i in range(self.max_seq_length)]
+                    tokens = [tokens[i] if i < len(tokens) else vocabulary.padding_token for i in range(self.max_seq_length)]
 
                 # Convert word and label tokens to indices
                 example.text = [vocabulary.token_to_idx[token] for token in tokens]
