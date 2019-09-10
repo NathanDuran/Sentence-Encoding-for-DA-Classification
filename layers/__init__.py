@@ -1,3 +1,3 @@
 from .bert_layer import BertLayer
 from .elmo_embedding_layer import ElmoEmbeddingLayer
-from .universal_sentence_encoder import UniversalSentenceEncoderLayer
+from .universal_sentence_encoder_layer import UniversalSentenceEncoderLayer
