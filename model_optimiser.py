@@ -20,8 +20,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'bi_lstm_opt',
-                     'model_name': 'bi_lstm',
+                     'experiment_name': 'deep_bi_lstm_opt',
+                     'model_name': 'deep_bi_lstm',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
@@ -110,8 +110,8 @@ for experiment in model_optimiser.get_experiments():
         experiment.log_other(key, value)
 
     # Build tensorflow datasets from .npz files
-    # train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
-    train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
+    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
+    # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
     val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))

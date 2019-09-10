@@ -59,7 +59,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -277,7 +277,7 @@ if testing:
         print(metric_str)
 
         confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
-        confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
+        confusion_matrix_file = os.path.join(output_dir, experiment_name + " Confusion Matrix.png")
         confusion_matrix.savefig(confusion_matrix_file)
         experiment.log_image(confusion_matrix_file)
 
