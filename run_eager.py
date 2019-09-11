@@ -35,6 +35,7 @@ experiment_params = {'task_name': 'swda',
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': True,
+                     'train_embedding': True,
                      'embedding_dim': 50,
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
@@ -108,6 +109,7 @@ print("Learning rate: " + str(learning_rate))
 vocab_size = experiment_params['vocab_size']
 max_seq_length = experiment_params['max_seq_length']
 to_tokens = experiment_params['to_tokens']
+train_embeddings = experiment_params['train_embeddings']
 embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
@@ -142,6 +144,7 @@ print("Vocabulary size: " + str(vocab_size))
 print("Maximum sequence length: " + str(max_seq_length))
 print("Using sequence tokens: " + str(to_tokens))
 print("Embedding dimension: " + str(embedding_dim))
+print("Embedding dimension: " + str(embedding_dim))
 print("Embedding type: " + embedding_type)
 print("Embedding source: " + embedding_source)
 print("Global steps: " + str(global_steps))
@@ -160,7 +163,7 @@ if load_model and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
 # Else build with supplied parameters
 else:
     model_class = models.get_model(experiment_params['model_name'])
-    model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
+    model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, train_embeddings, **model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))

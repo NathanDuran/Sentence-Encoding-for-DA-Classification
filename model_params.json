@@ -30,7 +30,7 @@
     "lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
-    "use_gpu": false,
+    "use_gpu": true,
     "lstm_units": 256,
     "lstm_dropout": 0.2,
     "recurrent_dropout": 0.1,

@@ -20,8 +20,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'deep_bi_lstm_opt',
-                     'model_name': 'deep_bi_lstm',
+                     'experiment_name': 'deep_bi_lstm_attn_opt',
+                     'model_name': 'deep_bi_lstm_attn',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
