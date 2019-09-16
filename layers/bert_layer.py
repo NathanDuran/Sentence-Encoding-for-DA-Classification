@@ -17,7 +17,7 @@ class BertLayer(tf.keras.layers.Layer):
         self.bert_path = bert_path
         # Pool: pooled output of the entire sequence with shape [batch_size, hidden_size]
         # Sequence: output every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
-        # Mean Sequence: Averaged sequence outpout with shape [batch_size, hidden_size]
+        # Mean Sequence: Averaged sequence output with shape [batch_size, hidden_size]
         if self.pooling not in ["pool", "sequence", "mean_sequence"]:
             raise NameError("BERT pooling type (must be either pool, sequence or mean_sequence but is" + self.pooling)
 

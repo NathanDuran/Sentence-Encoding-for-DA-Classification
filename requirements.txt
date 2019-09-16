@@ -1,4 +1,4 @@
-Comet-ml==2.0.11
+Comet-ml==2.0.12
 gluonnlp==0.7.1
 graphviz==0.11.1
 pydot==1.4.1
@@ -7,7 +7,6 @@ spacy==2.1.7
 mxnet==1.5.0
 tensorflow-gpu==1.14.0
 tensorflow_hub==0.5.0
-keras==2.2.4
 scikit-learn==0.20.3
 matplotlib==3.1.0
 seaborn==0.9.0

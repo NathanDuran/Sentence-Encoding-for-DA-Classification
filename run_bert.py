@@ -60,7 +60,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -130,8 +130,8 @@ if not os.listdir(dataset_dir):
 vocabulary, labels = data_set.load_metadata()
 
 # Build tensorflow datasets from .npz files
-# train_input_ids, train_input_masks, train_segment_ids, train_labels = data_set.build_dataset_for_bert('train', tokenizer, batch_size, is_training=True)
-train_input_ids, train_input_masks, train_segment_ids,  train_labels = data_set.build_dataset_for_bert('dev', tokenizer, batch_size, is_training=True)
+train_input_ids, train_input_masks, train_segment_ids, train_labels = data_set.build_dataset_for_bert('train', tokenizer, batch_size, is_training=True)
+# train_input_ids, train_input_masks, train_segment_ids,  train_labels = data_set.build_dataset_for_bert('dev', tokenizer, batch_size, is_training=True)
 val_input_ids, val_input_masks, val_segment_ids, val_labels = data_set.build_dataset_for_bert('val', tokenizer, batch_size, is_training=False)
 test_input_ids, test_input_masks, test_segment_ids, test_labels = data_set.build_dataset_for_bert('test', tokenizer, batch_size, is_training=False)
 global_steps = int(len(list(train_input_ids)) * num_epochs)
