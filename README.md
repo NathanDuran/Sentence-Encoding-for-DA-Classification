@@ -2,27 +2,26 @@
 
 # TODO
 
-- models
-- Add second dense layer to classification layers??? Time distributed?
+## models
+- Add second dense layer to classification layers??? Time distributed? or try CRF?
 
-- bi-lstm reduce num units (both recurrent and dense)?  Prob not
 - bi-lstm attn increase dropout?
 
 - GRU?
-- Recurrent convolutional
+- Recurrent convolutional - Ribeiro, E., Ribeiro, R. and de Matos, D. M. (2018) ‘Deep Dialog Act Recognition using Multiple Token, Segment, and Context Information Representations’, arXiv. doi: arXiv:1807.08587v1.
 
 - rnnlm + char level language model
-- Bothe, C. et al. (2018) ‘A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks’, in Eleventh International Conference on Language Resources and Evaluation (LREC 2018). Miyazaki, Japan. Available at: http://www.informatik.uni-hamburg.de/WTM/ (Accessed: 13 August 2019).
 - mLSTM https://github.com/titu1994/Keras-Multiplicative-LSTM
 
 - elmo (try 'elmo' instead of default?) + elmo attention? More layers? 
-- bert + attention? Different layers? 
+- bert Different num layers? 
 - use + attention?
 
+## Misc
 - Add truncating word vectors to embedding dim
 - Try saving trained embeddings?
 
 - Change test to only log final values?
 - Add experiment params to model? (so can compare max_seq_length, embedding_dim etc)
 - Visualising attention layers
-- Save train/test history + predictions?
+- Save train/test history + predictions

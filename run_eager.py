@@ -22,8 +22,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm',
-                     'model_name': 'lstm',
+                     'experiment_name': 'mlstm_char_lm',
+                     'model_name': 'mlstm_char_lm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -35,7 +35,7 @@ experiment_params = {'task_name': 'swda',
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': True,
-                     'train_embedding': True,
+                     'train_embeddings': True,
                      'embedding_dim': 50,
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
@@ -60,7 +60,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)

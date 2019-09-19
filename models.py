@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-from layers import ElmoEmbeddingLayer, BertLayer, UniversalSentenceEncoderLayer
+from layers import ElmoEmbeddingLayer, BertLayer, UniversalSentenceEncoderLayer, MLSTMCharLMLayer
 
 
 def get_model(model_name):
@@ -27,7 +27,9 @@ def get_model(model_name):
               'elmo': Elmo(),
               'bert': BERT(),
               'use': UniversalSentenceEncoder(),
-              'nnlm': NeuralNetworkLanguageModel()}
+              'nnlm': NeuralNetworkLanguageModel(),
+              'mlstm_char_lm': MLSTMCharLM(),
+              'lstm_word_lm': LSTMWordLM()}
 
     if model_name.lower() not in models.keys():
         raise Exception("The given model type: '" + model_name + "' is not valid!\n" +
@@ -755,13 +757,13 @@ class BERT(Model):
         in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks")
         in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids")
         bert_inputs = [in_id, in_mask, in_segment]
-
         bert_output = BertLayer(n_fine_tune_layers=num_fine_tune_layers, pooling=pooling)(bert_inputs)
+
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(bert_output)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
-        model = tf.keras.models.Model(inputs=bert_inputs, outputs=outputs)
+        model = tf.keras.models.Model(inputs=bert_inputs, outputs=outputs, name=self.name)
         return model
 
 
@@ -817,8 +819,95 @@ class NeuralNetworkLanguageModel(Model):
 
         model = tf.keras.Sequential([
             hub.KerasLayer(self.module_url, input_shape=[], dtype=tf.string, trainable=True),
-            tf.keras.layers.Dense(dense_units, activation=dense_activation, name='dense_1'),
+            tf.keras.layers.Dense(dense_units, activation=dense_activation),
             tf.keras.layers.Dropout(dropout_rate),
             tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')
         ])
+        return model
+
+
+class MLSTMCharLM(Model):
+    """ Uses an mLSTM Character Language Model as embedding layer.
+
+    Radford, A., Jozefowicz, R. and Sutskever, I. (2018) ‘Learning to Generate Reviews and Discovering Sentiment’,
+    arXiv. Available at: http://arxiv.org/abs/1704.01444
+
+    Bothe, C. et al. (2018) ‘A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks’,
+     in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).
+
+    Url: https://github.com/openai/generating-reviews-discovering-sentiment
+    """
+
+    def __init__(self, name='mLSTMCharLM'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
+
+        inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
+        embedding = MLSTMCharLMLayer()(inputs)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
+
+        model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
+        return model
+
+
+class LSTMWordLM(Model):
+    def __init__(self, name='LSTMWordLM'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        weights_file = kwargs['weights_file'] if 'weights_file' in kwargs.keys() else None
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
+        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                      output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                      input_length=input_shape[0],  # Max seq length
+                                      trainable=train_embeddings,
+                                      name='embedd')(inputs)
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='lstm_1')(x)
+            x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='lstm_2')(x)
+        else:
+            x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                     dropout=lstm_dropout,
+                                     recurrent_dropout=recurrent_dropout,
+                                     return_sequences=True,
+                                     name='lstm_1')(x)
+            x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                     dropout=lstm_dropout,
+                                     recurrent_dropout=recurrent_dropout,
+                                     return_sequences=True,
+                                     name='lstm_2')(x)
+        # x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(dense_units, activation=dense_activation), name='dense_1')(x)
+        # x = tf.keras.layers.Dropout(dropout_rate)(x)
+
+        x = tf.keras.layers.GlobalAveragePooling1D()(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        if weights_file:
+            model.load_weights(weights_file, by_name=True)
         return model

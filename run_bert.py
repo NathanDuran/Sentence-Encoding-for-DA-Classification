@@ -19,11 +19,11 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-# Enable Tensorflow eager execution
+# Run Tensorflow session
 sess = tf.Session()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'bert',
+                     'experiment_name': 'bert_3lyr',
                      'model_name': 'bert',
                      'training': True,
                      'testing': True,

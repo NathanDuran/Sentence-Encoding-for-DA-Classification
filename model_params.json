@@ -93,7 +93,7 @@
     "dense_units": 128
   },
     "deep_bi_lstm": {
-    "learning_rate": 0.001,
+    "learning_rate": 0.00075,
     "optimiser": "rmsprop",
     "use_gpu": true,
     "num_lstm_layers": 2,
@@ -104,7 +104,7 @@
     "dense_units": 128
   },
     "deep_bi_lstm_attn": {
-    "learning_rate": 0.001,
+    "learning_rate": 0.00075,
     "optimiser": "rmsprop",
     "use_gpu": true,
     "attention_type": "add",
@@ -122,7 +122,7 @@
     "dense_units": 256
   },
     "bert": {
-    "learning_rate": 0.001,
+    "learning_rate": 0.00002,
     "optimiser": "adam",
     "num_fine_tune_layers": 3,
     "pooling": "mean_sequence",
@@ -140,5 +140,22 @@
     "optimiser": "adam",
     "dropout_rate": 0.02,
     "dense_units": 256
+  },
+    "mlstm_char_lm": {
+    "learning_rate": 0.001,
+    "optimiser": "adam",
+    "dropout_rate": 0.02,
+    "dense_units": 256
+  },
+    "lstm_word_lm": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "use_gpu": true,
+    "weights_file": "weights/lstm-word-lm-50dim-weights-20-epochs.hdf5",
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
+    "dense_units": 128
   }
 }

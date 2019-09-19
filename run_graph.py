@@ -17,12 +17,12 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-# Enable Tensorflow eager execution
+# Run Tensorflow session
 sess = tf.Session()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'use',
-                     'model_name': 'use',
+                     'experiment_name': 'mlstm_char_lm',
+                     'model_name': 'mlstm_char_lm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -34,9 +34,9 @@ experiment_params = {'task_name': 'swda',
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': False,
-                     'embedding_dim': 512,
-                     'embedding_type': 'use',
-                     'embedding_source': 'use'}
+                     'embedding_dim': 4096,
+                     'embedding_type': 'mlstm_char_lm',
+                     'embedding_source': 'mlstm_char_lm'}
 
 # Load model params if file exists otherwise defaults will be used
 model_param_file = 'model_params.json'
