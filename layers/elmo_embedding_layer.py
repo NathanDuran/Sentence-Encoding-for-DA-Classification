@@ -3,6 +3,7 @@ import tensorflow_hub as hub
 
 
 class ElmoEmbeddingLayer(tf.keras.layers.Layer):
+    """ Wraps the Elmo module from Tensorflow Hub in a Keras Layer."""
 
     def __init__(self, **kwargs):
         self.dimensions = 1024

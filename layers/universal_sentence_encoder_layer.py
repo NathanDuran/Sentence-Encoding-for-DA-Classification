@@ -3,6 +3,7 @@ import tensorflow_hub as hub
 
 
 class UniversalSentenceEncoderLayer(tf.keras.layers.Layer):
+    """ Wraps the Universal Sentence Encoder module from Tensorflow Hub in a Keras Layer."""
 
     def __init__(self, **kwargs):
         self.dimensions = 512

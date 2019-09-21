@@ -114,11 +114,10 @@ embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
-# Initialize the dataset and embedding processor
+# Initialize the dataset processor
 data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
-embedding = embedding_processor.get_embedding_processor(embedding_type)
 
-# If dataset folder is empty get the metadata and datasets to TFRecords
+# If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
     data_set.get_dataset()
 
@@ -126,9 +125,10 @@ if not os.listdir(dataset_dir):
 vocabulary, labels = data_set.load_metadata()
 
 # Generate the embedding matrix
+embedding = embedding_processor.get_embedding_processor(embedding_type)
 embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
-# Build tensorflow datasets from .npz files
+# Build datasets from .npz files
 train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
 # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
 val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)

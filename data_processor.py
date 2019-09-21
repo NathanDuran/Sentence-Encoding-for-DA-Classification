@@ -237,9 +237,9 @@ class DataProcessor:
 
                     tokenized_utterances.append(sentence_tokens)
 
-            # Count the word frequencies and generate vocabulary with vocab_size (-2 to account for <unk> and <pad>)
+            # Count the word frequencies and generate vocabulary, vocab_size - 4 (<unk>=0, <pad>=1, <bos>=2, <eos>=3)
             vocab_counter = nlp.data.count_tokens(list(itertools.chain(*tokenized_utterances)))
-            vocabulary = nlp.Vocab(vocab_counter, self.vocab_size - 2, bos_token=None, eos_token=None)
+            vocabulary = nlp.Vocab(vocab_counter, self.vocab_size - 4)
 
             # Create and sort the labels counter
             label_counter = Counter(label_counter)
@@ -376,7 +376,7 @@ class DataProcessor:
         np.savez_compressed(os.path.join(self.output_dir, set_type), text=examples_text, labels=examples_labels)
 
     def build_dataset_from_numpy(self, set_type, batch_size, is_training=True):
-        """Creates an numpy dataset from the specified .npz File
+        """Creates an numpy dataset from the specified .npz file.
 
         Args:
             set_type (str): Specifies if this is the training, validation or test data

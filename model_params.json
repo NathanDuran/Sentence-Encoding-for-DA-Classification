@@ -144,6 +144,8 @@
     "mlstm_char_lm": {
     "learning_rate": 0.001,
     "optimiser": "adam",
+    "batch_size": 32,
+    "max_seq_length": 640,
     "dropout_rate": 0.02,
     "dense_units": 256
   },

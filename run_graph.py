@@ -21,7 +21,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 sess = tf.Session()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'mlstm_char_lm',
+                     'experiment_name': 'mlstm_char_lm_av',
                      'model_name': 'mlstm_char_lm',
                      'training': True,
                      'testing': True,
@@ -111,17 +111,17 @@ embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
-# Initialize the dataset and embedding processor
+# Initialize the dataset processor
 data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 
-# If dataset folder is empty get the metadata and datasets to TFRecords
+# If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
     data_set.get_dataset()
 
 # Load the metadata
 vocabulary, labels = data_set.load_metadata()
 
-# Build tensorflow datasets from .npz files
+# Build datasets from .npz files
 train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
 # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
 val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)

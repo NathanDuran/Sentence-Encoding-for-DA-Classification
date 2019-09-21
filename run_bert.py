@@ -113,7 +113,7 @@ embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
-# Initialize the dataset and embedding processor
+# Initialize the dataset processor
 data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 
 # Get the BERT vocab file and casing info from the Hub module
@@ -122,14 +122,14 @@ tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
 vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"], tokenization_info["do_lower_case"]])
 tokenizer = FullTokenizer(vocab_file=vocab_file, do_lower_case=do_lower_case)
 
-# If dataset folder is empty get the metadata and datasets to TFRecords
+# If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
     data_set.get_dataset()
 
 # Load the metadata
 vocabulary, labels = data_set.load_metadata()
 
-# Build tensorflow datasets from .npz files
+# Build datasets from .npz files
 train_input_ids, train_input_masks, train_segment_ids, train_labels = data_set.build_dataset_for_bert('train', tokenizer, batch_size, is_training=True)
 # train_input_ids, train_input_masks, train_segment_ids,  train_labels = data_set.build_dataset_for_bert('dev', tokenizer, batch_size, is_training=True)
 val_input_ids, val_input_masks, val_segment_ids, val_labels = data_set.build_dataset_for_bert('val', tokenizer, batch_size, is_training=False)

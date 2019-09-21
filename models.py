@@ -827,15 +827,17 @@ class NeuralNetworkLanguageModel(Model):
 
 
 class MLSTMCharLM(Model):
-    """ Uses an mLSTM Character Language Model as embedding layer.
+    """ Uses an mLSTM Character Language Model as embedding layer from:
+    https://github.com/openai/generating-reviews-discovering-sentiment
 
     Radford, A., Jozefowicz, R. and Sutskever, I. (2018) ‘Learning to Generate Reviews and Discovering Sentiment’,
     arXiv. Available at: http://arxiv.org/abs/1704.01444
 
+    Implements the model as described in:
     Bothe, C. et al. (2018) ‘A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks’,
      in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).
 
-    Url: https://github.com/openai/generating-reviews-discovering-sentiment
+    Note: batch_size and max_seq_length must be manually set for the MLSTMCharLMLayer, see mlstm_char_lm_layer.py
     """
 
     def __init__(self, name='mLSTMCharLM'):
@@ -844,13 +846,16 @@ class MLSTMCharLM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        batch_size = kwargs['batch_size'] if 'batch_size' in kwargs.keys() else 32
+        max_seq_length = kwargs['max_seq_length'] if 'max_seq_length' in kwargs.keys() else 64
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = MLSTMCharLMLayer()(inputs)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+        embedding = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length)(inputs)  # TODO try averaging outputs?
+        x = tf.keras.layers.GlobalAveragePooling1D(data_format='channels_first')(embedding)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
