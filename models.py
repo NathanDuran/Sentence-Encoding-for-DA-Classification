@@ -846,16 +846,20 @@ class MLSTMCharLM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        return_type = kwargs['return_type'] if 'return_type' in kwargs.keys() else 'mean'
         batch_size = kwargs['batch_size'] if 'batch_size' in kwargs.keys() else 32
-        max_seq_length = kwargs['max_seq_length'] if 'max_seq_length' in kwargs.keys() else 64
+        max_seq_length = kwargs['max_seq_length'] if 'max_seq_length' in kwargs.keys() else 640
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length)(inputs)  # TODO try averaging outputs?
-        x = tf.keras.layers.GlobalAveragePooling1D(data_format='channels_first')(embedding)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        embedding = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, return_type=return_type)(inputs)
+        if return_type == 'sequence':
+            x = tf.keras.layers.GlobalAveragePooling1D(data_format='channels_first')(embedding)
+            x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        else:
+            x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 

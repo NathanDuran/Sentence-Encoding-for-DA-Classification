@@ -222,7 +222,7 @@ class Model(object):
                 smb = np.zeros((2, hps.batch_size, hps.hidden_dim))
                 n = len(xmb)
                 xmb, mmb = batch_pad(xmb, hps.batch_size, hps.max_seq_length)
-                smb = sess.run(cells, {X: xmb, S: smb, M: mmb})
+                smb = seq_cells(xmb, mmb, smb)
                 smb = smb[:, :n, :]
                 if indexes is not None:
                     smb = smb[:, :, indexes]
@@ -242,20 +242,26 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
     arXiv. Available at: http://arxiv.org/abs/1704.01444
     https://github.com/openai/generating-reviews-discovering-sentiment
     """
-    def __init__(self, batch_size=32, max_seq_length=640, dimensions=4096, return_sequences=True, **kwargs):
+    def __init__(self, batch_size=32, max_seq_length=640, dimensions=4096, return_type='mean', **kwargs):
         """ Constructor for mLSTM Char Language Model Layer.
 
         Args:
             batch_size (int): Max size of input batches of examples, smaller batches will be padded to this size.
             max_seq_length (int): Max number of characters in input sentence, larger will be truncated.
             dimensions (int): Dimension of the hidden states of mLSTM
-            return_sequences (bool): Whether to return hidden state at each timestep or just last state
+            return_type (string): Final: final hidden state of the mLSTM with shape [batch_size, dimensions]
+                           Sequence: output every hidden state in the input sequence with shape [batch_size, max_seq_length, dimensions]
+                           Mean: Averaged sequence output with shape [batch_size, max_seq_length]
         """
         self.batch_size = batch_size
         self.max_seq_length = max_seq_length
         self.dimensions = dimensions
-        self.return_sequences = return_sequences
+        self.return_type = return_type.lower()
         self.weights_path = 'weights/mlstm_char_lm_weights'
+
+        if self.return_type not in ["final", "sequence", "mean"]:
+            raise NameError("mLSTM return type (must be either final, sequence or mean but is" + self.return_type)
+
         super(MLSTMCharLMLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
@@ -264,16 +270,20 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
 
     def call(self, x, **kwargs):
 
-        # with tf.device('/device:CPU:*'):
+        # with tf.device('/device:CPU:*'): # Could optionally run with CPU if batch or seq length too large
 
-        # Return sequences behaves like keras LSTM, either all cell states or last state
+        # Return hidden state, sequences or the mean of sequences
         # Need to reshape because py_func returns Tensors with no dimensions
-        if self.return_sequences:
+        if self.return_type in ["sequence", "mean"]:
             result = tf.py_func(func=self.model.cell_transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.max_seq_length, self.dimensions])
-        else:
+            if self.return_type == "mean":
+                result = tf.keras.backend.mean(result, axis=2)
+        elif self.return_type == "final":
             result = tf.py_func(func=self.model.transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.dimensions])
+        else:
+            raise NameError("mLSTM return type (must be either final, sequence or mean but is" + self.return_type)
 
         return result
 

@@ -19,7 +19,7 @@ class BertLayer(tf.keras.layers.Layer):
         self.n_fine_tune_layers = n_fine_tune_layers
         self.trainable = True
         self.hidden_size = 768
-        self.pooling = pooling
+        self.pooling = pooling.lower()
         self.bert_path = bert_path
 
         if self.pooling not in ["pool", "sequence", "mean_sequence"]:
@@ -82,4 +82,3 @@ class BertLayer(tf.keras.layers.Layer):
 
     def compute_output_shape(self, input_shape):
         return input_shape[0], self.hidden_size
-
