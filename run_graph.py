@@ -21,7 +21,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 sess = tf.Session()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'mlstm_char_lm_av',
+                     'experiment_name': 'mlstm_char_lm',
                      'model_name': 'mlstm_char_lm',
                      'training': True,
                      'testing': True,
@@ -168,7 +168,7 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metri
 
 # Display a model summary and create/save a model graph definition and image
 model.summary()
-model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
+model_image_file = os.path.join(output_dir, experiment_name + '-model.png')
 tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
 experiment.log_image(model_image_file)
 experiment.set_model_graph(model.to_json())

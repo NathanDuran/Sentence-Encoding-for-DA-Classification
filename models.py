@@ -833,7 +833,7 @@ class MLSTMCharLM(Model):
     Radford, A., Jozefowicz, R. and Sutskever, I. (2018) ‘Learning to Generate Reviews and Discovering Sentiment’,
     arXiv. Available at: http://arxiv.org/abs/1704.01444
 
-    Implements the model as described in:
+    Implements the model as described in (if return_type='mean'):
     Bothe, C. et al. (2018) ‘A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks’,
      in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).
 
@@ -854,12 +854,10 @@ class MLSTMCharLM(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, return_type=return_type)(inputs)
+        x = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, return_type=return_type)(inputs)
         if return_type == 'sequence':
-            x = tf.keras.layers.GlobalAveragePooling1D(data_format='channels_first')(embedding)
-            x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
-        else:
-            x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
@@ -894,24 +892,23 @@ class LSTMWordLM(Model):
                                       name='embedd')(inputs)
         # If a GPU is available use the CUDA layer
         if tf.test.is_gpu_available() and use_gpu:
-            x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='lstm_1')(x)
-            x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='lstm_2')(x)
+            x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, trainable=False, name='lstm_lm_1')(x)
+            # x = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='lstm_2')(x)
         else:
             x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
                                      dropout=lstm_dropout,
                                      recurrent_dropout=recurrent_dropout,
                                      return_sequences=True,
-                                     name='lstm_1')(x)
-            x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
-                                     dropout=lstm_dropout,
-                                     recurrent_dropout=recurrent_dropout,
-                                     return_sequences=True,
-                                     name='lstm_2')(x)
-        # x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(dense_units, activation=dense_activation), name='dense_1')(x)
-        # x = tf.keras.layers.Dropout(dropout_rate)(x)
+                                     name='lstm_lm_1')(x)
+            # x = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+            #                          dropout=lstm_dropout,
+            #                          recurrent_dropout=recurrent_dropout,
+            #                          return_sequences=True,
+            #                          name='lstm_2')(x)
+        x = tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(dense_units, activation=dense_activation))(x)
 
-        x = tf.keras.layers.GlobalAveragePooling1D()(x)
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        # x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
         # Create keras model

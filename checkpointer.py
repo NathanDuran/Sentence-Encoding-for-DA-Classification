@@ -4,7 +4,7 @@ import os
 class Checkpointer:
     """Class for saving a models checkpoints."""
 
-    def __init__(self, checkpoint_dir, experiment_name, model, saving=True, keep_best=1, minimise=True):
+    def __init__(self, checkpoint_dir, experiment_name, model, saving=True, save_weights=False, keep_best=1, minimise=True):
         """Constructs a Checkpointer for a given experiment and model.
 
         Can be used to save the best checkpoints during training according to a supplied metric value.
@@ -14,6 +14,7 @@ class Checkpointer:
             experiment_name (str): Name of the experiment, used for creating checkpoint file names
             model (Model): Instance of the model to save, so its save function can be called
             saving (bool): Whether to actually save models i.e. disables checkpointer
+            save_weights (bool): Whether to save weights as well as model
             keep_best (int): The number of 'best' checkpoints to keep
             minimise (bool): Whether the supplied metric values should be minimised (loss) or maximised (accuracy)
 
@@ -25,6 +26,7 @@ class Checkpointer:
         self.experiment_name = experiment_name
         self.model = model
         self.saving = saving
+        self.save_weights = save_weights
         self.keep_best = keep_best
         self.minimise = minimise
 
@@ -64,10 +66,15 @@ class Checkpointer:
                 self.best_checkpoints.pop(least_best_key)
 
                 # Create a new checkpoint file
-                ckpt_file = self.experiment_name + '_best_ckpt-{}.h5'.format(step)
+                ckpt_file = self.experiment_name + '-best-ckpt-{}.h5'.format(step)
                 self.model.save(os.path.join(self.checkpoint_dir, ckpt_file))
                 # Add to the best checkpoint dict
                 self.best_checkpoints[ckpt_file] = metric_val
+
+                # Check if saving weights as well
+                if self.save_weights:
+                    weight_file = self.experiment_name + '-best-weights-{}.h5'.format(step)
+                    self.model.save_weights(os.path.join(self.checkpoint_dir, weight_file))
 
     def save_checkpoint(self, step):
         """Creates a new checkpoint file for the model at the current step.
@@ -77,5 +84,10 @@ class Checkpointer:
         """
         if self.saving:
             # Create a new checkpoint file
-            ckpt_file = self.experiment_name + '_ckpt-{}.h5'.format(step)
+            ckpt_file = self.experiment_name + '-ckpt-{}.h5'.format(step)
             self.model.save(os.path.join(self.checkpoint_dir, ckpt_file))
+
+            # Check if saving weights as well
+            if self.save_weights:
+                weight_file = self.experiment_name + '-weights-{}.h5'.format(step)
+                self.model.save_weights(os.path.join(self.checkpoint_dir, weight_file))

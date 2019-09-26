@@ -22,8 +22,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'mlstm_char_lm',
-                     'model_name': 'mlstm_char_lm',
+                     'experiment_name': 'lstm_word_lm',
+                     'model_name': 'lstm_word_lm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -60,7 +60,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -176,7 +176,7 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metri
 
 # Display a model summary and create/save a model graph definition and image
 model.summary()
-model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
+model_image_file = os.path.join(output_dir, experiment_name + '-model.png')
 tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
 experiment.log_image(model_image_file)
 experiment.set_model_graph(model.to_json())

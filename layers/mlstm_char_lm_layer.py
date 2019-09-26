@@ -251,7 +251,7 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
             dimensions (int): Dimension of the hidden states of mLSTM
             return_type (string): Final: final hidden state of the mLSTM with shape [batch_size, dimensions]
                            Sequence: output every hidden state in the input sequence with shape [batch_size, max_seq_length, dimensions]
-                           Mean: Averaged sequence output with shape [batch_size, max_seq_length]
+                           Mean: Averaged sequence output with shape [batch_size, dimensions]
         """
         self.batch_size = batch_size
         self.max_seq_length = max_seq_length
@@ -278,7 +278,7 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
             result = tf.py_func(func=self.model.cell_transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.max_seq_length, self.dimensions])
             if self.return_type == "mean":
-                result = tf.keras.backend.mean(result, axis=2)
+                result = tf.keras.backend.mean(result, axis=1)
         elif self.return_type == "final":
             result = tf.py_func(func=self.model.transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.dimensions])
