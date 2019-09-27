@@ -64,6 +64,7 @@ experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO re
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
+experiment.log_parameters(experiment_params)
 for key, value in experiment_params.items():
     experiment.log_other(key, value)
 
@@ -234,8 +235,8 @@ if training:
                     # Print current loss/accuracy
                     result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Val loss: {:.3f} - acc: {:.3f}"
                     print(result_str.format(global_step, global_steps,
-                                            np.mean(train_loss), np.mean(train_accuracy),
-                                            np.mean(val_loss), np.mean(val_accuracy)))
+                                            np.mean(train_loss), np.mean(train_accuracy) * 100,
+                                            np.mean(val_loss), np.mean(val_accuracy) * 100))
 
                     # Save checkpoint if checkpointer metric improves
                     checkpointer.save_best_checkpoint(float(np.mean(val_loss)), global_step)
@@ -278,7 +279,7 @@ if testing:
             predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
 
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
-        print(result_str.format(test_steps, np.mean(test_loss), np.mean(test_accuracy)))
+        print(result_str.format(test_steps, np.mean(test_loss), np.mean(test_accuracy) * 100))
 
         # Generate metrics and confusion matrix
         metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)

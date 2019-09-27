@@ -91,3 +91,25 @@ class Checkpointer:
             if self.save_weights:
                 weight_file = self.experiment_name + '-weights-{}.h5'.format(step)
                 self.model.save_weights(os.path.join(self.checkpoint_dir, weight_file))
+
+    def save_embeddings(self, output_dir, vocabulary, layer_name='embedding'):
+        """Creates a word embedding .txt file from the models embedding layer.
+
+        Args:
+            output_dir (str): Location to save the embedding file
+            vocabulary (Gluonnlp Vocab): Data sets vocabulary for mapping indexes to words
+            layer_name (str): Name of the embedding layer, default = 'embedding'
+        """
+
+        # Get the embedding weights from the model layer
+        embedding_weights = self.model.get_layer(name=layer_name).get_weights()[0]
+
+        # If embeddings are not trained the layer will not have weights
+        if embedding_weights:
+            with open(os.path.join(output_dir, self.experiment_name + '-{:03d}d.txt'.format(embedding_weights.shape[1])), 'w') as file:
+                for i in range(embedding_weights.shape[0]):  # Vocab size
+                    line = vocabulary.idx_to_token[i] + " "
+                    for j in range(embedding_weights.shape[1]):  # Embedding dim
+                        line += str(embedding_weights[i][j]) + " "
+                    line += "\n"
+                    file.write(line)

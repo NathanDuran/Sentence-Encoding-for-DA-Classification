@@ -5,8 +5,6 @@
 ## models
 - Add second dense layer to classification layers??? Time distributed? or try CRF?
 
-- bi-lstm attn increase dropout?
-
 - GRU?
 - Recurrent convolutional - Ribeiro, E., Ribeiro, R. and de Matos, D. M. (2018) ‘Deep Dialog Act Recognition using Multiple Token, Segment, and Context Information Representations’, arXiv. doi: arXiv:1807.08587v1.
 
@@ -19,9 +17,8 @@
 
 ## Misc
 - Add truncating word vectors to embedding dim
-- Try saving trained embeddings?
+- Change test to log final values and step values
 
-- Change test to only log final values?
-- Add experiment params to model? (so can compare max_seq_length, embedding_dim etc)
+## To try
 - Visualising attention layers
-- Save train/test history + predictions
+- Saving trained embeddings

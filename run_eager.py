@@ -22,8 +22,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_word_lm',
-                     'model_name': 'lstm_word_lm',
+                     'experiment_name': 'lstm_test',
+                     'model_name': 'lstm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -64,6 +64,7 @@ experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO re
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
+experiment.log_parameters(experiment_params)
 for key, value in experiment_params.items():
     experiment.log_other(key, value)
 
@@ -228,8 +229,8 @@ if training:
                     # Print current loss/accuracy
                     result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Val loss: {:.3f} - acc: {:.3f}"
                     print(result_str.format(global_step, global_steps,
-                                            train_loss.result(), train_accuracy.result(),
-                                            val_loss.result(), val_accuracy.result()))
+                                            train_loss.result(), train_accuracy.result() * 100,
+                                            val_loss.result(), val_accuracy.result() * 100))
 
                     # Save checkpoint if checkpointer metric improves
                     checkpointer.save_best_checkpoint(val_loss.result(), global_step)
@@ -272,7 +273,7 @@ if testing:
             predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
 
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
-        print(result_str.format(test_steps, test_loss.result(), test_accuracy.result()))
+        print(result_str.format(test_steps, test_loss.result(), test_accuracy.result() * 100))
 
         # Generate metrics and confusion matrix
         metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)

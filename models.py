@@ -104,8 +104,8 @@ class CNN(Model):
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
         x = tf.keras.layers.Conv1D(num_filters, kernel_size, activation=conv_activation, name='conv_1')(x)
         x = tf.keras.layers.MaxPooling1D(pool_size)(x)
@@ -153,8 +153,8 @@ class CNNAttn(Model):
         inputs = tf.keras.Input(shape=input_shape)
         embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                               output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               trainable=train_embeddings)
 
         # Create query and value embeddings
@@ -206,8 +206,8 @@ class TextCNN(Model):
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
 
         x = tf.keras.layers.Reshape((input_shape[0], embedding_matrix.shape[1], 1))(x)
@@ -256,8 +256,8 @@ class LSTM(Model):
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
         x = lstm_layer(x)
         x = tf.keras.layers.GlobalMaxPooling1D()(x)
@@ -306,8 +306,8 @@ class LSTMAttn(Model):
         inputs = tf.keras.Input(shape=input_shape)
         embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                               output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               trainable=train_embeddings)
 
         # Create query and value embeddings
@@ -358,8 +358,8 @@ class DeepLSTM(Model):
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
 
         for i in range(num_lstm_layers):
@@ -430,8 +430,8 @@ class DeepLSTMAttn(Model):
         inputs = tf.keras.Input(shape=input_shape)
         embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                               output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               trainable=train_embeddings)
 
         # Create query and value embeddings
@@ -490,8 +490,8 @@ class BiLSTM(Model):
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
         x = tf.keras.layers.Bidirectional(lstm_layer)(x)
         x = tf.keras.layers.GlobalMaxPooling1D()(x)
@@ -540,8 +540,8 @@ class BiLSTMAttn(Model):
         inputs = tf.keras.Input(shape=input_shape)
         embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                               output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               trainable=train_embeddings)
 
         # Create query and value embeddings
@@ -601,8 +601,8 @@ class DeepBiLSTM(Model):
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
 
         for i in range(num_lstm_layers):
@@ -669,8 +669,8 @@ class DeepBiLSTMAttn(Model):
         inputs = tf.keras.Input(shape=input_shape)
         embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                               output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               trainable=train_embeddings)
 
         # Create query and value embeddings
@@ -886,8 +886,8 @@ class LSTMWordLM(Model):
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
                                       output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings,
                                       name='embedd')(inputs)
         # If a GPU is available use the CUDA layer
