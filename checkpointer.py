@@ -113,3 +113,6 @@ class Checkpointer:
                         line += str(embedding_weights[i][j]) + " "
                     line += "\n"
                     file.write(line)
+        else:
+            print("Embedding weights are 'NoneType', for character models this is correct, "
+                  "otherwise make sure train_embeddings=True.")

@@ -24,6 +24,7 @@ def get_model(model_name):
               'bi_lstm_attn': BiLSTMAttn(),
               'deep_bi_lstm': DeepBiLSTM(),
               'deep_bi_lstm_attn': DeepBiLSTMAttn(),
+              'rcnn': RCNN(),
               'elmo': Elmo(),
               'bert': BERT(),
               'use': UniversalSentenceEncoder(),
@@ -700,6 +701,61 @@ class DeepBiLSTMAttn(Model):
         return model
 
 
+class RCNN(Model):
+    def __init__(self, name='RCNN'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
+        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              trainable=train_embeddings)(inputs)
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            forwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(embedding)
+            backwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, go_backwards=True)(embedding)
+        else:
+            forwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                            dropout=lstm_dropout,
+                                            recurrent_dropout=recurrent_dropout,
+                                            return_sequences=True)(embedding)
+            backwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                             dropout=lstm_dropout,
+                                             recurrent_dropout=recurrent_dropout,
+                                             return_sequences=True,
+                                             go_backwards=True)(embedding)
+
+        # https://github.com/AlexYangLi/TextClassification
+        backward = tf.keras.layers.Lambda(lambda x: tf.keras.backend.reverse(x, axes=1))(backwards)
+        together = tf.keras.layers.Concatenate(axis=2)([forwards, embedding, backward])  # See equation (3).
+
+        semantic = tf.keras.layers.Conv1D(100, kernel_size=1, activation="tanh")(together)  # See equation (4).
+
+        x = tf.keras.layers.GlobalMaxPool1D()(semantic)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+        return model
+
+
 class Elmo(Model):
     """ Uses an elmo from Tensorflow Hub as embedding layer from:
     https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb
@@ -716,6 +772,7 @@ class Elmo(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256

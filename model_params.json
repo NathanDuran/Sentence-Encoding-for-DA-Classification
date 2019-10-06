@@ -115,6 +115,16 @@
     "dropout_rate": 0.02,
     "dense_units": 128
   },
+    "rcnn": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "use_gpu": true,
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "dropout_rate": 0.02,
+    "dense_units": 128
+  },
     "elmo": {
     "learning_rate": 0.001,
     "optimiser": "adam",
