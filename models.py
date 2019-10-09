@@ -186,7 +186,9 @@ class CNNAttn(Model):
 
 
 class TextCNN(Model):
-    """Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
+    """ Implements the Text CNN model from:
+
+    Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
     Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)
     """
 
@@ -242,6 +244,7 @@ class LSTM(Model):
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -253,6 +256,12 @@ class LSTM(Model):
                                               dropout=lstm_dropout,
                                               recurrent_dropout=recurrent_dropout,
                                               return_sequences=True)
+        # Define pooling type
+        if pooling == 'max':
+            pooling_layer = tf.keras.layers.GlobalMaxPooling1D()
+        else:
+            pooling_layer = tf.keras.layers.GlobalAveragePooling1D()
+
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
@@ -261,7 +270,8 @@ class LSTM(Model):
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
         x = lstm_layer(x)
-        x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        x = pooling_layer(x)
+
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -352,6 +362,7 @@ class DeepLSTM(Model):
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -373,7 +384,11 @@ class DeepLSTM(Model):
                                          recurrent_dropout=recurrent_dropout,
                                          return_sequences=True)(x)
 
-        x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -475,6 +490,7 @@ class BiLSTM(Model):
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -486,6 +502,11 @@ class BiLSTM(Model):
                                               dropout=lstm_dropout,
                                               recurrent_dropout=recurrent_dropout,
                                               return_sequences=True)
+        # Define pooling type
+        if pooling == 'max':
+            pooling_layer = tf.keras.layers.GlobalMaxPooling1D()
+        else:
+            pooling_layer = tf.keras.layers.GlobalAveragePooling1D()
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
@@ -495,7 +516,8 @@ class BiLSTM(Model):
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
         x = tf.keras.layers.Bidirectional(lstm_layer)(x)
-        x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        x = pooling_layer(x)
+
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -586,6 +608,7 @@ class DeepBiLSTM(Model):
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -609,7 +632,11 @@ class DeepBiLSTM(Model):
         for i in range(num_lstm_layers):
             x = tf.keras.layers.Bidirectional(lstm_layer)(x)
 
-        x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -702,6 +729,14 @@ class DeepBiLSTMAttn(Model):
 
 
 class RCNN(Model):
+    """ Implements the Recurrent Convolutional Network from:
+
+    Lai, S. et al. (2015) ‘Recurrent Convolutional Neural Networks for Text Classification’,
+    in Proceedings of the 29th AAAI Conference on Artificial Intelligence (AAAI’15).
+
+    Model code from: "https://github.com/AlexYangLi/TextClassification"
+    """
+
     def __init__(self, name='RCNN'):
         super().__init__(name)
         self.name = name
@@ -714,6 +749,7 @@ class RCNN(Model):
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 64
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -725,28 +761,45 @@ class RCNN(Model):
                                               embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                               trainable=train_embeddings)(inputs)
 
+        # Shift the document to the right to obtain the left-side contexts (reshape else lambda outputs 'None' shape)
+        l_embedding = tf.keras.layers.Lambda(lambda x: tf.keras.backend.concatenate(
+            [tf.keras.backend.zeros(shape=(tf.keras.backend.shape(x)[0], 1, tf.keras.backend.shape(x)[-1])),
+             x[:, :-1]], axis=1), name='l_shift')(embedding)
+        l_embedding = tf.keras.layers.Reshape((input_shape[0], embedding_matrix.shape[1]))(l_embedding)
+
+        # Shift the document to the left to obtain the right-side contexts (reshape else lambda outputs 'None' shape)
+        r_embedding = tf.keras.layers.Lambda(lambda x: tf.keras.backend.concatenate(
+            [tf.keras.backend.zeros(shape=(tf.keras.backend.shape(x)[0], 1, tf.keras.backend.shape(x)[-1])),
+             x[:, 1:]], axis=1), name='r_shift')(embedding)
+        r_embedding = tf.keras.layers.Reshape((input_shape[0], embedding_matrix.shape[1]))(r_embedding)
+
         # If a GPU is available use the CUDA layer
         if tf.test.is_gpu_available() and use_gpu:
-            forwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)(embedding)
-            backwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, go_backwards=True)(embedding)
+            forwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='forwards')(l_embedding)
+            backwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, go_backwards=True, name='backwards')(r_embedding)
         else:
             forwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
                                             dropout=lstm_dropout,
                                             recurrent_dropout=recurrent_dropout,
-                                            return_sequences=True)(embedding)
+                                            return_sequences=True,
+                                            name='forwards')(l_embedding)
             backwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
                                              dropout=lstm_dropout,
                                              recurrent_dropout=recurrent_dropout,
                                              return_sequences=True,
-                                             go_backwards=True)(embedding)
+                                             go_backwards=True,
+                                             name='backwards')(r_embedding)
 
-        # https://github.com/AlexYangLi/TextClassification
-        backward = tf.keras.layers.Lambda(lambda x: tf.keras.backend.reverse(x, axes=1))(backwards)
-        together = tf.keras.layers.Concatenate(axis=2)([forwards, embedding, backward])  # See equation (3).
+        # Keras returns backwards LSTM outputs in reverse, so return to correct order
+        backwards = tf.keras.layers.Lambda(lambda x: tf.keras.backend.reverse(x, axes=1))(backwards)
 
-        semantic = tf.keras.layers.Conv1D(100, kernel_size=1, activation="tanh")(together)  # See equation (4).
+        # Concatenate left, embedding and right contexts
+        concat = tf.keras.layers.Concatenate(axis=2)([forwards, embedding, backwards])
 
+        # Get semantic vector for each word in sequence
+        semantic = tf.keras.layers.Conv1D(num_filters, kernel_size=1, activation="tanh")(concat)
         x = tf.keras.layers.GlobalMaxPool1D()(semantic)
+
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -779,6 +832,7 @@ class Elmo(Model):
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
         embedding = ElmoEmbeddingLayer()(inputs)
+
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
@@ -846,6 +900,7 @@ class UniversalSentenceEncoder(Model):
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
         embedding = UniversalSentenceEncoderLayer()(inputs)
+
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
@@ -914,6 +969,7 @@ class MLSTMCharLM(Model):
         x = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, return_type=return_type)(inputs)
         if return_type == 'sequence':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
+
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
