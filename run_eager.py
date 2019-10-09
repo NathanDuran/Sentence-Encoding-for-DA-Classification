@@ -9,6 +9,7 @@ import data_processor
 import embedding_processor
 import optimisers
 import checkpointer
+import early_stopper
 import tensorflow as tf
 import numpy as np
 
@@ -22,8 +23,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'rcnn',
-                     'model_name': 'rcnn',
+                     'experiment_name': 'lstm',
+                     'model_name': 'lstm',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -60,7 +61,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -189,8 +190,9 @@ if training:
     start_time = time.time()
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
-    # Initialise model checkpointer
+    # Initialise model checkpointer and early stopping monitor
     checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
+    earlystop = early_stopper.EarlyStopper(patience=5, min_delta=0.0, minimise=True)
 
     # Initialise train and validation metrics
     train_loss = tf.keras.metrics.Mean()
@@ -235,6 +237,10 @@ if training:
                     # Save checkpoint if checkpointer metric improves
                     checkpointer.save_best_checkpoint(val_loss.result(), global_step)
 
+        # Check to stop training early
+        if earlystop.check_early_stop(val_loss.result()):
+            break
+
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
 
@@ -265,12 +271,16 @@ if testing:
             test_loss(loss)
             test_accuracy(accuracy)
 
-            experiment.log_metric('loss', test_loss.result().numpy(), step=test_step)
-            experiment.log_metric('accuracy', test_accuracy.result().numpy(), step=test_step)
+            experiment.log_metric('step_loss', test_loss.result().numpy(), step=test_step)
+            experiment.log_metric('step_accuracy', test_accuracy.result().numpy(), step=test_step)
 
             # Append to lists for creating metrics
             true_labels = np.append(true_labels, test_labels[test_step].flatten())
             predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
+
+        # Log final test result
+        experiment.log_metric('loss', test_loss.result().numpy(), step=test_steps)
+        experiment.log_metric('accuracy', test_accuracy.result().numpy(), step=test_steps)
 
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
         print(result_str.format(test_steps, test_loss.result(), test_accuracy.result() * 100))

@@ -8,6 +8,7 @@ import models
 import data_processor
 import optimisers
 import checkpointer
+import early_stopper
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
@@ -195,8 +196,9 @@ if training:
     start_time = time.time()
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
-    # Initialise model checkpointer
+    # Initialise model checkpointer and early stopping monitor
     checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
+    earlystop = early_stopper.EarlyStopper(patience=5, min_delta=0.0, minimise=True)
 
     # Initialise train and validation metrics
     train_loss = []
@@ -240,6 +242,10 @@ if training:
 
                     # Save checkpoint if checkpointer metric improves
                     checkpointer.save_best_checkpoint(float(np.mean(val_loss)), global_step)
+
+        # Check to stop training early
+        if earlystop.check_early_stop(float(np.mean(val_loss))):
+            break
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
