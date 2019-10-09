@@ -87,9 +87,9 @@ class GloveEmbedding(EmbeddingProcessor):
         vocabulary.set_embedding(glove)
 
         # Check desired embedding dimensions is valid
-        if len(vocabulary.embedding[0]) != embedding_dim:
+        if len(vocabulary.embedding[0]) < embedding_dim:
             raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
-                             "' does not match specified embedding dimensions: '" + str(embedding_dim) + "'.")
+                             "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
         # Generate empty numpy matrix of shape (vocabulary_size, embedding_dim)
         matrix = np.empty((len(vocabulary), embedding_dim), dtype='float32')
@@ -97,6 +97,7 @@ class GloveEmbedding(EmbeddingProcessor):
         # Copy vocabulary embeddings into matrix
         for i in range(len(vocabulary)):
             embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
+            embedding = [embedding[i] for i in range(embedding_dim)]
             matrix[i] = embedding
 
         return matrix
@@ -128,7 +129,7 @@ class Word2VecEmbedding(EmbeddingProcessor):
         # Check desired embedding dimensions is valid
         if len(vocabulary.embedding[0]) != embedding_dim:
             raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
-                             "' does not match specified embedding dimensions: '" + str(embedding_dim) + "'.")
+                             "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
         # Generate empty numpy matrix of shape (vocabulary_size, embedding_dim)
         matrix = np.empty((len(vocabulary), embedding_dim), dtype='float32')
@@ -136,6 +137,7 @@ class Word2VecEmbedding(EmbeddingProcessor):
         # Copy vocabulary embeddings into matrix
         for i in range(len(vocabulary)):
             embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
+            embedding = [embedding[i] for i in range(embedding_dim)]
             matrix[i] = embedding
 
         return matrix
@@ -165,7 +167,7 @@ class FastTextEmbedding(EmbeddingProcessor):
         # Check desired embedding dimensions is valid
         if len(vocabulary.embedding[0]) != embedding_dim:
             raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
-                             "' does not match specified embedding dimensions: '" + str(embedding_dim) + "'.")
+                             "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
         # Generate empty numpy matrix of shape (vocabulary_size, embedding_dim)
         matrix = np.empty((len(vocabulary), embedding_dim), dtype='float32')
@@ -173,6 +175,7 @@ class FastTextEmbedding(EmbeddingProcessor):
         # Copy vocabulary embeddings into matrix
         for i in range(len(vocabulary)):
             embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
+            embedding = [embedding[i] for i in range(embedding_dim)]
             matrix[i] = embedding
 
         return matrix
@@ -217,7 +220,7 @@ class Numberbatch(EmbeddingProcessor):
             # Check desired embedding dimensions is valid
             if len(vocabulary.embedding[0]) != embedding_dim:
                 raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
-                                 "' does not match specified embedding dimensions: '" + str(embedding_dim) + "'.")
+                                 "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
             # Generate empty numpy matrix of shape (vocabulary_size, embedding_dim)
             matrix = np.empty((len(vocabulary), embedding_dim), dtype='float32')
@@ -225,6 +228,7 @@ class Numberbatch(EmbeddingProcessor):
             # Copy vocabulary embeddings into matrix
             for i in range(len(vocabulary)):
                 embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
+                embedding = [embedding[i] for i in range(embedding_dim)]
                 matrix[i] = embedding
 
         return matrix
@@ -268,7 +272,7 @@ class Dependency(EmbeddingProcessor):
             # Check desired embedding dimensions is valid
             if len(vocabulary.embedding[0]) != embedding_dim:
                 raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
-                                 "' does not match specified embedding dimensions: '" + str(embedding_dim) + "'.")
+                                 "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
             # Generate empty numpy matrix of shape (vocabulary_size, embedding_dim)
             matrix = np.empty((len(vocabulary), embedding_dim), dtype='float32')
@@ -276,6 +280,7 @@ class Dependency(EmbeddingProcessor):
             # Copy vocabulary embeddings into matrix
             for i in range(len(vocabulary)):
                 embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
+                embedding = [embedding[i] for i in range(embedding_dim)]
                 matrix[i] = embedding
 
         return matrix

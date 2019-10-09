@@ -731,8 +731,8 @@ class DeepBiLSTMAttn(Model):
 class RCNN(Model):
     """ Implements the Recurrent Convolutional Network from:
 
-    Lai, S. et al. (2015) ‘Recurrent Convolutional Neural Networks for Text Classification’,
-    in Proceedings of the 29th AAAI Conference on Artificial Intelligence (AAAI’15).
+    Lai, S. et al. (2015) 'Recurrent Convolutional Neural Networks for Text Classification',
+    in Proceedings of the 29th AAAI Conference on Artificial Intelligence (AAAI'15).
 
     Model code from: "https://github.com/AlexYangLi/TextClassification"
     """
@@ -882,7 +882,7 @@ class UniversalSentenceEncoder(Model):
     """ Uses an Universal Sentence Encoder from Tensorflow Hub as embedding layer.
 
     Daniel Cer, Yinfei Yang, Sheng-yi Kong, Nan Hua, Nicole Limtiaco, Rhomni St. John, Noah Constant,
-    Mario Guajardo-Céspedes, Steve Yuan, Chris Tar, Yun-Hsuan Sung, Brian Strope, Ray Kurzweil.
+    Mario Guajardo-Cespedes, Steve Yuan, Chris Tar, Yun-Hsuan Sung, Brian Strope, Ray Kurzweil.
     Universal Sentence Encoder. arXiv:1803.11175, 2018.
 
     Module url: "https://tfhub.dev/google/universal-sentence-encoder-large/3"
@@ -912,7 +912,7 @@ class UniversalSentenceEncoder(Model):
 class NeuralNetworkLanguageModel(Model):
     """ Uses Neural Network Language Model from Tensorflow Hub.
     
-    Yoshua Bengio, Réjean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
+    Yoshua Bengio, Rejean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
     Journal of Machine Learning Research, 3:1137-1155, 2003.
 
     Module url: "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
@@ -942,11 +942,11 @@ class MLSTMCharLM(Model):
     """ Uses an mLSTM Character Language Model as embedding layer from:
     https://github.com/openai/generating-reviews-discovering-sentiment
 
-    Radford, A., Jozefowicz, R. and Sutskever, I. (2018) ‘Learning to Generate Reviews and Discovering Sentiment’,
+    Radford, A., Jozefowicz, R. and Sutskever, I. (2018) 'Learning to Generate Reviews and Discovering Sentiment',
     arXiv. Available at: http://arxiv.org/abs/1704.01444
 
     Implements the model as described in (if return_type='mean'):
-    Bothe, C. et al. (2018) ‘A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks’,
+    Bothe, C. et al. (2018) 'A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks',
      in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).
 
     Note: batch_size and max_seq_length must be manually set for the MLSTMCharLMLayer, see mlstm_char_lm_layer.py
