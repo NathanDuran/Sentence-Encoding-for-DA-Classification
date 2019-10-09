@@ -271,12 +271,16 @@ if testing:
             test_loss.append(loss)
             test_accuracy.append(accuracy)
 
-            experiment.log_metric('loss', np.mean(test_loss), step=test_step)
-            experiment.log_metric('accuracy', np.mean(test_accuracy), step=test_step)
+            experiment.log_metric('step_loss', np.mean(test_loss), step=test_step)
+            experiment.log_metric('step_accuracy', np.mean(test_accuracy), step=test_step)
 
             # Append to lists for creating metrics
             true_labels = np.append(true_labels, test_labels[test_step].flatten())
             predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
+
+        # Log final test result
+        experiment.log_metric('loss', np.mean(test_loss), step=test_steps)
+        experiment.log_metric('accuracy', np.mean(test_accuracy), step=test_steps)
 
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
         print(result_str.format(test_steps, np.mean(test_loss), np.mean(test_accuracy) * 100))

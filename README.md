@@ -10,11 +10,10 @@
 - GRU?
 - https://github.com/AlexYangLi/TextClassification
 
-- rnnlm + char level language model
+- rnnlm + char + seq2seq language model
 - mLSTM https://github.com/titu1994/Keras-Multiplicative-LSTM
 
 ## Misc
-- Change test to log final values and step values
 - Save training history/predictions
 - Document the models in readme
 
