@@ -6,7 +6,6 @@ from comet_ml import Optimizer
 import models
 import data_processor
 import embedding_processor
-import optimisers
 import tensorflow as tf
 
 # Suppress TensorFlow debugging
@@ -20,8 +19,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'deep_bi_lstm_attn_opt',
-                     'model_name': 'deep_bi_lstm_attn',
+                     'experiment_name': 'deep_lstm_opt',
+                     'model_name': 'deep_lstm',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
@@ -137,12 +136,6 @@ for experiment in model_optimiser.get_experiments():
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
-
-    # Create optimiser
-    optimiser = optimisers.get_optimiser(optimiser_type=model_params['optimiser'], lr=model_params['learning_rate'], **model_params)
-
-    # Compile the model
-    model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
 
     # Display a model summary
     model.summary()

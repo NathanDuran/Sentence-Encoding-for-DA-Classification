@@ -1,5 +1,6 @@
 import tensorflow as tf
 import tensorflow_hub as hub
+import optimisers
 from layers import ElmoEmbeddingLayer, BertLayer, UniversalSentenceEncoderLayer, MLSTMCharLMLayer
 
 
@@ -69,9 +70,14 @@ class Model(object):
         x = tf.keras.layers_t.Dense(dense_units, activation='relu', name='dense_1')(x)
         outputs = tf.keras.layers_t.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
-        # Create and return keras model
+        # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
 
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
 
         Args:
             input_shape (tuple): The input shape excluding batch size, i.e (sequence_length, )
@@ -93,6 +99,8 @@ class CNN(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.002
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'relu'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 64
@@ -118,6 +126,12 @@ class CNN(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -128,6 +142,8 @@ class CNNAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.002
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'relu'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
@@ -182,6 +198,12 @@ class CNNAttn(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -198,6 +220,8 @@ class TextCNN(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.002
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'elu'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 36
@@ -228,6 +252,12 @@ class TextCNN(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -238,6 +268,8 @@ class LSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -278,6 +310,12 @@ class LSTM(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -288,6 +326,8 @@ class LSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
@@ -345,6 +385,12 @@ class LSTMAttn(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -355,6 +401,8 @@ class DeepLSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -395,6 +443,12 @@ class DeepLSTM(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -405,6 +459,8 @@ class DeepLSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
@@ -474,6 +530,12 @@ class DeepLSTMAttn(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -484,6 +546,8 @@ class BiLSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -524,6 +588,12 @@ class BiLSTM(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -534,6 +604,8 @@ class BiLSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
@@ -591,6 +663,12 @@ class BiLSTMAttn(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -601,6 +679,8 @@ class DeepBiLSTM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -643,6 +723,12 @@ class DeepBiLSTM(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -653,6 +739,8 @@ class DeepBiLSTMAttn(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
@@ -725,6 +813,12 @@ class DeepBiLSTMAttn(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -743,6 +837,8 @@ class RCNN(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
         dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
@@ -806,6 +902,12 @@ class RCNN(Model):
 
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -825,6 +927,8 @@ class Elmo(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
@@ -837,7 +941,14 @@ class Elmo(Model):
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
+        # Create keras model
         model = tf.keras.models.Model(inputs=[inputs], outputs=outputs)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -858,6 +969,8 @@ class BERT(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00002
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         num_fine_tune_layers = kwargs['num_fine_tune_layers'] if 'num_fine_tune_layers' in kwargs.keys() else 3
         pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'mean_sequence'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
@@ -874,7 +987,14 @@ class BERT(Model):
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
+        # Create keras model
         model = tf.keras.models.Model(inputs=bert_inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -894,6 +1014,8 @@ class UniversalSentenceEncoder(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
@@ -905,7 +1027,14 @@ class UniversalSentenceEncoder(Model):
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
+        # Create keras model
         model = tf.keras.models.Model(inputs=[inputs], outputs=outputs)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -925,16 +1054,25 @@ class NeuralNetworkLanguageModel(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
+        # Create keras model
         model = tf.keras.Sequential([
             hub.KerasLayer(self.module_url, input_shape=[], dtype=tf.string, trainable=True),
             tf.keras.layers.Dense(dense_units, activation=dense_activation),
             tf.keras.layers.Dropout(dropout_rate),
             tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')
         ])
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -958,6 +1096,8 @@ class MLSTMCharLM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         return_type = kwargs['return_type'] if 'return_type' in kwargs.keys() else 'mean'
         batch_size = kwargs['batch_size'] if 'batch_size' in kwargs.keys() else 32
         max_seq_length = kwargs['max_seq_length'] if 'max_seq_length' in kwargs.keys() else 640
@@ -974,7 +1114,14 @@ class MLSTMCharLM(Model):
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
+        # Create keras model
         model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model
 
 
@@ -985,6 +1132,8 @@ class LSTMWordLM(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         weights_file = kwargs['weights_file'] if 'weights_file' in kwargs.keys() else None
         lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
@@ -1024,9 +1173,16 @@ class LSTMWordLM(Model):
         # x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
         # Create keras model
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
 
         if weights_file:
             model.load_weights(weights_file, by_name=True)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
         return model

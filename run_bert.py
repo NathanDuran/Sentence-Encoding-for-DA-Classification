@@ -6,7 +6,6 @@ from comet_ml import Experiment
 from metrics import *
 import models
 import data_processor
-import optimisers
 import checkpointer
 import early_stopper
 import tensorflow as tf
@@ -170,12 +169,6 @@ else:
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
 
-# Create optimiser
-optimiser = optimisers.get_optimiser(optimiser_type=optimiser_type, lr=learning_rate, **model_params)
-
-# Compile the model
-model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
-
 # Display a model summary and create/save a model graph definition and image
 model.summary()
 model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
@@ -198,7 +191,7 @@ if training:
 
     # Initialise model checkpointer and early stopping monitor
     checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
-    earlystop = early_stopper.EarlyStopper(patience=5, min_delta=0.0, minimise=True)
+    earlystopper = early_stopper.EarlyStopper(patience=2, min_delta=0.0, minimise=True)
 
     # Initialise train and validation metrics
     train_loss = []
@@ -244,7 +237,7 @@ if training:
                     checkpointer.save_best_checkpoint(float(np.mean(val_loss)), global_step)
 
         # Check to stop training early
-        if earlystop.check_early_stop(float(np.mean(val_loss))):
+        if earlystopper.check_early_stop(float(np.mean(val_loss))):
             break
 
     end_time = time.time()

@@ -7,7 +7,6 @@ from metrics import *
 import models
 import data_processor
 import embedding_processor
-import optimisers
 import checkpointer
 import early_stopper
 import tensorflow as tf
@@ -23,7 +22,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm',
+                     'experiment_name': 'lstm_test',
                      'model_name': 'lstm',
                      'training': True,
                      'testing': True,
@@ -61,7 +60,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -170,12 +169,6 @@ else:
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
 
-# Create optimiser
-optimiser = optimisers.get_optimiser(optimiser_type=optimiser_type, lr=learning_rate, **model_params)
-
-# Compile the model
-model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
-
 # Display a model summary and create/save a model graph definition and image
 model.summary()
 model_image_file = os.path.join(output_dir, experiment_name + '-model.png')
@@ -192,7 +185,7 @@ if training:
 
     # Initialise model checkpointer and early stopping monitor
     checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
-    earlystop = early_stopper.EarlyStopper(patience=5, min_delta=0.0, minimise=True)
+    earlystopper = early_stopper.EarlyStopper(patience=2, min_delta=0.0, minimise=True)
 
     # Initialise train and validation metrics
     train_loss = tf.keras.metrics.Mean()
@@ -238,7 +231,7 @@ if training:
                     checkpointer.save_best_checkpoint(val_loss.result(), global_step)
 
         # Check to stop training early
-        if earlystop.check_early_stop(val_loss.result()):
+        if earlystopper.check_early_stop(val_loss.result()):
             break
 
     end_time = time.time()
