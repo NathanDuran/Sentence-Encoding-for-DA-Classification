@@ -35,7 +35,7 @@ class InputExample(object):
 class DataProcessor:
     """Converts sentences for dialogue act classification into data sets."""
 
-    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, pad_seq=True, to_lower=True, no_punct=False, label_index=2):
+    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, pad_seq=True, to_lower=True, no_punct=False, label_index=2, use_crf=False):
         """Constructs a DataProcessor for the specified dataset.
 
         Note: For MRDA data there is the option to choose which type of labelling is used.
@@ -53,6 +53,7 @@ class DataProcessor:
             to_lower (bool): Flag to convert words to lowercase
             no_punct (bool): Flag to remove punctuation from sentences
             label_index (int): Determines the label type is used if there is more than one type
+            use_crf (bool): Using CRF as final layer requires labels shape [batch_size, num_labels, 1]
 
         Attributes:
             metadata_file (str): Default metadata file location
@@ -69,6 +70,7 @@ class DataProcessor:
         self.to_lower = to_lower
         self.no_punct = no_punct
         self.label_index = label_index
+        self.use_crf = use_crf
 
         self.metadata_file = os.path.join(self.output_dir, 'metadata.pkl')
 
@@ -301,11 +303,7 @@ class DataProcessor:
         return metadata['vocabulary']
 
     def get_dataset(self):
-        """Helper function. Gets the metadata and all datasets from the Github repository and saves to file.
-
-        Args:
-            to_numpy (bool): Wheather to save dataset as numpy arrays or TFRecord files
-        """
+        """Helper function. Gets the metadata and all datasets from the Github repository and saves to file."""
 
         vocabulary, labels = self.get_metadata()
 
@@ -406,6 +404,10 @@ class DataProcessor:
         labels = list(batch(labels, batch_size))
         text = np.asarray(text)
         labels = np.asarray(labels)
+
+        # Reshape labels for crf layer
+        if self.use_crf:
+            labels = [l.reshape((l.shape[0], l.shape[1], 1)) for l in labels]
 
         return text, labels
 

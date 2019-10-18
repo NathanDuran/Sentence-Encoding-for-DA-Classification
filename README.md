@@ -1,8 +1,8 @@
 # Supervised and Semi-supervised Sentence Encoding Methods for Dialogue Act Classification
 
 # TODO
-- retest deep_lstm, bi_lstm and deep_bi_lstm
-- test rcnn
+- retest bi_lstm and deep_bi_lstm
+- test rcnn and crf models
 - bert Different num layers
 
 ## models

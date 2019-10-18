@@ -1,7 +1,8 @@
 import tensorflow as tf
 import tensorflow_hub as hub
 import optimisers
-from layers import ElmoEmbeddingLayer, BertLayer, UniversalSentenceEncoderLayer, MLSTMCharLMLayer
+from layers import ElmoEmbeddingLayer, BertLayer, UniversalSentenceEncoderLayer, MLSTMCharLMLayer, CRF
+from layers import crf_loss, crf_accuracy
 
 
 def get_model(model_name):
@@ -18,6 +19,7 @@ def get_model(model_name):
               'cnn_attn': CNNAttn(),
               'text_cnn': TextCNN(),
               'lstm': LSTM(),
+              'lstm_crf': LSTMCRF(),
               'lstm_attn': LSTMAttn(),
               'deep_lstm': DeepLSTM(),
               'deep_lstm_attn': DeepLSTMAttn(),
@@ -208,7 +210,7 @@ class CNNAttn(Model):
 
 
 class TextCNN(Model):
-    """ Implements the Text CNN model from:
+    """Implements the Text CNN model from:
 
     Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
     Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)
@@ -316,6 +318,58 @@ class LSTM(Model):
 
         # Compile the model
         model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class LSTMCRF(Model):
+    """Uses CRF layer from keras_contrib:
+
+    https://github.com/keras-team/keras-contrib/tree/master/keras_contrib
+
+    Note: The labels must be of shape [batch_size, num_labels, 1].
+    """
+
+    def __init__(self, name='LSTMCRF'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
+        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            lstm_layer = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True)
+        else:
+            lstm_layer = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                              dropout=lstm_dropout,
+                                              recurrent_dropout=recurrent_dropout,
+                                              return_sequences=True)
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                      output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                      input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                      trainable=train_embeddings)(inputs)
+        x = lstm_layer(x)
+        outputs = CRF(output_shape, learn_mode='join', sparse_target=True)(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss=crf_loss, optimizer=optimiser, metrics=[crf_accuracy])
         return model
 
 
@@ -893,8 +947,8 @@ class RCNN(Model):
         concat = tf.keras.layers.Concatenate(axis=2)([forwards, embedding, backwards])
 
         # Get semantic vector for each word in sequence
-        semantic = tf.keras.layers.Conv1D(num_filters, kernel_size=1, activation="tanh")(concat)
-        x = tf.keras.layers.GlobalMaxPool1D()(semantic)
+        y = tf.keras.layers.Conv1D(num_filters, kernel_size=1, activation="tanh")(concat)
+        x = tf.keras.layers.GlobalMaxPool1D()(y)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)

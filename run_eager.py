@@ -22,8 +22,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_test',
-                     'model_name': 'lstm',
+                     'experiment_name': 'lstm_crf',
+                     'model_name': 'lstm_crf',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -60,7 +60,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -116,7 +116,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_crf=True)
 
 # If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
