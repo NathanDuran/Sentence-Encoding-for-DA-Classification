@@ -27,6 +27,14 @@ def get_model(model_name):
               'bi_lstm_attn': BiLSTMAttn(),
               'deep_bi_lstm': DeepBiLSTM(),
               'deep_bi_lstm_attn': DeepBiLSTMAttn(),
+              'gru': GRU(),
+              'gru_attn': GRUAttn(),
+              'deep_gru': DeepGRU(),
+              'deep_gru_attn': DeepGRUAttn(),
+              'bi_gru': BiGRU(),
+              'bi_gru_attn': BiGRUAttn(),
+              'deep_bi_gru': DeepBiGRU(),
+              'deep_bi_gru_attn': DeepBiGRUAttn(),
               'rcnn': RCNN(),
               'elmo': Elmo(),
               'bert': BERT(),
@@ -273,12 +281,12 @@ class LSTM(Model):
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -290,11 +298,6 @@ class LSTM(Model):
                                               dropout=lstm_dropout,
                                               recurrent_dropout=recurrent_dropout,
                                               return_sequences=True)
-        # Define pooling type
-        if pooling == 'max':
-            pooling_layer = tf.keras.layers.GlobalMaxPooling1D()
-        else:
-            pooling_layer = tf.keras.layers.GlobalAveragePooling1D()
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
@@ -304,8 +307,12 @@ class LSTM(Model):
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
         x = lstm_layer(x)
-        x = pooling_layer(x)
 
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -338,7 +345,7 @@ class LSTMCRF(Model):
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -384,8 +391,8 @@ class LSTMAttn(Model):
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -458,13 +465,13 @@ class DeepLSTM(Model):
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -517,8 +524,8 @@ class DeepLSTMAttn(Model):
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
@@ -603,12 +610,12 @@ class BiLSTM(Model):
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -620,11 +627,6 @@ class BiLSTM(Model):
                                               dropout=lstm_dropout,
                                               recurrent_dropout=recurrent_dropout,
                                               return_sequences=True)
-        # Define pooling type
-        if pooling == 'max':
-            pooling_layer = tf.keras.layers.GlobalMaxPooling1D()
-        else:
-            pooling_layer = tf.keras.layers.GlobalAveragePooling1D()
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
@@ -634,8 +636,12 @@ class BiLSTM(Model):
                                       embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
                                       trainable=train_embeddings)(inputs)
         x = tf.keras.layers.Bidirectional(lstm_layer)(x)
-        x = pooling_layer(x)
 
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
@@ -662,8 +668,8 @@ class BiLSTMAttn(Model):
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
@@ -736,13 +742,13 @@ class DeepBiLSTM(Model):
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -797,8 +803,8 @@ class DeepBiLSTMAttn(Model):
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
         use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
         attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         num_lstm_layers = kwargs['num_lstm_layers'] if 'num_lstm_layers' in kwargs.keys() else 2
         lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
         lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
@@ -876,6 +882,562 @@ class DeepBiLSTMAttn(Model):
         return model
 
 
+class GRU(Model):
+    def __init__(self, name='GRU'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            gru_layer = tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True)
+        else:
+            gru_layer = tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                            dropout=gru_dropout,
+                                            recurrent_dropout=recurrent_dropout,
+                                            return_sequences=True)
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                      output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                      input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                      trainable=train_embeddings)(inputs)
+        x = gru_layer(x)
+
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class GRUAttn(Model):
+    def __init__(self, name='GRUAttn'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Determine attention type
+        if attention_type is 'dot':
+            attention_layer = tf.keras.layers.Attention()
+        else:
+            attention_layer = tf.keras.layers.AdditiveAttention()
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            gru_layer = tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True)
+        else:
+            gru_layer = tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                            dropout=gru_dropout,
+                                            recurrent_dropout=recurrent_dropout,
+                                            return_sequences=True)
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              trainable=train_embeddings)
+
+        # Create query and value embeddings
+        query_embedding = embedding(inputs)
+        value_embeddings = embedding(inputs)
+
+        # Pass through encoding layer
+        query_seq_encoding = gru_layer(query_embedding)
+        value_seq_encoding = gru_layer(value_embeddings)
+
+        # Query-value attention
+        query_value_attention_seq = attention_layer([query_seq_encoding, value_seq_encoding])
+
+        # Pool attention and encoder outputs
+        query_encoding = tf.keras.layers.GlobalAveragePooling1D()(query_seq_encoding)
+        query_value_attention = tf.keras.layers.GlobalAveragePooling1D()(query_value_attention_seq)
+
+        # Concatenate query and encodings
+        concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class DeepGRU(Model):
+    def __init__(self, name='DeepGRU'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        num_gru_layers = kwargs['num_gru_layers'] if 'num_gru_layers' in kwargs.keys() else 2
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                      output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                      input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                      trainable=train_embeddings)(inputs)
+
+        for i in range(num_gru_layers):
+            # If a GPU is available use the CUDA layer
+            if tf.test.is_gpu_available() and use_gpu:
+                x = tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True)(x)
+            else:
+                x = tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                        dropout=gru_dropout,
+                                        recurrent_dropout=recurrent_dropout,
+                                        return_sequences=True)(x)
+
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class DeepGRUAttn(Model):
+    def __init__(self, name='DeepGRUAttn'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        num_gru_layers = kwargs['num_gru_layers'] if 'num_gru_layers' in kwargs.keys() else 2
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Determine attention type
+        if attention_type is 'dot':
+            attention_layer = tf.keras.layers.Attention()
+        else:
+            attention_layer = tf.keras.layers.AdditiveAttention()
+
+        # Define gru encoder model
+        gru_input = tf.keras.Input(shape=(input_shape[0], embedding_matrix.shape[1]))
+        # Create the first gru layer, if a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            gru_layer = tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True)(gru_input)
+        else:
+            gru_layer = tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                            dropout=gru_dropout,
+                                            recurrent_dropout=recurrent_dropout,
+                                            return_sequences=True)(gru_input)
+        for i in range(num_gru_layers):
+            if tf.test.is_gpu_available():
+                gru_layer = tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True)(gru_layer)
+            else:
+                gru_layer = tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                                dropout=gru_dropout,
+                                                recurrent_dropout=recurrent_dropout,
+                                                return_sequences=True)(gru_layer)
+        gru_layers = tf.keras.Model(inputs=gru_input, outputs=gru_layer, name='gru_layers')
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              trainable=train_embeddings)
+
+        # Create query and value embeddings
+        query_embedding = embedding(inputs)
+        value_embeddings = embedding(inputs)
+
+        # Pass through encoding layer
+        query_seq_encoding = gru_layers(query_embedding)
+        value_seq_encoding = gru_layers(value_embeddings)
+
+        # Query-value attention
+        query_value_attention_seq = attention_layer([query_seq_encoding, value_seq_encoding])
+
+        # Pool attention and encoder outputs
+        query_encoding = tf.keras.layers.GlobalAveragePooling1D()(query_seq_encoding)
+        query_value_attention = tf.keras.layers.GlobalAveragePooling1D()(query_value_attention_seq)
+
+        # Concatenate query and encodings
+        concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class BiGRU(Model):
+    def __init__(self, name='BiGRU'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            gru_layer = tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True)
+        else:
+            gru_layer = tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                            dropout=gru_dropout,
+                                            recurrent_dropout=recurrent_dropout,
+                                            return_sequences=True)
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                      output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                      input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                      trainable=train_embeddings)(inputs)
+        x = tf.keras.layers.Bidirectional(gru_layer)(x)
+
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class BiGRUAttn(Model):
+    def __init__(self, name='BiGRUAttn'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Determine attention type
+        if attention_type is 'dot':
+            attention_layer = tf.keras.layers.Attention()
+        else:
+            attention_layer = tf.keras.layers.AdditiveAttention()
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            gru_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True))
+        else:
+            gru_layer = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                                                          dropout=gru_dropout,
+                                                                          recurrent_dropout=recurrent_dropout,
+                                                                          return_sequences=True))
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              trainable=train_embeddings)
+
+        # Create query and value embeddings
+        query_embedding = embedding(inputs)
+        value_embeddings = embedding(inputs)
+
+        # Pass through encoding layer
+        query_seq_encoding = gru_layer(query_embedding)
+        value_seq_encoding = gru_layer(value_embeddings)
+
+        # Query-value attention
+        query_value_attention_seq = attention_layer([query_seq_encoding, value_seq_encoding])
+
+        # Pool attention and encoder outputs
+        query_encoding = tf.keras.layers.GlobalAveragePooling1D()(query_seq_encoding)
+        query_value_attention = tf.keras.layers.GlobalAveragePooling1D()(query_value_attention_seq)
+
+        # Concatenate query and encodings
+        concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class DeepBiGRU(Model):
+    def __init__(self, name='DeepBiGRU'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        num_gru_layers = kwargs['num_gru_layers'] if 'num_gru_layers' in kwargs.keys() else 2
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            gru_layer = tf.keras.layers.CuDNNLSTM(gru_units, return_sequences=True)
+        else:
+            gru_layer = tf.keras.layers.LSTM(gru_units, activation=gru_activation,
+                                             dropout=gru_dropout,
+                                             recurrent_dropout=recurrent_dropout,
+                                             return_sequences=True)
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                      output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                      input_length=input_shape[0],  # Max seq length
+                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                      trainable=train_embeddings)(inputs)
+
+        for i in range(num_gru_layers):
+            x = tf.keras.layers.Bidirectional(gru_layer)(x)
+
+        # Define pooling type
+        if pooling == 'max':
+            x = tf.keras.layers.GlobalMaxPooling1D()(x)
+        else:
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class DeepBiGRUAttn(Model):
+    def __init__(self, name='DeepBiGRUAttn'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00075
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        attention_type = kwargs['attention_type'] if 'attention_type' in kwargs.keys() else 'add'
+        gru_activation = kwargs['recurrent_activation'] if 'recurrent_activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        num_gru_layers = kwargs['num_gru_layers'] if 'num_gru_layers' in kwargs.keys() else 2
+        gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
+        gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Determine attention type
+        if attention_type is 'dot':
+            attention_layer = tf.keras.layers.Attention()
+        else:
+            attention_layer = tf.keras.layers.AdditiveAttention()
+
+        # Define gru encoder model
+        gru_input = tf.keras.Input(shape=(input_shape[0], embedding_matrix.shape[1]))
+        # Create the first gru layer, if a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            gru_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True))(gru_input)
+        else:
+            gru_layer = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                                                          dropout=gru_dropout,
+                                                                          recurrent_dropout=recurrent_dropout,
+                                                                          return_sequences=True))(gru_input)
+        for i in range(num_gru_layers):
+            if tf.test.is_gpu_available():
+                gru_layer = tf.keras.layers.Bidirectional(tf.keras.layers.CuDNNGRU(gru_units, return_sequences=True))(gru_layer)
+            else:
+                gru_layer = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(gru_units, activation=gru_activation,
+                                                                              dropout=gru_dropout,
+                                                                              recurrent_dropout=recurrent_dropout,
+                                                                              return_sequences=True))(gru_layer)
+        gru_layers = tf.keras.Model(inputs=gru_input, outputs=gru_layer, name='gru_layers')
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              trainable=train_embeddings)
+
+        # Create query and value embeddings
+        query_embedding = embedding(inputs)
+        value_embeddings = embedding(inputs)
+
+        # Pass through encoding layer
+        query_seq_encoding = gru_layers(query_embedding)
+        value_seq_encoding = gru_layers(value_embeddings)
+
+        # Query-value attention
+        query_value_attention_seq = attention_layer([query_seq_encoding, value_seq_encoding])
+
+        # Pool attention and encoder outputs
+        query_encoding = tf.keras.layers.GlobalAveragePooling1D()(query_seq_encoding)
+        query_value_attention = tf.keras.layers.GlobalAveragePooling1D()(query_value_attention_seq)
+
+        # Concatenate query and encodings
+        concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
 class RCNN(Model):
     """ Implements the Recurrent Convolutional Network from:
 
@@ -926,7 +1488,8 @@ class RCNN(Model):
         # If a GPU is available use the CUDA layer
         if tf.test.is_gpu_available() and use_gpu:
             forwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='forwards')(l_embedding)
-            backwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, go_backwards=True, name='backwards')(r_embedding)
+            backwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, go_backwards=True,
+                                                  name='backwards')(r_embedding)
         else:
             forwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
                                             dropout=lstm_dropout,
