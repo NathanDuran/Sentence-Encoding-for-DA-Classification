@@ -22,8 +22,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_crf',
-                     'model_name': 'lstm_crf',
+                     'experiment_name': 'gru_tst',
+                     'model_name': 'gru',
                      'training': True,
                      'testing': True,
                      'save_model': False,
@@ -60,7 +60,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -116,7 +116,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_crf=True)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_crf=False)
 
 # If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
@@ -171,7 +171,7 @@ else:
 
 # Display a model summary and create/save a model graph definition and image
 model.summary()
-model_image_file = os.path.join(output_dir, experiment_name + '-model.png')
+model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
 tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
 experiment.log_image(model_image_file)
 experiment.set_model_graph(model.to_json())
@@ -192,6 +192,7 @@ if training:
     train_accuracy = tf.keras.metrics.Mean()
     val_loss = tf.keras.metrics.Mean()
     val_accuracy = tf.keras.metrics.Mean()
+    history = {'step': [], 'train_loss': [], 'train_accuracy': [], 'val_loss': [], 'val_accuracy': []}
     global_step = 0
     for epoch in range(1, num_epochs + 1):
         print("Epoch: {}/{}".format(epoch, num_epochs))
@@ -221,11 +222,16 @@ if training:
                             experiment.log_metric('loss', val_loss.result().numpy(), step=global_step)
                             experiment.log_metric('accuracy', val_accuracy.result().numpy(), step=global_step)
 
-                    # Print current loss/accuracy
+                    # Print current loss/accuracy and add to history
                     result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Val loss: {:.3f} - acc: {:.3f}"
                     print(result_str.format(global_step, global_steps,
                                             train_loss.result(), train_accuracy.result() * 100,
                                             val_loss.result(), val_accuracy.result() * 100))
+                    history['step'].append(global_step)
+                    history['train_loss'].append(train_loss.result().numpy())
+                    history['train_accuracy'].append(train_accuracy.result().numpy())
+                    history['val_loss'].append(val_loss.result().numpy())
+                    history['val_accuracy'].append(val_accuracy.result().numpy())
 
                     # Save checkpoint if checkpointer metric improves
                     checkpointer.save_best_checkpoint(val_loss.result(), global_step)
@@ -233,6 +239,11 @@ if training:
         # Check to stop training early
         if earlystopper.check_early_stop(val_loss.result()):
             break
+
+    # Save training history
+    history_file = os.path.join(output_dir, experiment_name + "_history.npz")
+    save_history(history_file, history)
+    experiment.log_asset(history_file)
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
@@ -255,12 +266,13 @@ if testing:
     # Keep a copy of all true and predicted labels for creating evaluation metrics
     true_labels = np.empty(shape=0)
     predicted_labels = np.empty(shape=0)
+    predictions = []
     with experiment.test():
         for test_step in range(test_steps):
 
             # Perform test step on batch and record metrics
             loss, accuracy = model.test_on_batch(test_text[test_step], test_labels[test_step])
-            predictions = model.predict_on_batch(test_text[test_step])
+            batch_predictions = model.predict_on_batch(test_text[test_step])
             test_loss(loss)
             test_accuracy(accuracy)
 
@@ -269,7 +281,8 @@ if testing:
 
             # Append to lists for creating metrics
             true_labels = np.append(true_labels, test_labels[test_step].flatten())
-            predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
+            predicted_labels = np.append(predicted_labels, np.argmax(batch_predictions, axis=1))
+            predictions.append(batch_predictions)
 
         # Log final test result
         experiment.log_metric('loss', test_loss.result().numpy(), step=test_steps)
@@ -278,13 +291,22 @@ if testing:
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
         print(result_str.format(test_steps, test_loss.result(), test_accuracy.result() * 100))
 
+        # Write predictions to file
+        predictions = np.vstack(predictions)
+        predictions_file = os.path.join(output_dir, experiment_name + "_predictions.csv")
+        save_predictions(predictions_file, true_labels, predicted_labels, predictions)
+        experiment.log_asset(predictions_file)
+
         # Generate metrics and confusion matrix
+        test_results_file = os.path.join(output_dir, experiment_name + "_results.txt")
         metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)
+        save_results(test_results_file, test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)
+        experiment.log_asset(test_results_file)
         experiment.log_metrics(metrics)
         print(metric_str)
 
         confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
-        confusion_matrix_file = os.path.join(output_dir, experiment_name + " Confusion Matrix.png")
+        confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
         confusion_matrix.savefig(confusion_matrix_file)
         experiment.log_image(confusion_matrix_file)
 

@@ -118,3 +118,38 @@ def plot_confusion_matrix(true_labels, predicted_labels, labels, title=None, mat
         plt.title(title, fontsize=font_size)
     plt.tight_layout()
     return fig
+
+
+def save_history(file_name, history):
+    """Saves training history dictionary as numpy arrays in .npz file."""
+
+    np.savez_compressed(file_name, step=np.asarray(history['step']),
+                        train_loss=np.asarray(history['train_loss']),
+                        train_accuracy=np.asarray(history['train_accuracy']),
+                        val_loss=np.asarray(history['val_loss']),
+                        val_accuracy=np.asarray(history['val_loss']))
+
+
+def save_predictions(file_name, true_labels, predicted_labels, predictions):
+    """Saves predictions to .csv file."""
+
+    with open(file_name, 'w') as file:
+        # Write header
+        file.write("'true','predicted','predictions'\n")
+        # Write in order of 'True Label, Predicted Label, Predictions'.
+        for i in range(len(predictions)):
+            file.write(str(true_labels[i]) + ',' + str(predicted_labels[i]))
+            for j in range(len(predictions[i])):
+                file.write(',' + str(predictions[i][j]))
+            file.write('\n')
+
+
+def save_results(file_name, test_loss, test_accuracy, metrics):
+    """Saves test metrics to a .txt file."""
+
+    with open(file_name, 'w') as file:
+        file.write('test_loss: ' + str(test_loss) + '\n')
+        file.write('test_accuracy: ' + str(test_accuracy) + '\n')
+        # Write metrics dictionary (F1, Precision and Recall
+        for key, value in metrics.items():
+            file.write(key + ': ' + str(value) + '\n')

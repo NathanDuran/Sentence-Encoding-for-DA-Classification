@@ -103,7 +103,7 @@ class Model(object):
 
 
 class CNN(Model):
-    def __init__(self, name='CNN_1D'):
+    def __init__(self, name='CNN'):
         super().__init__(name)
         self.name = name
 
@@ -146,7 +146,7 @@ class CNN(Model):
 
 
 class CNNAttn(Model):
-    def __init__(self, name='CNN_1D'):
+    def __init__(self, name='CNNAttn'):
         super().__init__(name)
         self.name = name
 

@@ -7,7 +7,7 @@
 - bert Different num layers
 
 ## models
-- CRF, More models and/or add use_crf to params (i.e. in model just swap classification layers)
+- CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
 - Make bi-directional a parameter?
 - https://github.com/AlexYangLi/TextClassification
 
@@ -15,7 +15,6 @@
 - mLSTM https://github.com/titu1994/Keras-Multiplicative-LSTM
 
 ## Misc
-- Save training history/predictions
 - Document the models in readme
 
 ## To try

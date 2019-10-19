@@ -198,6 +198,7 @@ if training:
     train_accuracy = []
     val_loss = []
     val_accuracy = []
+    history = {'step': [], 'train_loss': [], 'train_accuracy': [], 'val_loss': [], 'val_accuracy': []}
     global_step = 0
     for epoch in range(1, num_epochs + 1):
         print("Epoch: {}/{}".format(epoch, num_epochs))
@@ -227,11 +228,16 @@ if training:
                             experiment.log_metric('loss', np.mean(val_loss), step=global_step)
                             experiment.log_metric('accuracy', np.mean(val_accuracy), step=global_step)
 
-                    # Print current loss/accuracy
+                    # Print current loss/accuracy and add to history
                     result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Val loss: {:.3f} - acc: {:.3f}"
                     print(result_str.format(global_step, global_steps,
                                             np.mean(train_loss), np.mean(train_accuracy) * 100,
                                             np.mean(val_loss), np.mean(val_accuracy) * 100))
+                    history['step'].append(global_step)
+                    history['train_loss'].append(np.mean(train_loss))
+                    history['train_accuracy'].append(np.mean(train_accuracy))
+                    history['val_loss'].append(np.mean(val_loss))
+                    history['val_accuracy'].append(np.mean(val_accuracy))
 
                     # Save checkpoint if checkpointer metric improves
                     checkpointer.save_best_checkpoint(float(np.mean(val_loss)), global_step)
@@ -239,6 +245,11 @@ if training:
         # Check to stop training early
         if earlystopper.check_early_stop(float(np.mean(val_loss))):
             break
+
+    # Save training history
+    history_file = os.path.join(output_dir, experiment_name + "_history.npz")
+    save_history(history_file, history)
+    experiment.log_asset(history_file)
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
@@ -261,12 +272,13 @@ if testing:
     # Keep a copy of all true and predicted labels for creating evaluation metrics
     true_labels = np.empty(shape=0)
     predicted_labels = np.empty(shape=0)
+    predictions = []
     with experiment.test():
         for test_step in range(test_steps):
 
             # Perform test step on batch and record metrics
             loss, accuracy = model.test_on_batch([test_input_ids[test_step], test_input_masks[test_step], test_segment_ids[test_step]], test_labels[test_step])
-            predictions = model.predict_on_batch([test_input_ids[test_step], test_input_masks[test_step], test_segment_ids[test_step]])
+            batch_predictions = model.predict_on_batch([test_input_ids[test_step], test_input_masks[test_step], test_segment_ids[test_step]])
             test_loss.append(loss)
             test_accuracy.append(accuracy)
 
@@ -275,7 +287,8 @@ if testing:
 
             # Append to lists for creating metrics
             true_labels = np.append(true_labels, test_labels[test_step].flatten())
-            predicted_labels = np.append(predicted_labels, np.argmax(predictions, axis=1))
+            predicted_labels = np.append(predicted_labels, np.argmax(batch_predictions, axis=1))
+            predictions.append(batch_predictions)
 
         # Log final test result
         experiment.log_metric('loss', np.mean(test_loss), step=test_steps)
@@ -284,13 +297,22 @@ if testing:
         result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
         print(result_str.format(test_steps, np.mean(test_loss), np.mean(test_accuracy) * 100))
 
+        # Write predictions to file
+        predictions = np.vstack(predictions)
+        predictions_file = os.path.join(output_dir, experiment_name + "_predictions.csv")
+        save_predictions(predictions_file, true_labels, predicted_labels, predictions)
+        experiment.log_asset(predictions_file)
+
         # Generate metrics and confusion matrix
+        test_results_file = os.path.join(output_dir, experiment_name + "_results.txt")
         metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)
+        save_results(test_results_file, np.mean(test_loss), np.mean(test_accuracy), metrics)
+        experiment.log_asset(test_results_file)
         experiment.log_metrics(metrics)
         print(metric_str)
 
         confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
-        confusion_matrix_file = os.path.join(output_dir, experiment_name + " Confusion Matrix.png")
+        confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
         confusion_matrix.savefig(confusion_matrix_file)
         experiment.log_image(confusion_matrix_file)
 
