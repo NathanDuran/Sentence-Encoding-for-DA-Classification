@@ -325,3 +325,10 @@ if testing:
 
         end_time = time.time()
         print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
+
+# TODO remove when all experiments complete
+if training and testing:
+    experiment_file = os.path.join(task_name, task_name + "_vocab_size" + ".csv")
+    save_experiment(experiment_file, experiment_params, train_loss.result().numpy(), train_accuracy.result().numpy(),
+                    val_loss.result().numpy(), val_accuracy.result().numpy(),
+                    test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)

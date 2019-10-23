@@ -40,8 +40,7 @@ def get_model(model_name):
               'bert': BERT(),
               'use': UniversalSentenceEncoder(),
               'nnlm': NeuralNetworkLanguageModel(),
-              'mlstm_char_lm': MLSTMCharLM(),
-              'lstm_word_lm': LSTMWordLM()}
+              'mlstm_char_lm': MLSTMCharLM()}
 
     if model_name.lower() not in models.keys():
         raise Exception("The given model type: '" + model_name + "' is not valid!\n" +

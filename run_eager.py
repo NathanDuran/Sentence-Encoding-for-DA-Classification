@@ -22,7 +22,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_over8',
+                     'experiment_name': 'lstm_5kvocab_2',  # TODO Change experiment results file name?
                      'model_name': 'lstm',
                      'training': True,
                      'testing': True,
@@ -32,7 +32,7 @@ experiment_params = {'task_name': 'swda',
                      'batch_size': 32,
                      'num_epochs': 15,
                      'evaluate_steps': 500,
-                     'vocab_size': 10000,
+                     'vocab_size': 5000,
                      'max_seq_length': 128,
                      'to_tokens': True,
                      'train_embeddings': True,
@@ -145,7 +145,6 @@ print("Vocabulary size: " + str(vocab_size))
 print("Maximum sequence length: " + str(max_seq_length))
 print("Using sequence tokens: " + str(to_tokens))
 print("Embedding dimension: " + str(embedding_dim))
-print("Embedding dimension: " + str(embedding_dim))
 print("Embedding type: " + embedding_type)
 print("Embedding source: " + embedding_source)
 print("Global steps: " + str(global_steps))
@@ -186,10 +185,6 @@ if training:
     print("Training model...")
     start_time = time.time()
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
-
-    # Initialise model checkpointer and early stopping monitor
-    checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
-    earlystopper = early_stopper.EarlyStopper(patience=2, min_delta=0.0, minimise=True)
 
     # Initialise train and validation metrics
     train_loss = tf.keras.metrics.Mean()
@@ -323,3 +318,10 @@ if testing:
 
         end_time = time.time()
         print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
+
+# TODO remove when all experiments complete
+if training and testing:
+    experiment_file = os.path.join(task_name, task_name + "_vocab_size" + ".csv")
+    save_experiment(experiment_file, experiment_params, train_loss.result().numpy(), train_accuracy.result().numpy(),
+                    val_loss.result().numpy(), val_accuracy.result().numpy(),
+                    test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)

@@ -153,3 +153,29 @@ def save_results(file_name, test_loss, test_accuracy, metrics):
         # Write metrics dictionary (F1, Precision and Recall
         for key, value in metrics.items():
             file.write(key + ': ' + str(value) + '\n')
+
+
+# TODO remove when all experiments complete?
+def save_experiment(file_name, params, train_loss, train_acc, val_loss, val_acc, test_loss, test_acc, metrics):
+    import os
+
+    if not os.path.exists(file_name):
+        with open(file_name, 'w+') as file:
+            file.write("'experiment_name','model_name',"
+                       "'vocab_size','max_seq_length',"
+                       "'embedding_dim','embedding_type','embedding_source',"
+                       "'train_loss','train_acc','val_loss','val_acc','test_loss','test_acc'")
+            for key, value in metrics.items():
+                file.write("'" + key + "',")
+            file.write("\n")
+
+    with open(file_name, 'a') as file:
+        file.write(params['experiment_name'] + "," + params['model_name'] + "," +
+                   str(params['vocab_size']) + "," + str(params['max_seq_length']) + "," +
+                   str(params['embedding_dim']) + "," + params['embedding_type'] + "," + params['embedding_source'] + "," +
+                   str(train_loss) + "," + str(train_acc) + "," +
+                   str(val_loss) + "," + str(val_acc) + "," +
+                   str(test_loss) + "," + str(test_acc))
+        for key, value in metrics.items():
+            file.write("," + str(value))
+        file.write("\n")
