@@ -35,10 +35,12 @@ class EarlyStopper:
         Returns:
             (bool): True if training should stop (no improvement for 'patience' number of epochs, else False
         """
+        # Calculate the difference between current and best metric value
+        delta = abs(metric_val - self.current_best)
 
-        # Depending on mode, determine if new metric value is better
-        if (self.minimise and metric_val <= self.current_best - self.min_delta) or (
-                not self.minimise and metric_val >= self.current_best + self.min_delta):
+        # Depending on mode, determine if new metric value is better (and delta is larger then min_delta)
+        if (self.minimise and metric_val <= self.current_best) or \
+                (not self.minimise and metric_val >= self.current_best) and (delta >= self.min_delta):
 
             # If it is set new best value and make sure counter is 0
             self.current_best = metric_val
@@ -51,7 +53,9 @@ class EarlyStopper:
 
             # If num epochs since last improvement = patience then stop
             if self.last_improvement == self.patience:
-                print("No improvement in monitored metric for " + str(self.patience) + " epochs. Stopping training.")
+                print("No improvement in monitored metric for " + str(self.patience) +
+                      " epochs. Current: " + str(metric_val) + " vs Best: " + str(self.current_best) +
+                      ". Stopping training.")
                 return True
             else:
                 return False

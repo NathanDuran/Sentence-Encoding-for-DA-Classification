@@ -76,6 +76,23 @@ class Checkpointer:
                     weight_file = self.experiment_name + '-best-weights-{}.h5'.format(step)
                     self.model.save_weights(os.path.join(self.checkpoint_dir, weight_file))
 
+    def get_best_checkpoint(self):
+        """Returns the file name of the best checkpoint from the current training session."""
+        # Sort the current best checkpoints according to the mode for the metric being monitored
+        if self.minimise:
+            sorted_checkpoints = sorted(self.best_checkpoints.items(), reverse=False, key=lambda kv: kv[1])
+        else:
+            sorted_checkpoints = sorted(self.best_checkpoints.items(), reverse=True, key=lambda kv: kv[1])
+
+        # Get the best key (checkpoint file name) according to metric
+        best_key = sorted_checkpoints[0][0]
+
+        # If this is a valid checkpoint file then return it
+        if os.path.exists(os.path.join(self.checkpoint_dir, best_key)):
+            return best_key
+        else:
+            return None
+
     def save_checkpoint(self, step):
         """Creates a new checkpoint file for the model at the current step.
 

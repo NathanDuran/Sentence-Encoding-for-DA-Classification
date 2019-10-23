@@ -48,10 +48,10 @@ def precision_recall_f1(true_labels, predicted_labels, labels):
     metrics_dict['recall_weighted'] = recall_weight
     metrics_dict['f1_weighted'] = f1_weight
 
-    # Need to remove label names that are not present in the test set at all
+    # Need to remove label names that are not present in the test set or predictions at all
     indices = []
     for i in range(len(labels)):
-        if i not in set(true_labels):
+        if i not in set(true_labels) and i not in set(predicted_labels):
             indices.append(i)
 
     for index in sorted(indices, reverse=True):

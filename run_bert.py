@@ -27,9 +27,9 @@ experiment_params = {'task_name': 'swda',
                      'model_name': 'bert',
                      'training': True,
                      'testing': True,
-                     'save_model': False,
-                     'load_model': False,
-                     'init_ckpt_file': '',
+                     'save_model': True,
+                     'load_model': True,
+                     'init_ckpt_file': None,
                      'batch_size': 32,
                      'num_epochs': 3,
                      'evaluate_steps': 500,
@@ -158,7 +158,7 @@ print("------------------------------------")
 print("Creating model...")
 
 # Load if checkpoint set
-if load_model and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
+if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
     model = tf.keras.models.load_model(os.path.join(checkpoint_dir, init_ckpt_file))
     print("Loaded model from: " + os.path.join(checkpoint_dir, init_ckpt_file))
 # Else build with supplied parameters
@@ -181,6 +181,10 @@ sess.run(tf.local_variables_initializer())
 sess.run(tf.global_variables_initializer())
 sess.run(tf.tables_initializer())
 tf.keras.backend.set_session(sess)
+
+# Initialise model checkpointer and early stopping monitor
+checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
+earlystopper = early_stopper.EarlyStopper(patience=3, min_delta=0.0, minimise=True)
 
 # Train the model
 if training:
@@ -263,6 +267,13 @@ if testing:
     # Test the model
     print("------------------------------------")
     print("Testing model...")
+
+    # Load if best checkpoint exists
+    best_ckpt_file = checkpointer.get_best_checkpoint()
+    if load_model and best_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, best_ckpt_file)):
+        model = tf.keras.models.load_model(os.path.join(checkpoint_dir, best_ckpt_file))
+        print("Loaded model from: " + os.path.join(checkpoint_dir, best_ckpt_file))
+
     start_time = time.time()
     print("Testing started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(test_steps) + " steps")
 
