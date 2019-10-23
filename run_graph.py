@@ -185,10 +185,6 @@ if training:
     start_time = time.time()
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
-    # Initialise model checkpointer and early stopping monitor
-    checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
-    earlystopper = early_stopper.EarlyStopper(patience=2, min_delta=0.0, minimise=True)
-
     # Initialise train and validation metrics
     train_loss = []
     train_accuracy = []

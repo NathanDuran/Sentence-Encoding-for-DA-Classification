@@ -264,16 +264,5 @@
     "max_seq_length": 640,
     "dropout_rate": 0.02,
     "dense_units": 256
-  },
-    "lstm_word_lm": {
-    "learning_rate": 0.001,
-    "optimiser": "rmsprop",
-    "use_gpu": true,
-    "weights_file": "weights/lstm-word-lm-50dim-weights-20-epochs.hdf5",
-    "lstm_units": 256,
-    "lstm_dropout": 0.2,
-    "recurrent_dropout": 0.1,
-    "dropout_rate": 0.02,
-    "dense_units": 128
   }
 }
