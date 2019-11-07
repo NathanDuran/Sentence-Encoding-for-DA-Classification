@@ -1,8 +1,7 @@
 # Supervised and Semi-supervised Sentence Encoding Methods for Dialogue Act Classification
 
 # TODO
-- retest bi_lstm and deep_bi_lstm
-- test rcnn and crf models
+- test crf models?
 - test gru models
 - bert Different num layers
 

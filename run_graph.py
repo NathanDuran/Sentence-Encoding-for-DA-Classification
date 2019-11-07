@@ -8,12 +8,12 @@ import models
 import data_processor
 import checkpointer
 import early_stopper
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 # Suppress TensorFlow debugging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.logging.set_verbosity(tf.logging.ERROR)
+
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
