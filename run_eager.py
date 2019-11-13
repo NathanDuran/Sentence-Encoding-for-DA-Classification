@@ -9,12 +9,12 @@ import data_processor
 import embedding_processor
 import checkpointer
 import early_stopper
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 # Suppress TensorFlow debugging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.logging.set_verbosity(tf.logging.ERROR)
+
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -22,8 +22,8 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'lstm_5kvocab_2',  # TODO Change experiment results file name?
-                     'model_name': 'lstm',
+                     'experiment_name': 'bi_lstm_5kvocab_10',  # TODO Change experiment results file name?
+                     'model_name': 'bi_lstm',
                      'training': True,
                      'testing': True,
                      'save_model': True,
@@ -59,8 +59,8 @@ load_model = experiment_params['load_model']
 init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
-# experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
+# experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
@@ -116,7 +116,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_crf=False)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 
 # If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
@@ -130,10 +130,10 @@ embedding = embedding_processor.get_embedding_processor(embedding_type)
 embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
 # Build datasets from .npz files
-train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
+train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
 # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
-val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)
-test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False)
+val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
+test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=False)
 global_steps = int(len(list(train_text)) * num_epochs)
 train_steps = int(len(list(train_text)))
 val_steps = int(len(list(val_text)))

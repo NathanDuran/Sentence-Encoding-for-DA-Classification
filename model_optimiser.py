@@ -10,7 +10,7 @@ import tensorflow as tf
 
 # Suppress TensorFlow debugging
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.logging.set_verbosity(tf.logging.ERROR)
+
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -42,7 +42,7 @@ with open(optimiser_config_file) as json_file:
     optimiser_config = json.load(json_file)[experiment_params['model_name']]
 
 # Set up comet optimiser
-model_optimiser = Optimizer(optimiser_config, project_name=experiment_params['project_name'])
+model_optimiser = Optimizer(optimiser_config)
 
 # Data set and output paths
 dataset_name = 'token_dataset' if experiment_params['to_tokens'] else 'text_dataset'
@@ -82,7 +82,7 @@ embedding_source = experiment_params['embedding_source']
 data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 embedding = embedding_processor.get_embedding_processor(embedding_type)
 
-# If dataset folder is empty get the metadata and datasets to TFRecords
+# If dataset folder is empty get the metadata and datasets
 if not os.listdir(dataset_dir):
     data_set.get_dataset()
 
@@ -93,7 +93,7 @@ vocabulary, labels = data_set.load_metadata()
 embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
 # Loop over each experiment in the optimiser
-for experiment in model_optimiser.get_experiments():
+for experiment in model_optimiser.get_experiments(project_name=experiment_params['project_name'], workspace="nathanduran", auto_output_logging='simple'):
 
     # Set up comet experiment
     experiment.set_name(experiment_name)

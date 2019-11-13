@@ -3,9 +3,10 @@
 # TODO
 - test crf models?
 - test gru models
-- bert Different num layers
+- bert Different num layers (concat last four hidden?)
 
 ## models
+- BiLSTM+ELMo+Attn?
 - CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
 - Make bi-directional a parameter?
 - https://github.com/AlexYangLi/TextClassification
