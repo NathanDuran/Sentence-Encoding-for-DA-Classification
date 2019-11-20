@@ -22,8 +22,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'bi_lstm_5kvocab_10',  # TODO Change experiment results file name?
-                     'model_name': 'bi_lstm',
+                     'experiment_name': 'cnn_5kvocab_1',  # TODO Change experiment results file name?
+                     'model_name': 'cnn',
                      'training': True,
                      'testing': True,
                      'save_model': True,
@@ -60,7 +60,7 @@ init_ckpt_file = experiment_params['init_ckpt_file']
 
 # Set up comet experiment
 experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-# experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+# experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
 experiment.set_name(experiment_name)
 # Log parameters
 experiment.log_parameters(model_params)
