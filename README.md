@@ -4,6 +4,7 @@
 - test crf models?
 - test gru models
 - bert Different num layers (concat last four hidden?)
+- bert + lstm?
 
 ## models
 - BiLSTM+ELMo+Attn?

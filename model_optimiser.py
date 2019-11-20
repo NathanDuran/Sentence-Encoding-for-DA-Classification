@@ -19,8 +19,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'rcnn_opt',
-                     'model_name': 'rcnn',
+                     'experiment_name': 'bi_gru_opt',
+                     'model_name': 'bi_gru',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
