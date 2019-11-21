@@ -22,8 +22,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'cnn_5kvocab_1',  # TODO Change experiment results file name?
-                     'model_name': 'cnn',
+                     'experiment_name': 'lstm_5kvocab_1',  # TODO Change experiment results file name?
+                     'model_name': 'lstm',
                      'training': True,
                      'testing': True,
                      'save_model': True,
@@ -32,6 +32,8 @@ experiment_params = {'task_name': 'swda',
                      'batch_size': 32,
                      'num_epochs': 15,
                      'evaluate_steps': 500,
+                     'early_stopping': False,
+                     'patience': 3,
                      'vocab_size': 5000,
                      'max_seq_length': 128,
                      'to_tokens': True,
@@ -95,6 +97,8 @@ print("Testing: " + str(testing))
 batch_size = experiment_params['batch_size']
 num_epochs = experiment_params['num_epochs']
 evaluate_steps = experiment_params['evaluate_steps']  # Evaluate every this many steps
+early_stopping = experiment_params['early_stopping']
+patience = experiment_params['patience']
 optimiser_type = model_params['optimiser']
 learning_rate = model_params['learning_rate']
 
@@ -103,6 +107,8 @@ print("Using parameters...")
 print("Batch size: " + str(batch_size))
 print("Epochs: " + str(num_epochs))
 print("Evaluate every steps: " + str(evaluate_steps))
+print("Early Stopping: " + str(early_stopping))
+print("Patience: " + str(patience))
 print("Optimiser: " + optimiser_type)
 print("Learning rate: " + str(learning_rate))
 
@@ -177,7 +183,7 @@ experiment.set_model_graph(model.to_json())
 
 # Initialise model checkpointer and early stopping monitor
 checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
-earlystopper = early_stopper.EarlyStopper(patience=3, min_delta=0.0, minimise=True)
+earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
 
 # Train the model
 if training:

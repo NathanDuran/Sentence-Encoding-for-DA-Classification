@@ -896,7 +896,7 @@ class GRU(Model):
         gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
         gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
@@ -1173,7 +1173,7 @@ class BiGRU(Model):
         gru_units = kwargs['gru_units'] if 'gru_units' in kwargs.keys() else 256
         gru_dropout = kwargs['gru_dropout'] if 'gru_dropout' in kwargs.keys() else 0.0
         recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'average'
+        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'max'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 

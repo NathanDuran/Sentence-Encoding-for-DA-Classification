@@ -134,7 +134,7 @@
     "gru_units": 256,
     "gru_dropout": 0.2,
     "recurrent_dropout": 0.1,
-    "pooling": "average",
+    "pooling": "max",
     "dropout_rate": 0.02,
     "dense_units": 128
   },
@@ -180,7 +180,7 @@
     "gru_units": 256,
     "gru_dropout": 0.2,
     "recurrent_dropout": 0.1,
-    "pooling": "average",
+    "pooling": "max",
     "dropout_rate": 0.02,
     "dense_units": 128
   },
@@ -226,7 +226,7 @@
     "lstm_units": 256,
     "lstm_dropout": 0.2,
     "recurrent_dropout": 0.1,
-    "num_filters": 100,
+    "num_filters": 64,
     "dropout_rate": 0.02,
     "dense_units": 128
   },

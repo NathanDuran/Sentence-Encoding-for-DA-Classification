@@ -1,12 +1,13 @@
 class EarlyStopper:
     """Class for early stopping a models training."""
 
-    def __init__(self, patience=1, min_delta=0.0, minimise=True):
+    def __init__(self, stopping=True, patience=1, min_delta=0.0, minimise=True):
         """Constructs a Checkpointer for a given experiment and model.
 
         Can be used to save the best checkpoints during training according to a supplied metric value.
 
         Args:
+            stopping (bool): Whether to use early stopping or not
             patience (int): Number of epochs with no improvement after which training will be stopped
             min_delta (float): Minimum change in the monitored quantity to qualify as an improvement
             minimise (bool): Whether the supplied metric values should be minimised (loss) or maximised (accuracy)
@@ -16,6 +17,7 @@ class EarlyStopper:
             current_best (float): Current best value for the monitored metric
         """
 
+        self.stopping = stopping
         self.patience = patience
         self.min_delta = min_delta
         self.minimise = minimise
@@ -35,6 +37,11 @@ class EarlyStopper:
         Returns:
             (bool): True if training should stop (no improvement for 'patience' number of epochs, else False
         """
+
+        # If not using early stopping just return
+        if not self.stopping:
+            return False
+
         # Calculate the difference between current and best metric value
         delta = abs(metric_val - self.current_best)
 
