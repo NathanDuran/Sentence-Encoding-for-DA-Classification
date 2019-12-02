@@ -6,7 +6,7 @@ from comet_ml import Experiment
 from metrics import *
 import models
 import data_processor
-import checkpointer
+import check_pointer
 import early_stopper
 import numpy as np
 import tensorflow as tf
@@ -181,7 +181,7 @@ sess.run(tf.tables_initializer())
 tf.keras.backend.set_session(sess)
 
 # Initialise model checkpointer and early stopping monitor
-checkpointer = checkpointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
+checkpointer = check_pointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
 earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
 
 # Train the model
@@ -241,7 +241,7 @@ if training:
                     checkpointer.save_best_checkpoint(float(np.mean(val_loss)), global_step)
 
         # Check to stop training early
-        if earlystopper.check_early_stop(float(np.mean(val_loss))):
+        if early_stopping and earlystopper.check_early_stop(float(np.mean(val_loss))):
             break
 
     # Save training history

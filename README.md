@@ -2,10 +2,9 @@
 
 # TODO
 - test crf models?
-- test gru models
 - bert Different num layers (concat last four hidden?)
 - bert + lstm?
-
+- bert large?
 ## models
 - BiLSTM+ELMo+Attn?
 - CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
