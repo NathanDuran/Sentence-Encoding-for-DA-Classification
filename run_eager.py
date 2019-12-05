@@ -5,6 +5,7 @@ import json
 from comet_ml import Experiment
 from metrics import *
 import models
+from layers import custom_layers
 import data_processor
 import embedding_processor
 import check_pointer
@@ -165,7 +166,7 @@ for i in range(1, 11):
 
     # Load if checkpoint set
     if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
-        model = tf.keras.models.load_model(os.path.join(checkpoint_dir, init_ckpt_file))
+        model = tf.keras.models.load_model(os.path.join(checkpoint_dir, init_ckpt_file), custom_objects=custom_layers)
         print("Loaded model from: " + os.path.join(checkpoint_dir, init_ckpt_file))
     # Else build with supplied parameters
     else:
@@ -267,7 +268,7 @@ for i in range(1, 11):
         # Load if best checkpoint exists
         best_ckpt_file = checkpointer.get_best_checkpoint()
         if load_model and best_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, best_ckpt_file)):
-            model = tf.keras.models.load_model(os.path.join(checkpoint_dir, best_ckpt_file))
+            model = tf.keras.models.load_model(os.path.join(checkpoint_dir, best_ckpt_file), custom_objects=custom_layers)
             print("Loaded model from: " + os.path.join(checkpoint_dir, best_ckpt_file))
 
         start_time = time.time()

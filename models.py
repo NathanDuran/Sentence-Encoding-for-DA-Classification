@@ -1,8 +1,7 @@
 import tensorflow as tf
 import tensorflow_hub as hub
 import optimisers
-from layers import ElmoEmbeddingLayer, BertLayer, UniversalSentenceEncoderLayer, MLSTMCharLMLayer, CRF
-from layers import crf_loss, crf_accuracy
+from layers import *
 
 
 def get_model(model_name):
@@ -18,6 +17,7 @@ def get_model(model_name):
     models = {'cnn': CNN(),
               'cnn_attn': CNNAttn(),
               'text_cnn': TextCNN(),
+              'dcnn': DCNN(),
               'lstm': LSTM(),
               'lstm_crf': LSTMCRF(),
               'lstm_attn': LSTMAttn(),
@@ -256,6 +256,76 @@ class TextCNN(Model):
         x = tf.keras.layers.Concatenate(axis=1)(maxpool_pool)
         x = tf.keras.layers.Flatten()(x)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class DCNN(Model):
+    """Implements the DCNN model from:
+
+    Kalchbrenner, N., Grefenstette, E. and Blunsom, P. (2014) A Convolutional Neural Network for Modelling Sentences.
+    Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics.
+
+    Model code from: "https://github.com/AlexYangLi/TextClassification"
+    """
+
+    def __init__(self, name='DCNN'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.002
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
+        conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'elu'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 128
+        kernel_sizes = kwargs['kernel_sizes'] if 'kernel_sizes' in kwargs.keys() else [7, 5]
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.1
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embeddding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                               output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                               input_length=input_shape[0],  # Max seq length
+                                               embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                               trainable=train_embeddings)(inputs)
+
+        # Wide convolution and dynamic k-max pooling
+        zero_padded_1 = tf.keras.layers.ZeroPadding1D((6, 6))(embeddding)
+        conv_1 = tf.keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_sizes[0], strides=1, padding='valid',
+                                        activation=conv_activation)(zero_padded_1)
+        k_maxpool_1 = KMaxPooling(k=int(input_shape[0] / 3 * 2))(conv_1)
+        non_linear_1 = tf.keras.layers.ReLU()(k_maxpool_1)
+
+        # Wide convolution and dynamic k-max pooling
+        zero_padded_2 = tf.keras.layers.ZeroPadding1D((4, 4))(non_linear_1)
+        conv_2 = tf.keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_sizes[1], strides=1, padding='valid',
+                                        activation=conv_activation)(zero_padded_2)
+        k_maxpool_2 = KMaxPooling(k=int(input_shape[0] / 3 * 1))(conv_2)
+        non_linear_2 = tf.keras.layers.ReLU()(k_maxpool_2)
+
+        # Wide convolution, folding and dynamic k-max pooling
+        zero_padded_3 = tf.keras.layers.ZeroPadding1D((2, 2))(non_linear_2)
+        conv_3 = tf.keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_sizes[1], strides=1, padding='valid',
+                                        activation=conv_activation)(zero_padded_3)
+        folded = Folding()(conv_3)
+        k_maxpool_3 = KMaxPooling(k=10)(folded)
+        non_linear_3 = tf.keras.layers.ReLU()(k_maxpool_3)
+
+        flatten = tf.keras.layers.Flatten()(non_linear_3)
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(flatten)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -1551,7 +1621,7 @@ class Elmo(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = ElmoEmbeddingLayer()(inputs)
+        embedding = ElmoLayer()(inputs)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)

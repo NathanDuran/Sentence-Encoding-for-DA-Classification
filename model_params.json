@@ -27,6 +27,14 @@
     "dropout_rate": 0.1,
     "dense_units": 128
   },
+    "dcnn": {
+    "learning_rate": 0.002,
+    "optimiser": "adam",
+    "num_filters": 128,
+    "kernel_size": [7, 5],
+    "dropout_rate": 0.1,
+    "dense_units": 128
+  },
     "lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",

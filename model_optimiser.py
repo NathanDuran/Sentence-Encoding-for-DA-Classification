@@ -19,8 +19,8 @@ tf.enable_eager_execution()
 
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'gru_attn_opt',
-                     'model_name': 'gru_attn',
+                     'experiment_name': 'text_cnn_opt',
+                     'model_name': 'text_cnn',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
