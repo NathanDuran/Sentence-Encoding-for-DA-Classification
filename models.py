@@ -230,13 +230,13 @@ class TextCNN(Model):
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.002
-        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adagrad'
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'elu'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
-        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 36
+        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 128  # Original = 36
         kernel_sizes = kwargs['kernel_sizes'] if 'kernel_sizes' in kwargs.keys() else [1, 2, 3, 4, 5]
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.1
-        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 192
 
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
@@ -285,11 +285,11 @@ class DCNN(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
-        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.002
-        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.02
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adagrad'
         conv_activation = kwargs['conv_activation'] if 'conv_activation' in kwargs.keys() else 'elu'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
-        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 128
+        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 64
         kernel_sizes = kwargs['kernel_sizes'] if 'kernel_sizes' in kwargs.keys() else [7, 5]
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.1
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128

@@ -2,7 +2,6 @@
 
 # TODO
 - test crf models?
-- test text_cnn, dcnn
 
 - bert Different num layers (concat last four hidden?)
 - bert + lstm?

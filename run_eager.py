@@ -22,10 +22,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
 for i in range(1, 11):
-    exp_name = 'cnn_5kvocab_' + str(i)
+    exp_name = 'dcnn_5kvocab_' + str(i)
     experiment_params = {'task_name': 'swda',
                          'experiment_name': exp_name,  # TODO Change experiment results file name?
-                         'model_name': 'cnn',
+                         'model_name': 'dcnn',
                          'training': True,
                          'testing': True,
                          'save_model': True,

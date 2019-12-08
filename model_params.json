@@ -19,18 +19,18 @@
     "dense_units": 224
   },
     "text_cnn": {
-    "learning_rate": 0.002,
-    "optimiser": "adam",
-    "num_filters": 64,
+    "learning_rate": 0.02,
+    "optimiser": "adagrad",
+    "num_filters": 128,
     "kernel_size": [1, 2, 3, 4, 5],
     "pool_size": 8,
     "dropout_rate": 0.1,
-    "dense_units": 128
+    "dense_units": 192
   },
     "dcnn": {
-    "learning_rate": 0.002,
-    "optimiser": "adam",
-    "num_filters": 128,
+    "learning_rate": 0.02,
+    "optimiser": "adagrad",
+    "num_filters": 64,
     "kernel_size": [7, 5],
     "dropout_rate": 0.1,
     "dense_units": 128

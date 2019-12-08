@@ -61,7 +61,6 @@
             "optimiser": {"type": "categorical", "values": ["adadelta", "adagrad" ,"adam", "adamax"]},
             "learning_rate": {"type": "float", "scalingType": "uniform", "min": 0.0001, "max": 0.05},
             "num_filters": {"type": "integer", "scalingType": "uniform", "min": 32, "max": 256},
-            "kernel_sizes": {"type": "integer", "scalingType": "uniform", "min": 3, "max": 10},
             "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.3},
             "dense_units": {"type": "integer", "scalingType": "uniform", "min": 32, "max": 256}
         },
@@ -82,8 +81,7 @@
         "parameters": {
             "optimiser": {"type": "categorical", "values": ["adadelta", "adagrad" ,"adam", "adamax"]},
             "learning_rate": {"type": "float", "scalingType": "uniform", "min": 0.0001, "max": 0.05},
-            "num_filters": {"type": "integer", "scalingType": "uniform", "min": 32, "max": 256},
-            "kernel_sizes": {"type": "integer", "scalingType": "uniform", "min": 3, "max": 10},
+            "num_filters": {"type": "discrete", "values": [32, 64, 128, 256]},
             "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.3},
             "dense_units": {"type": "integer", "scalingType": "uniform", "min": 32, "max": 256}
         },
