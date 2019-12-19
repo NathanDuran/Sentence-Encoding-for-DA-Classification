@@ -1,4 +1,5 @@
 import os
+import string
 import urllib.request
 import tempfile
 import collections
@@ -35,7 +36,7 @@ class InputExample(object):
 class DataProcessor:
     """Converts sentences for dialogue act classification into data sets."""
 
-    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, pad_seq=True, to_lower=True, no_punct=False, label_index=2):
+    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, to_indices=True, pad_seq=True, to_lower=True, no_punct=False, label_index=2):
         """Constructs a DataProcessor for the specified dataset.
 
         Note: For MRDA data there is the option to choose which type of labelling is used.
@@ -49,6 +50,7 @@ class DataProcessor:
             max_seq_length (int): Length to pad or truncate sentences to
             vocab_size (int): Specifies the size of the datasets vocabulary to use, if 'None' uses all words
             to_tokens (bool): Flag for tokenising input sentences, if false returns full sentence strings
+            to_indices (bool): Flag for converting input sentences, if true converts word tokens to indices
             pad_seq (bool): Flag for padding sequences to max_seq_length
             to_lower (bool): Flag to convert words to lowercase
             no_punct (bool): Flag to remove punctuation from sentences
@@ -65,6 +67,7 @@ class DataProcessor:
         self.max_seq_length = max_seq_length
         self.vocab_size = vocab_size
         self.to_tokens = to_tokens
+        self.to_indices = to_indices
         self.pad_seq = pad_seq
         self.to_lower = to_lower
         self.no_punct = no_punct
@@ -342,22 +345,35 @@ class DataProcessor:
         # Process each example and save to file
         for example in examples:
 
+            # Convert to lowercase and remove punctuation
+            if self.no_punct:
+                example.text = example.text.translate(str.maketrans('', '', string.punctuation))
+            if self.to_lower:
+                example.text = example.text.lower()
+
+            # Tokenize, else return full sentence
             if self.to_tokens:
-                # Tokenize, convert to lowercase and remove punctuation
+
                 tokens = tokenizer(example.text)
-                if self.no_punct:
-                    tokens = [token for token in tokens if not token.is_punct]
-                if self.to_lower:
-                    tokens = [token.orth_.lower() for token in tokens]
-                else:
-                    tokens = [token.orth_ for token in tokens]
+                # if self.no_punct:
+                #     tokens = [token for token in tokens if not token.is_punct]
+                # if self.to_lower:
+                #     tokens = [token.orth_.lower() for token in tokens]
+                # else:
+                #     tokens = [token.orth_ for token in tokens]
+                tokens = [token.orth_ for token in tokens]
 
                 # Pad/truncate sequences to max_sequence_length (1 = <pad> token in vocabulary)
                 if self.pad_seq:
                     tokens = [tokens[i] if i < len(tokens) else vocabulary.padding_token for i in range(self.max_seq_length)]
+                else:
+                    tokens = [tokens[i] for i in range(len(tokens)) if i < self.max_seq_length]
 
-                # Convert word and label tokens to indices
-                example.text = [vocabulary.token_to_idx[token] for token in tokens]
+                # Convert word tokens to indices or keep as words
+                if self.to_indices:
+                    example.text = vocabulary.to_indices(tokens)
+                else:
+                    example.text = [token if vocabulary[token] else vocabulary.unknown_token for token in tokens]
 
             # Convert labels to indices
             example.label = [labels.index(example.label)]
@@ -382,7 +398,7 @@ class DataProcessor:
 
         Returns:
             text (np.array): Numpy array of input text
-            labels (np.array: Numpy array of target labels
+            labels (np.array): Numpy array of target labels
         """
 
         # Get the dataset from the .npz file
@@ -460,7 +476,7 @@ class DataProcessor:
             assert len(segment_ids) == max_seq_length
 
             return input_ids, input_mask, segment_ids
-        """Converts a single sentence of text to BERT input features."""
+
         # Get the dataset from the .npz file
         dataset = np.load(os.path.join(self.output_dir, set_type + ".npz"))
         text = dataset['text']
