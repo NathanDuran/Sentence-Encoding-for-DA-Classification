@@ -28,9 +28,9 @@ class ElmoLayer(tf.keras.layers.Layer):
         if self.input_mode not in ["default", "tokens"]:
             raise NameError("Elmo input mode must be either default or token but is " + self.input_mode)
 
-        self.output_modes = ["default", "word_emb", "lstm_outputs1", "lstm_outputs2", "elmo"]
-        if self.output_mode not in self.output_modes:
-            raise NameError("Elmo output mode must be in " + str(self.output_modes) + " but is " + self.output_mode)
+        self.valid_output_modes = ["default", "word_emb", "lstm_outputs1", "lstm_outputs2", "elmo"]
+        if self.output_mode not in self.valid_output_modes:
+            raise NameError("Elmo output mode must be in " + str(self.valid_output_modes) + " but is " + self.output_mode)
 
         super(ElmoLayer, self).__init__(**kwargs)
 
@@ -53,7 +53,7 @@ class ElmoLayer(tf.keras.layers.Layer):
                 "tokens": tf.keras.backend.cast(x, tf.string),
                 "sequence_len": tf.cast(tf.count_nonzero(x, axis=1), dtype=tf.int32)
             }
-        result = self.elmo(inputs=inputs, as_dict=True, signature=self.input_mode)['default']
+        result = self.elmo(inputs=inputs, as_dict=True, signature=self.input_mode)[self.output_mode]
         return result
 
     # def compute_mask(self, inputs, mask=None):

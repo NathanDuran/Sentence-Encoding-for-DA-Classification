@@ -5,7 +5,7 @@ import json
 from comet_ml import Optimizer
 import models
 import data_processor
-import embedding_processor
+import numpy as np
 import tensorflow as tf
 
 # Suppress TensorFlow debugging
@@ -14,12 +14,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-# Enable Tensorflow eager execution
-tf.enable_eager_execution()
+# Run Tensorflow session
+sess = tf.Session()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'dcnn_opt',
-                     'model_name': 'dcnn',
+                     'experiment_name': 'elmo_opt',
+                     'model_name': 'elmo',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
@@ -27,9 +27,9 @@ experiment_params = {'task_name': 'swda',
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': True,
-                     'embedding_dim': 50,
-                     'embedding_type': 'glove',
-                     'embedding_source': 'glove.6B.50d'}
+                     'embedding_dim': 1024,
+                     'embedding_type': 'elmo',
+                     'embedding_source': 'elmo'}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -77,19 +77,15 @@ embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
-# Initialize the dataset and embedding processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
-embedding = embedding_processor.get_embedding_processor(embedding_type)
+# Initialize the dataset processor
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, to_indices=False, vocab_size=vocab_size)
 
-# If dataset folder is empty get the metadata and datasets
+# If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
     data_set.get_dataset()
 
 # Load the metadata
 vocabulary, labels = data_set.load_metadata()
-
-# Generate the embedding matrix
-embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
 # Loop over each experiment in the optimiser
 for experiment in model_optimiser.get_experiments(project_name=experiment_params['project_name'], workspace="nathanduran", auto_output_logging='simple'):
@@ -131,7 +127,7 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
     print("------------------------------------")
     print("Creating model...")
     model_class = models.get_model(experiment_params['model_name'])
-    model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, **model_params)
+    model = model_class.build_model((max_seq_length,), len(labels), [], **model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
@@ -139,16 +135,22 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
     # Display a model summary
     model.summary()
 
+    # Initialise variables
+    sess.run(tf.local_variables_initializer())
+    sess.run(tf.global_variables_initializer())
+    sess.run(tf.tables_initializer())
+    tf.keras.backend.set_session(sess)
+
     print("------------------------------------")
     print("Training model...")
     start_time = time.time()
     print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
     # Initialise train and validation metrics
-    train_loss = tf.keras.metrics.Mean()
-    train_accuracy = tf.keras.metrics.Mean()
-    val_loss = tf.keras.metrics.Mean()
-    val_accuracy = tf.keras.metrics.Mean()
+    train_loss = []
+    train_accuracy = []
+    val_loss = []
+    val_accuracy = []
     global_step = 0
     for epoch in range(1, num_epochs + 1):
         print("Epoch: {}/{}".format(epoch, num_epochs))
@@ -159,11 +161,11 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
 
                 # Perform training step on batch and record metrics
                 loss, accuracy = model.train_on_batch(train_text[train_step], train_labels[train_step])
-                train_loss(loss)
-                train_accuracy(accuracy)
+                train_loss.append(loss)
+                train_accuracy.append(accuracy)
 
-                experiment.log_metric('loss', train_loss.result().numpy(), step=global_step)
-                experiment.log_metric('accuracy', train_accuracy.result().numpy(), step=global_step)
+                experiment.log_metric('loss', np.mean(train_loss), step=global_step)
+                experiment.log_metric('accuracy', np.mean(train_accuracy), step=global_step)
 
                 # Every evaluate_steps evaluate model on validation set
                 if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
@@ -172,17 +174,17 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
 
                             # Perform evaluation step on batch and record metrics
                             loss, accuracy = model.test_on_batch(val_text[val_step], val_labels[val_step])
-                            val_loss(loss)
-                            val_accuracy(accuracy)
+                            val_loss.append(loss)
+                            val_accuracy.append(accuracy)
 
-                            experiment.log_metric('loss', val_loss.result().numpy(), step=global_step)
-                            experiment.log_metric('accuracy', val_accuracy.result().numpy(), step=global_step)
+                            experiment.log_metric('loss', np.mean(val_loss), step=global_step)
+                            experiment.log_metric('accuracy', np.mean(val_accuracy), step=global_step)
 
-                    # Print current loss/accuracy
+                    # Print current loss/accuracy and add to history
                     result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Val loss: {:.3f} - acc: {:.3f}"
                     print(result_str.format(global_step, global_steps,
-                                            train_loss.result(), train_accuracy.result(),
-                                            val_loss.result(), val_accuracy.result()))
+                                            np.mean(train_loss), np.mean(train_accuracy) * 100,
+                                            np.mean(val_loss), np.mean(val_accuracy) * 100))
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
