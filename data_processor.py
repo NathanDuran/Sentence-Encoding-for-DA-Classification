@@ -355,12 +355,6 @@ class DataProcessor:
             if self.to_tokens:
 
                 tokens = tokenizer(example.text)
-                # if self.no_punct:
-                #     tokens = [token for token in tokens if not token.is_punct]
-                # if self.to_lower:
-                #     tokens = [token.orth_.lower() for token in tokens]
-                # else:
-                #     tokens = [token.orth_ for token in tokens]
                 tokens = [token.orth_ for token in tokens]
 
                 # Pad/truncate sequences to max_sequence_length (1 = <pad> token in vocabulary)
@@ -402,7 +396,7 @@ class DataProcessor:
         """
 
         # Get the dataset from the .npz file
-        dataset = np.load(os.path.join(self.output_dir, set_type + ".npz"))
+        dataset = np.load(os.path.join(self.output_dir, set_type + ".npz"), allow_pickle=True)
         text = dataset['text']
         labels = dataset['labels']
 

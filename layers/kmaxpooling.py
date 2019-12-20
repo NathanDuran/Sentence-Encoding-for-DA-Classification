@@ -2,8 +2,7 @@ import tensorflow as tf
 
 
 class KMaxPooling(tf.keras.layers.Layer):
-    """
-    Implemetation of temporal k-max pooling layer, which was first proposed in:
+    """ Implemetation of temporal k-max pooling layer, which was first proposed in:
 
     Kalchbrenner, N., Grefenstette, E. and Blunsom, P. (2014) A Convolutional Neural Network for Modelling Sentences.
     Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics.
@@ -29,11 +28,6 @@ class KMaxPooling(tf.keras.layers.Layer):
         super(KMaxPooling, self).build(input_shape)
 
     def call(self, x, mask=None):
-        """
-        Reference: https://stackoverflow.com/questions/51299181/how-to-implement-k-max-pooling-in-tensorflow-or-keras
-        The key point is preserving the relative order
-        """
-
         out_shape = self.compute_output_shape(x.shape)
 
         permute_inputs = tf.keras.backend.permute_dimensions(x, (0, 2, 1))

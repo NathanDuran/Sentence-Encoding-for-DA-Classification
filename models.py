@@ -36,7 +36,7 @@ def get_model(model_name):
               'deep_bi_gru': DeepBiGRU(),
               'deep_bi_gru_attn': DeepBiGRUAttn(),
               'rcnn': RCNN(),
-              'elmo': Elmo(),
+              'elmo': ELMo(),
               'bert': BERT(),
               'use': UniversalSentenceEncoder(),
               'nnlm': NeuralNetworkLanguageModel(),
@@ -1597,8 +1597,8 @@ class RCNN(Model):
         return model
 
 
-class Elmo(Model):
-    """ Uses an elmo from Tensorflow Hub as embedding layer from:
+class ELMo(Model):
+    """ Uses an ELMo from Tensorflow Hub as embedding layer from:
     https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb
 
     Matthew E. Peters, Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, Luke Zettlemoyer.
@@ -1607,21 +1607,22 @@ class Elmo(Model):
     Module url: "https://tfhub.dev/google/elmo/2"
     """
 
-    def __init__(self, name='Elmo'):
+    def __init__(self, name='ELMo'):
         super().__init__(name)
-        self.name = name
+        self.name = "ELMo"
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        input_mode = kwargs['input_mode'] if 'input_mode' in kwargs.keys() else 'tokens'
+        output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'default'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = ElmoLayer()(inputs)
+        embedding = ElmoLayer(input_mode=input_mode, output_mode=output_mode)(inputs)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
@@ -1667,7 +1668,7 @@ class BERT(Model):
         in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks")
         in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids")
         bert_inputs = [in_id, in_mask, in_segment]
-        bert_output = BertLayer(n_fine_tune_layers=num_fine_tune_layers, pooling=pooling)(bert_inputs)
+        bert_output = BertLayer(num_fine_tune_layers=num_fine_tune_layers, pooling=pooling)(bert_inputs)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(bert_output)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
