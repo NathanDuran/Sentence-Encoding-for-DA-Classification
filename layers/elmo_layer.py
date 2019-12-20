@@ -16,9 +16,10 @@ class ElmoLayer(tf.keras.layers.Layer):
                     word_emb = the character-based word representations with shape [batch_size, max_sequence_length, 512]
                     lstm_outputs1 = the first LSTM hidden state with shape [batch_size, max_sequence_length, 1024]
                     lstm_outputs2 = the second LSTM hidden state with shape [batch_size, max_sequence_length, 1024]
-                    elmo = weighted sum of the 3 layers, where the weights are trainable. Tensor has shape [batch_size, max_sequence_length, 1024]
+                    elmo = weighted sum of the 3 layers with shape [batch_size, max_sequence_length, 1024]
                     default = fixed mean-pooling of all contextualized word representations with shape [batch_size, 1024]
         """
+
         self.input_mode = input_mode
         self.output_mode = output_mode
         self.dimensions = 1024

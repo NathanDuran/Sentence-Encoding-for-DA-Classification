@@ -159,21 +159,16 @@ print("Train steps: " + str(train_steps))
 print("Val steps: " + str(val_steps))
 print("Test steps: " + str(test_steps))
 
-# Build or load the model
+# Build the model
 print("------------------------------------")
 print("Creating model...")
 
-# Load if checkpoint set
-if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
-    model = tf.keras.models.load_model(os.path.join(checkpoint_dir, init_ckpt_file))
-    print("Loaded model from: " + os.path.join(checkpoint_dir, init_ckpt_file))
-# Else build with supplied parameters
-else:
-    model_class = models.get_model(experiment_params['model_name'])
-    model = model_class.build_model((max_seq_length,), len(labels), [], **model_params)
-    print("Built model using parameters:")
-    for key, value in model_params.items():
-        print("{}: {}".format(key, value))
+# Build model with supplied parameters
+model_class = models.get_model(experiment_params['model_name'])
+model = model_class.build_model((max_seq_length,), len(labels), [], **model_params)
+print("Built model using parameters:")
+for key, value in model_params.items():
+    print("{}: {}".format(key, value))
 
 # Display a model summary and create/save a model graph definition and image
 model.summary()
@@ -188,8 +183,14 @@ sess.run(tf.global_variables_initializer())
 sess.run(tf.tables_initializer())
 tf.keras.backend.set_session(sess)
 
+# Load initialisation weights if set
+init_ckpt_file = os.path.join(checkpoint_dir, init_ckpt_file)
+if load_model and os.path.exists(init_ckpt_file):
+    model.load_weights(init_ckpt_file)
+    print("Loaded model weights from: " + init_ckpt_file)
+
 # Initialise model checkpointer and early stopping monitor
-checkpointer = check_pointer.Checkpointer(checkpoint_dir, experiment_name, model, saving=save_model, keep_best=1, minimise=True)
+checkpointer = check_pointer.Checkpointer(checkpoint_dir, experiment_name, model, save_weights=save_model, keep_best=1, minimise=True)
 earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
 
 # Train the model
@@ -246,7 +247,7 @@ if training:
                     history['val_accuracy'].append(np.mean(val_accuracy))
 
                     # Save checkpoint if checkpointer metric improves
-                    checkpointer.save_best_checkpoint(float(np.mean(val_loss)), global_step)
+                    checkpointer.save_best(float(np.mean(val_loss)), global_step)
 
         # Check to stop training early
         if early_stopping and earlystopper.check_early_stop(float(np.mean(val_loss))):
@@ -262,7 +263,7 @@ if training:
 
     print("------------------------------------")
     print("Saving model...")
-    checkpointer.save_checkpoint(global_step)
+    checkpointer.save(global_step)
     experiment.log_asset_folder(checkpoint_dir)
 
 if testing:
@@ -270,11 +271,11 @@ if testing:
     print("------------------------------------")
     print("Testing model...")
 
-    # Load if best checkpoint exists
-    best_ckpt_file = checkpointer.get_best_checkpoint()
-    if load_model and best_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, best_ckpt_file)):
-        model = tf.keras.models.load_model(os.path.join(checkpoint_dir, best_ckpt_file))
-        print("Loaded model from: " + os.path.join(checkpoint_dir, best_ckpt_file))
+    # Load if best weights exists
+    best_weights_file = checkpointer.get_best_weights()
+    if load_model and best_weights_file and os.path.exists(best_weights_file):
+        model.load_weights(best_weights_file)
+        print("Loaded model weights from: " + best_weights_file)
 
     start_time = time.time()
     print("Testing started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(test_steps) + " steps")

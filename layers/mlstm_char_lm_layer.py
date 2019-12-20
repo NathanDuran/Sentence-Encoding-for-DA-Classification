@@ -249,10 +249,12 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
             batch_size (int): Max size of input batches of examples, smaller batches will be padded to this size.
             max_seq_length (int): Max number of characters in input sentence, larger will be truncated.
             dimensions (int): Dimension of the hidden states of mLSTM
-            return_type (string): Final: final hidden state of the mLSTM with shape [batch_size, dimensions]
-                           Sequence: output every hidden state in the input sequence with shape [batch_size, max_seq_length, dimensions]
-                           Mean: Averaged sequence output with shape [batch_size, dimensions]
+            return_type (string):
+                final = final hidden state of the mLSTM with shape [batch_size, dimensions]
+                sequence = output every hidden state in the input sequence with shape [batch_size, max_seq_length, dimensions]
+                mean = Averaged sequence output with shape [batch_size, dimensions]
         """
+
         self.batch_size = batch_size
         self.max_seq_length = max_seq_length
         self.dimensions = dimensions

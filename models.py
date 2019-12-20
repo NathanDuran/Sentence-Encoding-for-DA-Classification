@@ -1598,8 +1598,9 @@ class RCNN(Model):
 
 
 class ELMo(Model):
-    """ Uses an ELMo from Tensorflow Hub as embedding layer from:
+    """ Uses ELMo from Tensorflow Hub as embedding layer from:
     https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb
+    https://github.com/JHart96/keras_elmo_embedding_layer/blob/master/elmo.py
 
     Matthew E. Peters, Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, Luke Zettlemoyer.
     Deep contextualized word representations. arXiv preprint arXiv:1802.05365, 2018.
@@ -1629,7 +1630,7 @@ class ELMo(Model):
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
         # Create keras model
-        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs)
+        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs, name=self.name)
 
         # Create optimiser
         optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
@@ -1715,7 +1716,7 @@ class UniversalSentenceEncoder(Model):
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
         # Create keras model
-        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs)
+        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs, name=self.name)
 
         # Create optimiser
         optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
@@ -1802,7 +1803,7 @@ class MLSTMCharLM(Model):
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
         # Create keras model
-        model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
+        model = tf.keras.models.Model(inputs=inputs, outputs=outputs, name=self.name)
 
         # Create optimiser
         optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)

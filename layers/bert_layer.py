@@ -17,6 +17,7 @@ class BertLayer(tf.keras.layers.Layer):
                     mean_sequence = Averaged sequence output with shape [batch_size, hidden_size]
             bert_path (string): URL to the BERT module
         """
+
         self.num_fine_tune_layers = num_fine_tune_layers
         self.trainable = True
         self.hidden_size = 768
