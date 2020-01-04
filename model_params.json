@@ -241,10 +241,10 @@
     "elmo": {
     "learning_rate": 0.001,
     "optimiser": "adam",
-    "input_mode": "tokens",
+    "input_mode": "default",
     "output_mode": "default",
     "dropout_rate": 0.02,
-    "dense_units": 256
+    "dense_units": 512
   },
     "bert": {
     "learning_rate": 0.00002,

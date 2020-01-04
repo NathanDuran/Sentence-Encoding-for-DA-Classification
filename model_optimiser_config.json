@@ -497,11 +497,11 @@
             "retryAssignLimit": 0
         },
         "parameters": {
-            "optimiser": {"type": "categorical", "values": ["adadelta", "adagrad" ,"adam", "adamax"]},
+            "optimiser": {"type": "categorical", "values": ["adagrad", "adam", "admax"]},
             "learning_rate": {"type": "float", "scalingType": "uniform", "min": 0.0001, "max": 0.05},
-            "input_mode": {"type": "categorical", "values": ["tokens"]},
-            "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.3},
-            "dense_units": {"type": "discrete", "values": [32, 64, 128, 256, 512]}
+            "output_mode": {"type": "categorical", "values": ["default", "word_emb", "elmo"]},
+            "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.2},
+            "dense_units": {"type": "discrete", "values": [128, 256, 512]}
         },
         "name": "Bayes Search",
         "trials": 1

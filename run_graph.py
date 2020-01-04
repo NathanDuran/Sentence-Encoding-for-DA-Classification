@@ -34,8 +34,8 @@ experiment_params = {'task_name': 'swda',
                      'early_stopping': False,
                      'patience': 3,
                      'vocab_size': 10000,
-                     'max_seq_length': 128,
-                     'to_tokens': True,
+                     'max_seq_length': 1,
+                     'to_tokens': False,
                      'embedding_dim': 1024,
                      'embedding_type': 'elmo',
                      'embedding_source': 'elmo'}
@@ -119,7 +119,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, to_indices=False, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
 
 # If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
@@ -176,9 +176,8 @@ sess.run(tf.tables_initializer())
 tf.keras.backend.set_session(sess)
 
 # Load initialisation weights if set
-init_ckpt_file = os.path.join(checkpoint_dir, init_ckpt_file)
-if load_model and os.path.exists(init_ckpt_file):
-    model.load_weights(init_ckpt_file)
+if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
+    model.load_weights(os.path.join(checkpoint_dir, init_ckpt_file))
     print("Loaded model weights from: " + init_ckpt_file)
 
 # Initialise model checkpointer and early stopping monitor

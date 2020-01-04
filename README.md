@@ -10,8 +10,8 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 - bert large?
 - bert output? pooled, seq/mean_seq
 
-- elmo try word_emb/elmo and default
-- BiLSTM+ELMo+Attn?
+- elmo try word_emb/elmo (with pooling) and default
+- Bi/LSTM+ELMo+Attn?
 
 - test load/save for eager models and bert
 
@@ -26,7 +26,7 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 
 ## Misc
 - Document the models in readme
-- elmo needs to be strings or tokenised strings
+- elmo needs to be strings (or tokenised strings - but those suck)
 
 ## To try
 - Visualising attention layers

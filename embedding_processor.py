@@ -127,7 +127,7 @@ class Word2VecEmbedding(EmbeddingProcessor):
         vocabulary.set_embedding(word2vec)
 
         # Check desired embedding dimensions is valid
-        if len(vocabulary.embedding[0]) != embedding_dim:
+        if len(vocabulary.embedding[0]) < embedding_dim:
             raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
                              "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
@@ -165,7 +165,7 @@ class FastTextEmbedding(EmbeddingProcessor):
         vocabulary.set_embedding(fastext)
 
         # Check desired embedding dimensions is valid
-        if len(vocabulary.embedding[0]) != embedding_dim:
+        if len(vocabulary.embedding[0]) < embedding_dim:
             raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
                              "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
@@ -218,7 +218,7 @@ class Numberbatch(EmbeddingProcessor):
             vocabulary.set_embedding(numberbatch)
 
             # Check desired embedding dimensions is valid
-            if len(vocabulary.embedding[0]) != embedding_dim:
+            if len(vocabulary.embedding[0]) < embedding_dim:
                 raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
                                  "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 
@@ -270,7 +270,7 @@ class Dependency(EmbeddingProcessor):
             vocabulary.set_embedding(dependency)
 
             # Check desired embedding dimensions is valid
-            if len(vocabulary.embedding[0]) != embedding_dim:
+            if len(vocabulary.embedding[0]) < embedding_dim:
                 raise ValueError("The given embedding source dimension: '" + str(len(vocabulary.embedding[0])) +
                                  "' less than specified embedding dimensions: '" + str(embedding_dim) + "'.")
 

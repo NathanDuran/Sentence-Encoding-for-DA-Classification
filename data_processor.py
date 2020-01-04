@@ -372,7 +372,7 @@ class DataProcessor:
             # Convert labels to indices
             example.label = [labels.index(example.label)]
 
-            # convert to numpy
+            # Add to lists
             examples_text.append(example.text)
             examples_labels.append(example.label)
 
@@ -617,6 +617,66 @@ def batch(input_arr, batch_size):
     """Yield successive batch_size chunks from input_arr."""
     for i in range(0, len(input_arr), batch_size):
         yield input_arr[i:i + batch_size]
+
+
+def batch_and_pad(text, labels, batch_size, max_seq_length, min_seq_length=5, pad_value=1):
+    """Sorts tokenised sentences by length and pads them so that sentences in each batch have the same length.
+
+    Args:
+        text (list): List of tokenised sentences to batch.
+        labels (list): List of labels to batch.
+        batch_size (int): Number of sentences to put in each batch.
+        max_seq_length (int): Maximum length of any sequence.
+        min_seq_length (int): Minimum length of any sequence.
+        pad_value (int/str): Value to pad sequences with.
+
+    Returns:
+        text_batches (list): List of batches (lists) of sentences.
+        labels_batches (list): List of batches (lists) of labels.
+    """
+    # Sort sentences in order of length
+    combined = list(zip(text, labels))
+    combined = sorted(combined, key=lambda l: len(l[1]))
+    text, labels = map(list, (zip(*combined)))
+
+    text_batches = []
+    label_batches = []
+
+    # Create batches of batch_size
+    start = 0
+    while start < len(text):
+        end = start + batch_size
+        if end > len(text):
+            end = len(text)
+
+        text_batch = text[start:end]
+        label_batch = np.asarray(labels[start:end])
+
+        # Find the longest sentence in the batch
+        batch_max_len = max([len(l) for l in text_batch])
+
+        datatype = object if type(pad_value) == str else 'int32'
+        # Ensure each batch is: min_seq_length <= batch_max_len <= max_seq_length
+        if min_seq_length <= batch_max_len <= max_seq_length:
+            text_batch = tf.keras.preprocessing.sequence.pad_sequences(text_batch, maxlen=batch_max_len, dtype=datatype,
+                                                                  padding='post', truncating='post', value=pad_value)
+        # Else pad, or truncate
+        elif batch_max_len < min_seq_length:
+            text_batch = tf.keras.preprocessing.sequence.pad_sequences(text_batch, maxlen=min_seq_length, dtype=datatype,
+                                                                  padding='post', truncating='post', value=pad_value)
+        elif batch_max_len > max_seq_length:
+            text_batch = tf.keras.preprocessing.sequence.pad_sequences(text_batch, maxlen=max_seq_length - 1, dtype=datatype,
+                                                                  padding='post', truncating='post', value=pad_value)
+
+        text_batches.append(text_batch)
+        label_batches.append(label_batch)
+
+        start += batch_size
+
+    print('max length per batch: ', [max([len(l) for l in text_batch]) for text_batch in text_batches])
+    print('num batches', len(text_batches))
+
+    return text_batches, label_batches
 
 
 def to_one_hot(label, labels):

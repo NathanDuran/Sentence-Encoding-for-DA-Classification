@@ -1616,16 +1616,19 @@ class ELMo(Model):
         # Unpack key word arguments
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
-        input_mode = kwargs['input_mode'] if 'input_mode' in kwargs.keys() else 'tokens'
+        input_mode = kwargs['input_mode'] if 'input_mode' in kwargs.keys() else 'default'
         output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'default'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = ElmoLayer(input_mode=input_mode, output_mode=output_mode)(inputs)
+        x = ElmoLayer(input_mode=input_mode, output_mode=output_mode)(inputs)
 
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+        if output_mode != 'default':
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 
