@@ -166,7 +166,7 @@ def save_experiment(file_name, params, train_loss, train_acc, val_loss, val_acc,
                        "'embedding_dim','embedding_type','embedding_source',"
                        "'train_loss','train_acc','val_loss','val_acc','test_loss','test_acc'")
             for key, value in metrics.items():
-                file.write("'" + key + "',")
+                file.write(",'" + key + "'")
             file.write("\n")
 
     with open(file_name, 'a') as file:

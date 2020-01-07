@@ -497,9 +497,9 @@
             "retryAssignLimit": 0
         },
         "parameters": {
-            "optimiser": {"type": "categorical", "values": ["adagrad", "adam", "admax"]},
+            "optimiser": {"type": "categorical", "values": ["adagrad", "adam", "adamax"]},
             "learning_rate": {"type": "float", "scalingType": "uniform", "min": 0.0001, "max": 0.05},
-            "output_mode": {"type": "categorical", "values": ["default", "word_emb", "elmo"]},
+            "output_mode": {"type": "categorical", "values": ["default", "elmo"]},
             "dropout_rate": {"type": "float", "scalingType": "uniform", "min": 0.0, "max": 0.2},
             "dense_units": {"type": "discrete", "values": [128, 256, 512]}
         },

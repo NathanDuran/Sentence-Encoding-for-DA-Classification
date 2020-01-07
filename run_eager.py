@@ -23,7 +23,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.enable_eager_execution()
 for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi_gru', 'rcnn']:
     for i in range(1, 11):
-        exp_name = curr_model_name + '_1kvocab_' + str(i)
+        exp_name = curr_model_name + '_0.5kvocab_' + str(i)
         experiment_params = {'task_name': 'swda',
                              'experiment_name': exp_name,  # TODO Change experiment results file name?
                              'model_name': curr_model_name,
@@ -37,7 +37,7 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
                              'evaluate_steps': 500,
                              'early_stopping': False,
                              'patience': 3,
-                             'vocab_size': 1000,
+                             'vocab_size': 500,
                              'max_seq_length': 128,
                              'to_tokens': True,
                              'train_embeddings': True,
@@ -166,9 +166,8 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
         print("Creating model...")
 
         # Load if checkpoint set
-        init_ckpt_file = os.path.join(checkpoint_dir, init_ckpt_file)
-        if load_model and init_ckpt_file and os.path.exists(init_ckpt_file):
-            model = tf.keras.models.load_model(init_ckpt_file, custom_objects=custom_layers)
+        if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
+            model = tf.keras.models.load_model(os.path.join(checkpoint_dir, init_ckpt_file), custom_objects=custom_layers)
             print("Loaded model from: " + init_ckpt_file)
         # Else build with supplied parameters
         else:
