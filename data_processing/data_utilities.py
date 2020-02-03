@@ -10,6 +10,7 @@ def load_experiment_data(task_name, experiment_type):
     data_path = os.path.join('..', task_name, task_name + '_' + experiment_type + '.csv')
     data = pd.read_csv(data_path, index_col=False, header=0, quotechar="'")
     data = data.drop('experiment_name', axis='columns')
+    data.model_name = data.model_name.str.replace("_", " ")
     return data
 
 
