@@ -12,14 +12,14 @@ vocab_size_data = sort_experiment_data_by_model_and_metric(vocab_size_data, expe
 # Save dataframe
 save_dataframe(experiment_type + '_current.csv', vocab_size_data)
 # Generate and save charts # TODO Add saving and plot test and val on same plot?
-# g, fig = plot_implot_chart(vocab_size_data, x="vocab_size", y="val_acc", hue="model_name",
-#                            order=4, num_legend_col=4, y_label='Test Accuracy', x_label='Vocabulary Size',
-#                            legend_loc='lower right', colour='Paired')
-# fig.show()
-# g, fig = plot_implot_chart(vocab_size_data, x="vocab_size", y="test_acc", hue="model_name",
-#                            order=4, num_legend_col=4, y_label='Test Accuracy', x_label='Vocabulary Size',
-#                            legend_loc='lower right', colour='Paired')
-# fig.show()
+g, fig = plot_implot_chart(vocab_size_data, x="vocab_size", y="val_acc", hue="model_name",
+                           order=4, num_legend_col=4, y_label='Test Accuracy', x_label='Vocabulary Size',
+                           legend_loc='lower right', colour='Paired')
+fig.show()
+g, fig = plot_implot_chart(vocab_size_data, x="vocab_size", y="test_acc", hue="model_name",
+                           order=4, num_legend_col=4, y_label='Test Accuracy', x_label='Vocabulary Size',
+                           legend_loc='lower right', colour='Paired')
+fig.show()
 
 # Get means over all experiments
 vocab_size_means = get_experiment_means(vocab_size_data, experiment_type)
@@ -42,6 +42,15 @@ vocab_size_best = pd.concat([best_val, best_test], axis=1, ignore_index=False, s
 print(vocab_size_best)
 
 # Test if result pairs are statistically significant # TODO concat val and test data? + graph to show what is significant
-t_test_frame = t_test(vocab_size_data, experiment_type)
+t_test_frame = t_test(vocab_size_data, experiment_type, 'test_acc')
 print(t_test_frame)
+# BONFERRONI CORRECTION POST-HOC COMPARISON???
+# p-value/# of comparisons = 0.05/3 = 0.00385
+
+anova_test_frame = anova_test(vocab_size_data, experiment_type, 'test_acc')
+print(anova_test_frame)
+
+anova_test_frame = anova_test2(vocab_size_data, experiment_type, 'test_acc')
+print(anova_test_frame)
+# Eta-squared and omega-squared share the same suggested ranges for low (0.01 – 0.059), medium (0.06 – 0.139), and large (0.14+) effect size classification.
 # TODO Change order so rcnn is after dcnn (also for models/model_params)
