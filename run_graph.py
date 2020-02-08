@@ -165,7 +165,7 @@ for key, value in model_params.items():
 # Display a model summary and create/save a model graph definition and image
 model.summary()
 model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
-tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
+tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=False, show_shapes=True)
 experiment.log_image(model_image_file)
 experiment.set_model_graph(model.to_json())
 
@@ -325,8 +325,9 @@ if testing:
         print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
 
 # # TODO remove when all experiments complete
-# if training and testing:
-#     experiment_file = os.path.join(task_name, task_name + "_vocab_size" + ".csv")
-#     save_experiment(experiment_file, experiment_params, train_loss.result().numpy(), train_accuracy.result().numpy(),
-#                     val_loss.result().numpy(), val_accuracy.result().numpy(),
-#                     test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)
+if training and testing:
+    experiment_file = os.path.join(task_name, task_name + "_vocab_size" + ".csv")
+    save_experiment(experiment_file, experiment_params,
+                    np.mean(train_loss), np.mean(train_accuracy),
+                    np.mean(val_loss), np.mean(val_accuracy),
+                    np.mean(test_loss), np.mean(test_accuracy), metrics)

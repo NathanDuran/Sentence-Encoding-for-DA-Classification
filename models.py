@@ -1623,7 +1623,7 @@ class ELMo(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        x = ElmoLayer(input_mode=input_mode, output_mode=output_mode)(inputs)
+        x = ElmoLayer(input_mode=input_mode, output_mode=output_mode, name='elmo')(inputs)
 
         if output_mode != 'default':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
@@ -1672,7 +1672,7 @@ class BERT(Model):
         in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks")
         in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids")
         bert_inputs = [in_id, in_mask, in_segment]
-        bert_output = BertLayer(num_fine_tune_layers=num_fine_tune_layers, pooling=pooling)(bert_inputs)
+        bert_output = BertLayer(num_fine_tune_layers=num_fine_tune_layers, pooling=pooling, name='bert')(bert_inputs)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(bert_output)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
@@ -1712,7 +1712,7 @@ class UniversalSentenceEncoder(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = UniversalSentenceEncoderLayer()(inputs)
+        embedding = UniversalSentenceEncoderLayer(name='universal_sentence_encoder')(inputs)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
@@ -1753,7 +1753,7 @@ class NeuralNetworkLanguageModel(Model):
 
         # Create keras model
         model = tf.keras.Sequential([
-            hub.KerasLayer(self.module_url, input_shape=[], dtype=tf.string, trainable=True),
+            hub.KerasLayer(self.module_url, input_shape=[], dtype=tf.string, trainable=True, name='nnlm'),
             tf.keras.layers.Dense(dense_units, activation=dense_activation),
             tf.keras.layers.Dropout(dropout_rate),
             tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')
@@ -1797,7 +1797,7 @@ class MLSTMCharLM(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        x = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, return_type=return_type)(inputs)
+        x = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, return_type=return_type, name='mlstm_char_lm')(inputs)
         if return_type == 'sequence':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
 

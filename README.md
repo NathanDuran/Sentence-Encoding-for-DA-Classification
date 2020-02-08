@@ -5,22 +5,21 @@
 - CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
 https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers/ChainCRF.py
 
+- Make bi-directional a parameter?
+
 - bert Different num layers (concat last four hidden?)
 - bert + lstm?
 - bert large?
 - bert output? pooled, seq/mean_seq
 
-- Bi/LSTM+ELMo+Attn?
-
-- test load/save for eager models and bert
-
 - Add new confusion matrix to comet experiment?
 
-- Make bi-directional a parameter?
-## models
-
-- albert?/ distillbert?
-
+## Models to Add
+- ELMo + LSTM/Bi-LSTM
+- ELMo + LSTM/Bi-LSTM + Attn
+- ELMo + Attn
+- Albert 
+- Distillbert
 - https://github.com/AlexYangLi/TextClassification
 
 ## Misc
