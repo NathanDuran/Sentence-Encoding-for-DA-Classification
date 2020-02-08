@@ -324,10 +324,11 @@ if testing:
         experiment.log_metrics(metrics)
         print(metric_str)
 
-        confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
+        conf_matrix_fig, confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
         confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
-        confusion_matrix.savefig(confusion_matrix_file)
+        conf_matrix_fig.savefig(confusion_matrix_file)
         experiment.log_image(confusion_matrix_file)
+        experiment.log_confusion_matrix(matrix=confusion_matrix.tolist(), labels=labels[:len(confusion_matrix)])
 
         end_time = time.time()
         print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")

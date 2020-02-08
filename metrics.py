@@ -63,8 +63,8 @@ def precision_recall_f1(true_labels, predicted_labels, labels):
     return metrics_dict, metric_str
 
 
-def plot_confusion_matrix(true_labels, predicted_labels, labels, title=None, matrix_dim=15,
-                          normalise=True, fig_size=(10, 10), font_size=15):
+def plot_confusion_matrix(true_labels, predicted_labels, labels,  matrix_dim=15, normalise=False,
+                          title=None, fig_size=(10, 10), font_size=15):
     """Generates a confusion matrix for the given predictions.
 
     Uses sklearn to generate the confusion matrix.
@@ -82,28 +82,29 @@ def plot_confusion_matrix(true_labels, predicted_labels, labels, title=None, mat
 
     Returns:
         fig (matplotlib figure): The confusion matrix figure
+        matrix (numpy array): The 2d confusion matrix array
     """
 
     # Generate the confusion matrix array
-    cm = confusion_matrix(true_labels, predicted_labels)
+    matrix = confusion_matrix(true_labels, predicted_labels)
 
     # Normalise the matrix
     if normalise:
         # Ignore divide by zero for no predictions for a certain label
         with np.errstate(divide='ignore', invalid='ignore'):
-            cm = np.true_divide(cm.astype('float'), cm.sum(axis=1)[:, np.newaxis])
-            cm[~ np.isfinite(cm)] = 0  # -inf inf NaN
+            matrix = np.true_divide(matrix.astype('float'), matrix.sum(axis=1)[:, np.newaxis])
+            matrix[~ np.isfinite(matrix)] = 0  # -inf inf NaN
         fmt = '.2f'
     else:
         fmt = 'd'
 
     # Truncate matrix and labels to desired matrix dimensions
     if matrix_dim:
-        cm = cm[:matrix_dim, :matrix_dim]
-        labels = labels[:cm.shape[0]]
+        matrix = matrix[:matrix_dim, :matrix_dim]
+        labels = labels[:matrix.shape[0]]
 
     # Create pandas dataframe
-    df_cm = pd.DataFrame(cm, index=labels, columns=labels)
+    df_cm = pd.DataFrame(matrix, index=labels, columns=labels)
 
     # Create figure and heatmap
     fig = plt.figure(figsize=fig_size)
@@ -117,7 +118,7 @@ def plot_confusion_matrix(true_labels, predicted_labels, labels, title=None, mat
     if title:
         plt.title(title, fontsize=font_size)
     plt.tight_layout()
-    return fig
+    return fig, matrix
 
 
 def save_history(file_name, history):

@@ -12,8 +12,6 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 - bert large?
 - bert output? pooled, seq/mean_seq
 
-- Add new confusion matrix to comet experiment?
-
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
 - ELMo + LSTM/Bi-LSTM + Attn

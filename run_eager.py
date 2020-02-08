@@ -165,27 +165,27 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
         print("------------------------------------")
         print("Creating model...")
 
-        # Load if checkpoint set
-        if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
-            model = tf.keras.models.load_model(os.path.join(checkpoint_dir, init_ckpt_file), custom_objects=custom_layers)
-            print("Loaded model from: " + init_ckpt_file)
-        # Else build with supplied parameters
-        else:
-            model_class = models.get_model(experiment_params['model_name'])
-            model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, train_embeddings, **model_params)
-            print("Built model using parameters:")
-            for key, value in model_params.items():
-                print("{}: {}".format(key, value))
+        # Build model with supplied parameters
+        model_class = models.get_model(experiment_params['model_name'])
+        model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, train_embeddings, **model_params)
+        print("Built model using parameters:")
+        for key, value in model_params.items():
+            print("{}: {}".format(key, value))
 
         # Display a model summary and create/save a model graph definition and image
         model.summary()
         model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
-        tf.keras.utils.plot_model(model, to_file=model_image_file, show_shapes=True)
+        tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=False, show_shapes=True)
         experiment.log_image(model_image_file)
         experiment.set_model_graph(model.to_json())
 
+        # Load initialisation weights if set
+        if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
+            model.load_weights(os.path.join(checkpoint_dir, init_ckpt_file))
+            print("Loaded model weights from: " + init_ckpt_file)
+
         # Initialise model checkpointer and early stopping monitor
-        checkpointer = check_pointer.Checkpointer(checkpoint_dir, experiment_name, model, save_ckpt=save_model, keep_best=1, minimise=True)
+        checkpointer = check_pointer.Checkpointer(checkpoint_dir, experiment_name, model, save_weights=save_model, keep_best=1, minimise=True)
         earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
 
         # Train the model
@@ -266,11 +266,11 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
             print("------------------------------------")
             print("Testing model...")
 
-            # Load if best checkpoint exists
-            best_ckpt_file = checkpointer.get_best_ckpt()
-            if load_model and best_ckpt_file and os.path.exists(best_ckpt_file):
-                model = tf.keras.models.load_model(best_ckpt_file, custom_objects=custom_layers)
-                print("Loaded model from: " + best_ckpt_file)
+            # Load if best weights exists
+            best_weights_file = checkpointer.get_best_weights()
+            if load_model and best_weights_file and os.path.exists(best_weights_file):
+                model.load_weights(best_weights_file)
+                print("Loaded model weights from: " + best_weights_file)
 
             start_time = time.time()
             print("Testing started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(test_steps) + " steps")
@@ -320,10 +320,11 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
                 experiment.log_metrics(metrics)
                 print(metric_str)
 
-                confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
+                conf_matrix_fig, confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
                 confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
-                confusion_matrix.savefig(confusion_matrix_file)
+                conf_matrix_fig.savefig(confusion_matrix_file)
                 experiment.log_image(confusion_matrix_file)
+                experiment.log_confusion_matrix(matrix=confusion_matrix.tolist(), labels=labels[:len(confusion_matrix)])
 
                 end_time = time.time()
                 print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
@@ -331,6 +332,7 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
         # TODO remove when all experiments complete
         if training and testing:
             experiment_file = os.path.join(task_name, task_name + "_vocab_size" + ".csv")
-            save_experiment(experiment_file, experiment_params, train_loss.result().numpy(), train_accuracy.result().numpy(),
+            save_experiment(experiment_file, experiment_params,
+                            train_loss.result().numpy(), train_accuracy.result().numpy(),
                             val_loss.result().numpy(), val_accuracy.result().numpy(),
                             test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)
