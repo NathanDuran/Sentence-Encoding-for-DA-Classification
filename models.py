@@ -18,6 +18,7 @@ def get_model(model_name):
               'cnn_attn': CNNAttn(),
               'text_cnn': TextCNN(),
               'dcnn': DCNN(),
+              'rcnn': RCNN(),
               'lstm': LSTM(),
               'lstm_crf': LSTMCRF(),
               'lstm_attn': LSTMAttn(),
@@ -35,7 +36,6 @@ def get_model(model_name):
               'bi_gru_attn': BiGRUAttn(),
               'deep_bi_gru': DeepBiGRU(),
               'deep_bi_gru_attn': DeepBiGRUAttn(),
-              'rcnn': RCNN(),
               'elmo': ELMo(),
               'bert': BERT(),
               'use': UniversalSentenceEncoder(),
@@ -326,6 +326,96 @@ class DCNN(Model):
 
         flatten = tf.keras.layers.Flatten()(non_linear_3)
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(flatten)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class RCNN(Model):
+    """ Implements the Recurrent Convolutional Network from:
+
+    Lai, S. et al. (2015) 'Recurrent Convolutional Neural Networks for Text Classification',
+    in Proceedings of the 29th AAAI Conference on Artificial Intelligence (AAAI'15).
+
+    Model code from: "https://github.com/AlexYangLi/TextClassification"
+    """
+
+    def __init__(self, name='RCNN'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
+        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
+        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
+        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
+        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
+        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
+        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
+        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 64
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
+
+        # Define model
+        inputs = tf.keras.Input(shape=input_shape)
+        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                              input_length=input_shape[0],  # Max seq length
+                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                              trainable=train_embeddings)(inputs)
+
+        # Shift the document to the right to obtain the left-side contexts (reshape else lambda outputs 'None' shape)
+        l_embedding = tf.keras.layers.Lambda(lambda x: tf.keras.backend.concatenate(
+            [tf.keras.backend.zeros(shape=(tf.keras.backend.shape(x)[0], 1, tf.keras.backend.shape(x)[-1])),
+             x[:, :-1]], axis=1), name='l_shift')(embedding)
+        l_embedding = tf.keras.layers.Reshape((input_shape[0], embedding_matrix.shape[1]))(l_embedding)
+
+        # Shift the document to the left to obtain the right-side contexts (reshape else lambda outputs 'None' shape)
+        r_embedding = tf.keras.layers.Lambda(lambda x: tf.keras.backend.concatenate(
+            [tf.keras.backend.zeros(shape=(tf.keras.backend.shape(x)[0], 1, tf.keras.backend.shape(x)[-1])),
+             x[:, 1:]], axis=1), name='r_shift')(embedding)
+        r_embedding = tf.keras.layers.Reshape((input_shape[0], embedding_matrix.shape[1]))(r_embedding)
+
+        # If a GPU is available use the CUDA layer
+        if tf.test.is_gpu_available() and use_gpu:
+            forwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='forwards')(l_embedding)
+            backwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, go_backwards=True,
+                                                  name='backwards')(r_embedding)
+        else:
+            forwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                            dropout=lstm_dropout,
+                                            recurrent_dropout=recurrent_dropout,
+                                            return_sequences=True,
+                                            name='forwards')(l_embedding)
+            backwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
+                                             dropout=lstm_dropout,
+                                             recurrent_dropout=recurrent_dropout,
+                                             return_sequences=True,
+                                             go_backwards=True,
+                                             name='backwards')(r_embedding)
+
+        # Keras returns backwards LSTM outputs in reverse, so return to correct order
+        backwards = tf.keras.layers.Lambda(lambda x: tf.keras.backend.reverse(x, axes=1))(backwards)
+
+        # Concatenate left, embedding and right contexts
+        concat = tf.keras.layers.Concatenate(axis=2)([forwards, embedding, backwards])
+
+        # Get semantic vector for each word in sequence
+        y = tf.keras.layers.Conv1D(num_filters, kernel_size=1, activation="tanh")(concat)
+        x = tf.keras.layers.GlobalMaxPool1D()(y)
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
@@ -1493,96 +1583,6 @@ class DeepBiGRUAttn(Model):
         concat = tf.keras.layers.Concatenate()([query_encoding, query_value_attention])
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(concat)
-        x = tf.keras.layers.Dropout(dropout_rate)(x)
-        outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
-
-        # Create keras model
-        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
-
-        # Create optimiser
-        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
-
-        # Compile the model
-        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
-        return model
-
-
-class RCNN(Model):
-    """ Implements the Recurrent Convolutional Network from:
-
-    Lai, S. et al. (2015) 'Recurrent Convolutional Neural Networks for Text Classification',
-    in Proceedings of the 29th AAAI Conference on Artificial Intelligence (AAAI'15).
-
-    Model code from: "https://github.com/AlexYangLi/TextClassification"
-    """
-
-    def __init__(self, name='RCNN'):
-        super().__init__(name)
-        self.name = name
-
-    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
-        # Unpack key word arguments
-        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
-        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'rmsprop'
-        use_gpu = kwargs['use_gpu'] if 'use_gpu' in kwargs.keys() else True
-        lstm_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'tanh'
-        dense_activation = kwargs['activation'] if 'activation' in kwargs.keys() else 'relu'
-        lstm_units = kwargs['lstm_units'] if 'lstm_units' in kwargs.keys() else 256
-        lstm_dropout = kwargs['lstm_dropout'] if 'lstm_dropout' in kwargs.keys() else 0.0
-        recurrent_dropout = kwargs['recurrent_dropout'] if 'recurrent_dropout' in kwargs.keys() else 0.0
-        num_filters = kwargs['num_filters'] if 'num_filters' in kwargs.keys() else 64
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
-        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
-
-        # Define model
-        inputs = tf.keras.Input(shape=input_shape)
-        embedding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
-                                              output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                              input_length=input_shape[0],  # Max seq length
-                                              embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
-                                              trainable=train_embeddings)(inputs)
-
-        # Shift the document to the right to obtain the left-side contexts (reshape else lambda outputs 'None' shape)
-        l_embedding = tf.keras.layers.Lambda(lambda x: tf.keras.backend.concatenate(
-            [tf.keras.backend.zeros(shape=(tf.keras.backend.shape(x)[0], 1, tf.keras.backend.shape(x)[-1])),
-             x[:, :-1]], axis=1), name='l_shift')(embedding)
-        l_embedding = tf.keras.layers.Reshape((input_shape[0], embedding_matrix.shape[1]))(l_embedding)
-
-        # Shift the document to the left to obtain the right-side contexts (reshape else lambda outputs 'None' shape)
-        r_embedding = tf.keras.layers.Lambda(lambda x: tf.keras.backend.concatenate(
-            [tf.keras.backend.zeros(shape=(tf.keras.backend.shape(x)[0], 1, tf.keras.backend.shape(x)[-1])),
-             x[:, 1:]], axis=1), name='r_shift')(embedding)
-        r_embedding = tf.keras.layers.Reshape((input_shape[0], embedding_matrix.shape[1]))(r_embedding)
-
-        # If a GPU is available use the CUDA layer
-        if tf.test.is_gpu_available() and use_gpu:
-            forwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, name='forwards')(l_embedding)
-            backwards = tf.keras.layers.CuDNNLSTM(lstm_units, return_sequences=True, go_backwards=True,
-                                                  name='backwards')(r_embedding)
-        else:
-            forwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
-                                            dropout=lstm_dropout,
-                                            recurrent_dropout=recurrent_dropout,
-                                            return_sequences=True,
-                                            name='forwards')(l_embedding)
-            backwards = tf.keras.layers.LSTM(lstm_units, activation=lstm_activation,
-                                             dropout=lstm_dropout,
-                                             recurrent_dropout=recurrent_dropout,
-                                             return_sequences=True,
-                                             go_backwards=True,
-                                             name='backwards')(r_embedding)
-
-        # Keras returns backwards LSTM outputs in reverse, so return to correct order
-        backwards = tf.keras.layers.Lambda(lambda x: tf.keras.backend.reverse(x, axes=1))(backwards)
-
-        # Concatenate left, embedding and right contexts
-        concat = tf.keras.layers.Concatenate(axis=2)([forwards, embedding, backwards])
-
-        # Get semantic vector for each word in sequence
-        y = tf.keras.layers.Conv1D(num_filters, kernel_size=1, activation="tanh")(concat)
-        x = tf.keras.layers.GlobalMaxPool1D()(y)
-
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')(x)
 

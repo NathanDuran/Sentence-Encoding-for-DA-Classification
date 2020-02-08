@@ -35,6 +35,17 @@
     "dropout_rate": 0.1,
     "dense_units": 128
   },
+    "rcnn": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "use_gpu": true,
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "num_filters": 64,
+    "dropout_rate": 0.02,
+    "dense_units": 128
+  },
     "lstm": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
@@ -227,24 +238,13 @@
     "dropout_rate": 0.02,
     "dense_units": 128
   },
-    "rcnn": {
-    "learning_rate": 0.001,
-    "optimiser": "rmsprop",
-    "use_gpu": true,
-    "lstm_units": 256,
-    "lstm_dropout": 0.2,
-    "recurrent_dropout": 0.1,
-    "num_filters": 64,
-    "dropout_rate": 0.02,
-    "dense_units": 128
-  },
     "elmo": {
-    "learning_rate": 0.001,
-    "optimiser": "adam",
+    "learning_rate": 0.04,
+    "optimiser": "adagrad",
     "input_mode": "default",
     "output_mode": "default",
-    "dropout_rate": 0.02,
-    "dense_units": 512
+    "dropout_rate": 0.01,
+    "dense_units": 256
   },
     "bert": {
     "learning_rate": 0.00002,
