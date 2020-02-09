@@ -1663,7 +1663,7 @@ class BERT(Model):
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00002
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         num_fine_tune_layers = kwargs['num_fine_tune_layers'] if 'num_fine_tune_layers' in kwargs.keys() else 3
-        pooling = kwargs['pooling'] if 'pooling' in kwargs.keys() else 'mean_sequence'
+        output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'mean_sequence'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
@@ -1672,9 +1672,12 @@ class BERT(Model):
         in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks")
         in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids")
         bert_inputs = [in_id, in_mask, in_segment]
-        bert_output = BertLayer(num_fine_tune_layers=num_fine_tune_layers, pooling=pooling, name='bert')(bert_inputs)
+        x = BertLayer(num_fine_tune_layers=num_fine_tune_layers, output_mode=output_mode, name='bert')(bert_inputs)
 
-        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(bert_output)
+        if output_mode != 'sequence':
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
         outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
 

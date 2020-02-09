@@ -5,15 +5,15 @@ import tensorflow_hub as hub
 class BertLayer(tf.keras.layers.Layer):
     """ Wraps the BERT module from Tensorflow Hub in a Keras Layer."""
 
-    def __init__(self, num_fine_tune_layers=12, pooling="mean_sequence",
+    def __init__(self, num_fine_tune_layers=12, output_mode="mean_sequence",
                  bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1", **kwargs):
         """Constructor for BERT Layer.
 
         Args:
             num_fine_tune_layers (int): Int between 1 and 12, determines how many bert layers are fine tuned
-            pooling (string):
-                    pool = pooled output of the entire sequence with shape [batch_size, hidden_size]
-                    sequence = output every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
+            output_mode (string):
+                    pool = Pooled output of the entire sequence with shape [batch_size, hidden_size]
+                    sequence = Putput every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
                     mean_sequence = Averaged sequence output with shape [batch_size, hidden_size]
             bert_path (string): URL to the BERT module
         """
@@ -21,11 +21,11 @@ class BertLayer(tf.keras.layers.Layer):
         self.num_fine_tune_layers = num_fine_tune_layers
         self.trainable = True
         self.hidden_size = 768
-        self.pooling = pooling.lower()
+        self.output_mode = output_mode.lower()
         self.bert_path = bert_path
 
-        if self.pooling not in ["pool", "sequence", "mean_sequence"]:
-            raise NameError("BERT pooling type must be either pool, sequence or mean_sequence but is " + self.pooling)
+        if self.output_mode not in ["pooled", "sequence", "mean_sequence"]:
+            raise NameError("BERT output_mode must be either pool, sequence or mean_sequence but is " + self.output_mode)
 
         super(BertLayer, self).__init__(**kwargs)
 
@@ -34,15 +34,15 @@ class BertLayer(tf.keras.layers.Layer):
 
         # Remove unused layers
         trainable_vars = self.bert.variables
-        if self.pooling == "pool":
+        if self.output_mode == "pooled":
             trainable_vars = [var for var in trainable_vars if not "/cls/" in var.name]
             trainable_layers = ["pooler/dense"]
 
-        elif self.pooling == "sequence" or self.pooling == "mean_sequence":
+        elif self.output_mode == "sequence" or self.output_mode == "mean_sequence":
             trainable_vars = [var for var in trainable_vars if not "/cls/" in var.name and not "/pooler/" in var.name]
             trainable_layers = []
         else:
-            raise NameError("BERT pooling type must be either pool, sequence or mean_sequence but is " + self.pooling)
+            raise NameError("BERT output_mode must be either pool, sequence or mean_sequence but is " + self.output_mode)
 
         # Select how many layers to fine tune
         for i in range(self.num_fine_tune_layers):
@@ -65,11 +65,11 @@ class BertLayer(tf.keras.layers.Layer):
         inputs = [tf.keras.backend.cast(x, dtype="int32") for x in inputs]
         input_ids, input_mask, segment_ids = inputs
         bert_inputs = dict(input_ids=input_ids, input_mask=input_mask, segment_ids=segment_ids)
-        if self.pooling == "pool":
+        if self.output_mode == "pooled":
             result = self.bert(inputs=bert_inputs, signature="tokens", as_dict=True)["pooled_output"]
-        elif self.pooling == "sequence":
+        elif self.output_mode == "sequence":
             result = self.bert(inputs=bert_inputs, signature="tokens", as_dict=True)["sequence_output"]
-        elif self.pooling == "mean_sequence":
+        elif self.output_mode == "mean_sequence":
             sequence = self.bert(inputs=bert_inputs, signature="tokens", as_dict=True)["sequence_output"]
 
             mul_mask = lambda x, m: x * tf.expand_dims(m, axis=-1)
@@ -78,7 +78,7 @@ class BertLayer(tf.keras.layers.Layer):
             input_mask = tf.cast(input_mask, tf.float32)
             result = masked_reduce_mean(sequence, input_mask)
         else:
-            raise NameError("BERT pooling type must be either pool, sequence or mean_sequence but is " + self.pooling)
+            raise NameError("BERT output_mode must be either pool, sequence or mean_sequence but is " + self.output_mode)
 
         return result
 
