@@ -1,24 +1,18 @@
-import os
 import pandas as pd
-from scipy.stats import ttest_ind, f_oneway
-import statsmodels.api as sm
-from statsmodels.formula.api import ols
-
-def save_dataframe(path, data):
-    data.to_csv(path, index_label='labels')
 
 
-def load_experiment_data(task_name, experiment_type):
-    data_path = os.path.join('..', task_name, task_name + '_' + experiment_type + '.csv')
-    data = pd.read_csv(data_path, index_col=False, header=0, quotechar="'")
-    data = data.drop('experiment_name', axis='columns')
-    data.model_name = data.model_name.str.replace("_", " ")
+def save_dataframe(path, data, index_name='index'):
+    data.to_csv(path, index_label=index_name)
+
+
+def load_dataframe(path):
+    data = pd.read_csv(path, index_col=False, header=0, quotechar="'")
     return data
 
 
 def sort_experiment_data_by_model(data):
     # Model sort order
-    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']
+    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']  # TODO make this param?
 
     # Create the dictionary that defines the order for sorting
     sorter_index = dict(zip(sort_order, range(len(sort_order))))
@@ -36,7 +30,7 @@ def sort_experiment_data_by_model(data):
 
 def sort_experiment_data_by_model_and_metric(data, metric):
     # Model sort order
-    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']
+    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']  # TODO make this param?
 
     # Create the dictionary that defines the order for sorting
     sorter_index = dict(zip(sort_order, range(len(sort_order))))
@@ -49,15 +43,18 @@ def sort_experiment_data_by_model_and_metric(data, metric):
     # Drop rank column
     data.drop('model_name_rank', 1, inplace=True)
 
+    # Reset index
+    data.reset_index(drop=True, inplace=True)
+
     return data
 
 
-def get_experiment_means(data, experiment_type):
-
+def get_means(data, experiment_type):
+    """Creates dataframe of the means of each experiment value for an experiment_type."""
     # Create empty dataframe
     mean_data = pd.DataFrame(columns=data.columns)
 
-    # Get the list of models and ranges of experiment
+    # Get the list of models and ranges of experiment values
     model_names = data['model_name'].unique()
     experiment_values = data[experiment_type].unique()
     for model in model_names:
@@ -75,92 +72,25 @@ def get_experiment_means(data, experiment_type):
     return mean_data
 
 
-def t_test(data, experiment_type, metric):
+def get_max(data, experiment_type):
+    """Creates dataframe of the max validation/test/F1 and corresponding experiment value for an experiment_type."""
+    # Get the index with the max validation accuracy by experiment_type value
+    max_val = data.loc[data.groupby(['model_name'], sort=False)['val_acc'].idxmax()].reset_index()
+    max_val.drop(max_val.columns.difference(['model_name', experiment_type, 'val_acc']), 1, inplace=True)
+    max_val.rename(columns={experiment_type: 'val_' + experiment_type}, inplace=True)
 
-    # Get the list of models and ranges of experiment
-    model_names = data['model_name'].unique()
-    experiment_values = data[experiment_type].unique()
-    results_dict = dict()
-    for model in model_names:
-        model_dict = dict()
-        for i in range(len(experiment_values) - 1):
+    # Get the index with the max test/F1 accuracy by experiment_type value
+    max_test = data.loc[data.groupby(['model_name'], sort=False)['test_acc'].idxmax()].reset_index()
+    max_test.drop(max_test.columns.difference(['model_name', experiment_type, 'test_acc', 'f1_micro', 'f1_weighted']), 1, inplace=True)
+    max_test.rename(columns={experiment_type: 'test_' + experiment_type}, inplace=True)
 
-            # Select the data to compare
-            data_a = data.loc[(data['model_name'] == model) & (data[experiment_type] == experiment_values[i])]
-            data_b = data.loc[(data['model_name'] == model) & (data[experiment_type] == experiment_values[i+1])]
+    # Group the validation and test data
+    max_data = pd.concat([max_val, max_test], axis=1, ignore_index=False, sort=False)
+    # Remove duplicate columns i.e. model_name
+    max_data = max_data.loc[:, ~max_data.columns.duplicated()]
+    # Remove '_' from column/model names
+    max_data.columns = max_data.columns.str.replace("_", " ")
+    # Round data to 6 decimals
+    max_data = max_data.round(6)
 
-            # T-test
-            t_and_p = ttest_ind(data_a[metric], data_b[metric])
-            # Add the p value to this pair in the dict
-            model_dict[str(experiment_values[i]) + " & " + str(experiment_values[i+1])] = t_and_p[1]
-
-        # Add this models results to the dict
-        results_dict[model] = model_dict
-
-    # Create dataframe
-    t_test_frame = pd.DataFrame.from_dict(results_dict, orient='index').reindex(results_dict.keys())
-
-    return t_test_frame
-
-
-def anova_test(data, experiment_type, metric):
-
-    # Get the list of models and ranges of experiment
-    model_names = data['model_name'].unique()
-    experiment_values = data[experiment_type].unique()
-    results_dict = dict()
-    for model in model_names:
-
-        # Create a list of all experiment values for this model and metric
-        model_values_list = [data.loc[(data['model_name'] == model) & (data[experiment_type] == val)][metric].tolist() for val in experiment_values]
-
-        # Unpack list and generate stats
-        anova = f_oneway(*model_values_list)
-
-        # Add this models results to the dict
-        results_dict[model] = anova
-
-    # Create dataframe
-    anova_test_frame = pd.DataFrame.from_dict(results_dict, orient='index')
-
-    # Round to 4 decimal places
-    anova_test_frame = anova_test_frame.round(6)
-    return anova_test_frame
-
-
-def anova_test2(data, experiment_type, metric):
-
-    def _anova_table(aov):
-        aov['mean_sq'] = aov[:]['sum_sq']/aov[:]['df']
-        aov['eta_sq'] = aov[:-1]['sum_sq']/sum(aov['sum_sq'])
-        aov['omega_sq'] = (aov[:-1]['sum_sq']-(aov[:-1]['df']*aov['mean_sq'][-1]))/(sum(aov['sum_sq'])+aov['mean_sq'][-1])
-        cols = ['sum_sq', 'df', 'mean_sq', 'F', 'PR(>F)', 'eta_sq', 'omega_sq']
-        aov = aov[cols]
-        return aov
-
-    # Get the list of models and ranges of experiment
-    model_names = data['model_name'].unique()
-    experiment_values = data[experiment_type].unique()
-    results_dict = dict()
-    for model in model_names:
-
-        # Create a list of all experiment values for this model and metric
-        model_values_list = data.loc[(data['model_name'] == model)]
-
-        # Unpack list and generate stats
-        anova = ols(metric + '~ C(' + experiment_type + ')', data=model_values_list).fit()
-        # print(anova.summary())
-        aov_table = sm.stats.anova_lm(anova, typ=2)
-        print(_anova_table(aov_table))
-
-
-
-    #     # Add this models results to the dict
-    #     results_dict[model] = anova
-    #
-    # # Create dataframe
-    # anova_test_frame = pd.DataFrame.from_dict(results_dict, orient='index')
-    #
-    # # Round to 4 decimal places
-    # anova_test_frame = anova_test_frame.round(6)
-    # return anova_test_frame
+    return max_data

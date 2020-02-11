@@ -13,7 +13,7 @@ class BertLayer(tf.keras.layers.Layer):
             num_fine_tune_layers (int): Int between 1 and 12, determines how many bert layers are fine tuned
             output_mode (string):
                     pool = Pooled output of the entire sequence with shape [batch_size, hidden_size]
-                    sequence = Putput every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
+                    sequence = Output every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
                     mean_sequence = Averaged sequence output with shape [batch_size, hidden_size]
             bert_path (string): URL to the BERT module
         """
@@ -83,4 +83,7 @@ class BertLayer(tf.keras.layers.Layer):
         return result
 
     def compute_output_shape(self, input_shape):
-        return input_shape[0], self.hidden_size
+        if self.output_mode == 'pooled' or self.output_mode == 'mean_sequence':
+            return input_shape[0], self.hidden_size
+        elif self.output_mode == 'sequence':
+            return input_shape[0], self.hidden_size, self.hidden_size

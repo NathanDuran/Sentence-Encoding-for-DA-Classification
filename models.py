@@ -1674,7 +1674,7 @@ class BERT(Model):
         bert_inputs = [in_id, in_mask, in_segment]
         x = BertLayer(num_fine_tune_layers=num_fine_tune_layers, output_mode=output_mode, name='bert')(bert_inputs)
 
-        if output_mode != 'sequence':
+        if output_mode == 'sequence':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
