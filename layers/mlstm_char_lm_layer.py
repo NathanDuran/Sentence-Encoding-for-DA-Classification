@@ -242,14 +242,14 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
     arXiv. Available at: http://arxiv.org/abs/1704.01444
     https://github.com/openai/generating-reviews-discovering-sentiment
     """
-    def __init__(self, batch_size=32, max_seq_length=640, dimensions=4096, return_type='mean', **kwargs):
+    def __init__(self, batch_size=32, max_seq_length=640, dimensions=4096, output_mode='mean', **kwargs):
         """ Constructor for mLSTM Char Language Model Layer.
 
         Args:
             batch_size (int): Max size of input batches of examples, smaller batches will be padded to this size.
             max_seq_length (int): Max number of characters in input sentence, larger will be truncated.
             dimensions (int): Dimension of the hidden states of mLSTM
-            return_type (string):
+            output_mode (string):
                 final = final hidden state of the mLSTM with shape [batch_size, dimensions]
                 sequence = output every hidden state in the input sequence with shape [batch_size, max_seq_length, dimensions]
                 mean = Averaged sequence output with shape [batch_size, dimensions]
@@ -258,11 +258,11 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
         self.batch_size = batch_size
         self.max_seq_length = max_seq_length
         self.dimensions = dimensions
-        self.return_type = return_type.lower()
+        self.output_mode = output_mode.lower()
         self.weights_path = 'weights/mlstm_char_lm_weights'
 
-        if self.return_type not in ["final", "sequence", "mean"]:
-            raise NameError("mLSTM return type (must be either final, sequence or mean but is" + self.return_type)
+        if self.output_mode not in ["final", "sequence", "mean"]:
+            raise NameError("mLSTM output_mode (must be either final, sequence or mean but is" + self.output_mode)
 
         super(MLSTMCharLMLayer, self).__init__(**kwargs)
 
@@ -276,18 +276,21 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
 
         # Return hidden state, sequences or the mean of sequences
         # Need to reshape because py_func returns Tensors with no dimensions
-        if self.return_type in ["sequence", "mean"]:
+        if self.output_mode in ["sequence", "mean"]:
             result = tf.py_func(func=self.model.cell_transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.max_seq_length, self.dimensions])
-            if self.return_type == "mean":
+            if self.output_mode == "mean":
                 result = tf.keras.backend.mean(result, axis=1)
-        elif self.return_type == "final":
+        elif self.output_mode == "final":
             result = tf.py_func(func=self.model.transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.dimensions])
         else:
-            raise NameError("mLSTM return type (must be either final, sequence or mean but is" + self.return_type)
+            raise NameError("mLSTM output_mode (must be either final, sequence or mean but is" + self.output_mode)
 
         return result
 
     def compute_output_shape(self, input_shape):
-        return input_shape[0], self.dimensions
+        if self.output_mode == 'final' or self.output_mode == 'mean':
+            return input_shape[0], self.dimensions
+        elif self.output_mode == 'sequence':
+            return input_shape[0], self.max_seq_length, self.dimensions

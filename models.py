@@ -1660,12 +1660,12 @@ class BERT(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
-        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.00002
-        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.0015  # BERT default 0.00002
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adagrad'  # BERT default adam
         num_fine_tune_layers = kwargs['num_fine_tune_layers'] if 'num_fine_tune_layers' in kwargs.keys() else 3
-        output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'mean_sequence'
+        output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'sequence'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
-        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         in_id = tf.keras.layers.Input(shape=input_shape, name="input_ids")
@@ -1792,7 +1792,7 @@ class MLSTMCharLM(Model):
         # Unpack key word arguments
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
-        return_type = kwargs['return_type'] if 'return_type' in kwargs.keys() else 'mean'
+        output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'mean'
         batch_size = kwargs['batch_size'] if 'batch_size' in kwargs.keys() else 32
         max_seq_length = kwargs['max_seq_length'] if 'max_seq_length' in kwargs.keys() else 640
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
@@ -1800,8 +1800,8 @@ class MLSTMCharLM(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        x = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, return_type=return_type, name='mlstm_char_lm')(inputs)
-        if return_type == 'sequence':
+        x = MLSTMCharLMLayer(batch_size=batch_size, max_seq_length=max_seq_length, output_mode=output_mode, name='mlstm_char_lm')(inputs)
+        if output_mode == 'sequence':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)

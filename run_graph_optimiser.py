@@ -18,8 +18,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 sess = tf.Session()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'elmo_opt',
-                     'model_name': 'elmo',
+                     'experiment_name': 'use_opt',
+                     'model_name': 'use',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
@@ -28,8 +28,8 @@ experiment_params = {'task_name': 'swda',
                      'max_seq_length': 1,
                      'to_tokens': False,
                      'embedding_dim': 1024,
-                     'embedding_type': 'elmo',
-                     'embedding_source': 'elmo'}
+                     'embedding_type': 'use',
+                     'embedding_source': 'use'}
 
 # Task and experiment name
 task_name = experiment_params['task_name']

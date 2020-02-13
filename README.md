@@ -10,7 +10,6 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 - bert Different num layers (concat last four hidden?)
 - bert + lstm?
 - bert large?
-- bert output? pooled, seq/mean_seq
 
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM

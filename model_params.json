@@ -247,11 +247,11 @@
     "dense_units": 256
   },
     "bert": {
-    "learning_rate": 0.00002,
-    "optimiser": "adam",
+    "learning_rate": 0.0015,
+    "optimiser": "adagrad",
     "num_fine_tune_layers": 3,
-    "output_mode": "mean_sequence",
-    "dropout_rate": 0.02,
+    "output_mode": "sequence",
+    "dropout_rate": 0.05,
     "dense_units": 256
   },
     "use": {
@@ -269,7 +269,7 @@
     "mlstm_char_lm": {
     "learning_rate": 0.001,
     "optimiser": "adam",
-    "return_type": "mean",
+    "output_mode": "mean",
     "batch_size": 32,
     "max_seq_length": 640,
     "dropout_rate": 0.02,

@@ -5,7 +5,7 @@ import tensorflow_hub as hub
 class BertLayer(tf.keras.layers.Layer):
     """ Wraps the BERT module from Tensorflow Hub in a Keras Layer."""
 
-    def __init__(self, num_fine_tune_layers=12, output_mode="mean_sequence",
+    def __init__(self, num_fine_tune_layers=12, output_mode="sequence",
                  bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1", **kwargs):
         """Constructor for BERT Layer.
 
