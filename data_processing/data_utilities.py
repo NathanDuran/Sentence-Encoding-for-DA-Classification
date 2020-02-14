@@ -10,38 +10,65 @@ def load_dataframe(path):
     return data
 
 
-def sort_experiment_data_by_model(data):
-    # Model sort order
-    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']  # TODO make this param?
+def dataframe_wide_to_long(data):
+    """Utility function for reshaping dataframes for plotting.
+    Converts from 'wide' to 'long' format, where each observation is on a separate row.
+
+    Example input:
+              Multi-Pi
+                 ap        da   ap type
+    set 1  0.127465  0.404772  0.110144
+    set 2  0.053677  0.252012  0.051167
+    set 3  0.071018  0.367728  0.073543
+    set 4  0.127416  0.465957  0.137216
+    set 5  0.145793  0.441656  0.157172
+    mean   0.105074  0.386425  0.105849
+
+    Example output:
+        index    metric group     value
+    0   set 1  Multi-Pi    ap  0.127465
+    1   set 2  Multi-Pi    ap  0.053677
+    2   set 3  Multi-Pi    ap  0.071018
+    3   set 4  Multi-Pi    ap  0.127416
+    4   set 5  Multi-Pi    ap  0.145793
+    5    mean  Multi-Pi    ap  0.105074
+    ...etc
+    """
+    data = data.copy()
+    data = data.reset_index().melt(id_vars=["index"])
+    data = data.rename(columns={'variable_0': 'metric', 'variable_1': 'group'})
+    data = data.dropna()
+    return data
+
+
+def sort_dataframe_by_list(data, sort_column, sort_order):
 
     # Create the dictionary that defines the order for sorting
     sorter_index = dict(zip(sort_order, range(len(sort_order))))
 
     # Generate a rank column that will be used to sort the dataframe numerically
-    data['model_name_rank'] = data['model_name'].map(sorter_index)
+    data['rank'] = data[sort_column].map(sorter_index)
 
-    # Sort by model name (rank) and metric
-    data.sort_values(['model_name_rank'],  inplace=True)
+    # Sort by rank and param
+    data.sort_values(['rank'],  inplace=True)
     # Drop rank column
-    data.drop('model_name_rank', 1, inplace=True)
+    data.drop('rank', 1, inplace=True)
 
     return data
 
 
-def sort_experiment_data_by_model_and_metric(data, metric):
-    # Model sort order
-    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']  # TODO make this param?
+def sort_dataframe_by_list_and_param(data, sort_column, sort_order, param):
 
     # Create the dictionary that defines the order for sorting
     sorter_index = dict(zip(sort_order, range(len(sort_order))))
 
     # Generate a rank column that will be used to sort the dataframe numerically
-    data['model_name_rank'] = data['model_name'].map(sorter_index)
+    data['rank'] = data[sort_column].map(sorter_index)
 
-    # Sort by model name (rank) and metric
-    data.sort_values(['model_name_rank', metric],  inplace=True)
+    # Sort by rank and param
+    data.sort_values(['rank', param],  inplace=True)
     # Drop rank column
-    data.drop('model_name_rank', 1, inplace=True)
+    data.drop('rank', 1, inplace=True)
 
     # Reset index
     data.reset_index(drop=True, inplace=True)
