@@ -260,6 +260,7 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
         self.dimensions = dimensions
         self.output_mode = output_mode.lower()
         self.weights_path = 'weights/mlstm_char_lm_weights'
+        self.mlstm = None
 
         if self.output_mode not in ["final", "sequence", "mean"]:
             raise NameError("mLSTM output_mode (must be either final, sequence or mean but is" + self.output_mode)
@@ -267,7 +268,7 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
         super(MLSTMCharLMLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.model = Model(self.weights_path, batch_size=self.batch_size, max_seq_length=self.max_seq_length)
+        self.mlstm = Model(self.weights_path, batch_size=self.batch_size, max_seq_length=self.max_seq_length)
         super(MLSTMCharLMLayer, self).build(input_shape)
 
     def call(self, x, **kwargs):
@@ -277,12 +278,12 @@ class MLSTMCharLMLayer(tf.keras.layers.Layer):
         # Return hidden state, sequences or the mean of sequences
         # Need to reshape because py_func returns Tensors with no dimensions
         if self.output_mode in ["sequence", "mean"]:
-            result = tf.py_func(func=self.model.cell_transform, inp=[x], Tout=tf.float32)
+            result = tf.py_func(func=self.mlstm.cell_transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.max_seq_length, self.dimensions])
             if self.output_mode == "mean":
                 result = tf.keras.backend.mean(result, axis=1)
         elif self.output_mode == "final":
-            result = tf.py_func(func=self.model.transform, inp=[x], Tout=tf.float32)
+            result = tf.py_func(func=self.mlstm.transform, inp=[x], Tout=tf.float32)
             result.set_shape([x.get_shape()[0], self.dimensions])
         else:
             raise NameError("mLSTM output_mode (must be either final, sequence or mean but is" + self.output_mode)

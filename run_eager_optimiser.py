@@ -6,6 +6,7 @@ from comet_ml import Optimizer
 import models
 import data_processor
 import embedding_processor
+import early_stopper
 import tensorflow as tf
 
 # Suppress TensorFlow debugging
@@ -18,15 +19,17 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.enable_eager_execution()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'dcnn_opt',
-                     'model_name': 'dcnn',
+                     'experiment_name': 'nnlm_opt',
+                     'model_name': 'nnlm',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
                      'evaluate_steps': 500,
+                     'early_stopping': True,
+                     'patience': 2,
                      'vocab_size': 10000,
                      'max_seq_length': 128,
-                     'to_tokens': True,
+                     'to_tokens': False,
                      'embedding_dim': 50,
                      'embedding_type': 'glove',
                      'embedding_source': 'glove.6B.50d'}
@@ -62,12 +65,16 @@ print(task_name + ": " + experiment_name)
 batch_size = experiment_params['batch_size']
 num_epochs = experiment_params['num_epochs']
 evaluate_steps = experiment_params['evaluate_steps']  # Evaluate every this many steps
+early_stopping = experiment_params['early_stopping']
+patience = experiment_params['patience']
 
 print("------------------------------------")
 print("Using parameters...")
 print("Batch size: " + str(batch_size))
 print("Epochs: " + str(num_epochs))
 print("Evaluate every steps: " + str(evaluate_steps))
+print("Early Stopping: " + str(early_stopping))
+print("Patience: " + str(patience))
 
 # Data set parameters
 vocab_size = experiment_params['vocab_size']
@@ -139,6 +146,9 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
     # Display a model summary
     model.summary()
 
+    # Initialise early stopping monitor
+    earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
+
     print("------------------------------------")
     print("Training model...")
     start_time = time.time()
@@ -183,6 +193,10 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
                     print(result_str.format(global_step, global_steps,
                                             train_loss.result(), train_accuracy.result(),
                                             val_loss.result(), val_accuracy.result()))
+
+        # Check to stop training early
+        if early_stopping and earlystopper.check_early_stop(val_loss.result().numpy()):
+            break
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")

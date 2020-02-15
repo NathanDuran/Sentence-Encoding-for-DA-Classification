@@ -5,6 +5,7 @@ import json
 from comet_ml import Optimizer
 import models
 import data_processor
+import early_stopper
 import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -26,6 +27,8 @@ experiment_params = {'task_name': 'swda',
                      'batch_size': 32,
                      'num_epochs': 5,
                      'evaluate_steps': 500,
+                     'early_stopping': True,
+                     'patience': 2,
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': False,
@@ -64,12 +67,16 @@ print(task_name + ": " + experiment_name)
 batch_size = experiment_params['batch_size']
 num_epochs = experiment_params['num_epochs']
 evaluate_steps = experiment_params['evaluate_steps']  # Evaluate every this many steps
+early_stopping = experiment_params['early_stopping']
+patience = experiment_params['patience']
 
 print("------------------------------------")
 print("Using parameters...")
 print("Batch size: " + str(batch_size))
 print("Epochs: " + str(num_epochs))
 print("Evaluate every steps: " + str(evaluate_steps))
+print("Early Stopping: " + str(early_stopping))
+print("Patience: " + str(patience))
 
 # Data set parameters
 vocab_size = experiment_params['vocab_size']
@@ -88,7 +95,7 @@ tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
 vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"], tokenization_info["do_lower_case"]])
 tokenizer = FullTokenizer(vocab_file=vocab_file, do_lower_case=do_lower_case)
 
-# If dataset folder is empty get the metadata and datasets to .npz files
+# If dataset folder is empty get the metadata and datasets
 if not os.listdir(dataset_dir):
     data_set.get_dataset()
 
@@ -145,6 +152,9 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
     # Display a model summary
     model.summary()
 
+    # Initialise early stopping monitor
+    earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
+
     # Initialise variables
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
@@ -195,6 +205,10 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
                     print(result_str.format(global_step, global_steps,
                                             np.mean(train_loss), np.mean(train_accuracy) * 100,
                                             np.mean(val_loss), np.mean(val_accuracy) * 100))
+
+        # Check to stop training early
+        if early_stopping and earlystopper.check_early_stop(float(np.mean(val_loss))):
+            break
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")

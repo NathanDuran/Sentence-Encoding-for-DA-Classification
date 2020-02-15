@@ -1777,11 +1777,12 @@ class MLSTMCharLM(Model):
     Radford, A., Jozefowicz, R. and Sutskever, I. (2018) 'Learning to Generate Reviews and Discovering Sentiment',
     arXiv. Available at: http://arxiv.org/abs/1704.01444
 
-    Implements the model as described in (if return_type='mean'):
+    Implements the model as described in (if return_type='mean' and max_seq_length=64):
     Bothe, C. et al. (2018) 'A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks',
      in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).
 
-    Note: batch_size and max_seq_length must be manually set for the MLSTMCharLMLayer, see mlstm_char_lm_layer.py
+    Note: batch_size and max_seq_length must be manually set for the MLSTMCharLMLayer, see mlstm_char_lm_layer.py.
+    Default embedding dimension is 4,096.
     """
 
     def __init__(self, name='mLSTMCharLM'):

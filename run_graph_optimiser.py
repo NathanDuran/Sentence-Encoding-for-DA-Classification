@@ -5,6 +5,7 @@ import json
 from comet_ml import Optimizer
 import models
 import data_processor
+import early_stopper
 import numpy as np
 import tensorflow as tf
 
@@ -14,22 +15,21 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-# Run Tensorflow session
-sess = tf.Session()
-
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'use_opt',
-                     'model_name': 'use',
+                     'experiment_name': 'mlstm_char_lm_opt',
+                     'model_name': 'mlstm_char_lm',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
                      'evaluate_steps': 500,
+                     'early_stopping': True,
+                     'patience': 2,
                      'vocab_size': 10000,
                      'max_seq_length': 1,
                      'to_tokens': False,
-                     'embedding_dim': 1024,
-                     'embedding_type': 'use',
-                     'embedding_source': 'use'}
+                     'embedding_dim': 4096,
+                     'embedding_type': 'mlstm_char_lm',
+                     'embedding_source': 'mlstm_char_lm'}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -62,12 +62,16 @@ print(task_name + ": " + experiment_name)
 batch_size = experiment_params['batch_size']
 num_epochs = experiment_params['num_epochs']
 evaluate_steps = experiment_params['evaluate_steps']  # Evaluate every this many steps
+early_stopping = experiment_params['early_stopping']
+patience = experiment_params['patience']
 
 print("------------------------------------")
 print("Using parameters...")
 print("Batch size: " + str(batch_size))
 print("Epochs: " + str(num_epochs))
 print("Evaluate every steps: " + str(evaluate_steps))
+print("Early Stopping: " + str(early_stopping))
+print("Patience: " + str(patience))
 
 # Data set parameters
 vocab_size = experiment_params['vocab_size']
@@ -80,7 +84,7 @@ embedding_source = experiment_params['embedding_source']
 # Initialize the dataset processor
 data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, to_indices=False, vocab_size=vocab_size)
 
-# If dataset folder is empty get the metadata and datasets to .npz files
+# If dataset folder is empty get the metadata and datasets
 if not os.listdir(dataset_dir):
     data_set.get_dataset()
 
@@ -135,6 +139,12 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
     # Display a model summary
     model.summary()
 
+    # Initialise early stopping monitor
+    earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
+
+    # Run Tensorflow session
+    sess = tf.Session()
+
     # Initialise variables
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
@@ -185,6 +195,10 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
                     print(result_str.format(global_step, global_steps,
                                             np.mean(train_loss), np.mean(train_accuracy) * 100,
                                             np.mean(val_loss), np.mean(val_accuracy) * 100))
+
+        # Check to stop training early
+        if early_stopping and earlystopper.check_early_stop(float(np.mean(val_loss))):
+            break
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")
