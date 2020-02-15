@@ -6,7 +6,7 @@ class BertLayer(tf.keras.layers.Layer):
     """ Wraps the BERT module from Tensorflow Hub in a Keras Layer."""
 
     def __init__(self, num_fine_tune_layers=12, output_mode="sequence",
-                 bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1", **kwargs):
+                 bert_url="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1", **kwargs):
         """Constructor for BERT Layer.
 
         Args:
@@ -15,14 +15,14 @@ class BertLayer(tf.keras.layers.Layer):
                     pool = Pooled output of the entire sequence with shape [batch_size, hidden_size]
                     sequence = Output every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
                     mean_sequence = Averaged sequence output with shape [batch_size, hidden_size]
-            bert_path (string): URL to the BERT module
+            bert_url (string): URL to the BERT module
         """
 
         self.num_fine_tune_layers = num_fine_tune_layers
         self.trainable = True
         self.hidden_size = 768
         self.output_mode = output_mode.lower()
-        self.bert_path = bert_path
+        self.bert_url = bert_url
 
         if self.output_mode not in ["pooled", "sequence", "mean_sequence"]:
             raise NameError("BERT output_mode must be either pool, sequence or mean_sequence but is " + self.output_mode)
@@ -30,7 +30,7 @@ class BertLayer(tf.keras.layers.Layer):
         super(BertLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.bert = hub.Module(self.bert_path, trainable=self.trainable, name="{}_module".format(self.name))
+        self.bert = hub.Module(self.bert_url, trainable=self.trainable, name="{}_module".format(self.name))
 
         # Remove unused layers
         trainable_vars = self.bert.variables

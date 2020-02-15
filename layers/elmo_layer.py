@@ -23,6 +23,8 @@ class ElmoLayer(tf.keras.layers.Layer):
         self.input_mode = input_mode
         self.output_mode = output_mode
         self.dimensions = 1024
+        self.elmo_url = 'https://tfhub.dev/google/elmo/2'
+        self.elmo = None
 
         # Check input and output mode is valid
         if self.input_mode not in ["default", "tokens"]:
@@ -35,7 +37,7 @@ class ElmoLayer(tf.keras.layers.Layer):
         super(ElmoLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.elmo = hub.Module('https://tfhub.dev/google/elmo/2', trainable=True, name="{}_module".format(self.name))
+        self.elmo = hub.Module(self.elmo_url, trainable=True, name="{}_module".format(self.name))
 
         if self.trainable:
             self._trainable_weights.extend(tf.trainable_variables(scope="^{}_module/.*".format(self.name)))

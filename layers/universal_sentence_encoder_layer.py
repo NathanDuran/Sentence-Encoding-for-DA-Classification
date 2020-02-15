@@ -7,11 +7,12 @@ class UniversalSentenceEncoderLayer(tf.keras.layers.Layer):
 
     def __init__(self, **kwargs):
         self.dimensions = 512
+        self.model_url = 'https://tfhub.dev/google/universal-sentence-encoder-large/3'
+        self.encoder = None
         super(UniversalSentenceEncoderLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.encoder = hub.Module('https://tfhub.dev/google/universal-sentence-encoder-large/3', name="{}_module".format(self.name))
-
+        self.encoder = hub.Module(self.model_url, name="{}_module".format(self.name))
         super(UniversalSentenceEncoderLayer, self).build(input_shape)
 
     def call(self, x, mask=None):

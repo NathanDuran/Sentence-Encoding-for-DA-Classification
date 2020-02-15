@@ -22,6 +22,11 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 ## Misc
 - Document the models in readme
 - elmo needs to be strings (or tokenised strings - but those suck)
+#### graph models
+- elmo
+- bert
+- use
+- mlstm_char_lm
 
 ## To try
 - Visualising attention layers
