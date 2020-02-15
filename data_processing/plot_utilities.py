@@ -1,5 +1,6 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 import six
 import warnings
@@ -37,6 +38,23 @@ colour_palettes = {'xkcd_red': xkcd_red, 'xkcd_green': xkcd_green, 'xkcd_blue': 
                    'triple_orange': triple_orange, 'triple_purple': triple_purple,
                    'triples_rgb': triples_rgb, 'triples': triples, 'five_colour': five_colour, 'rgb': rgb,
                    'default': 'tab10'}
+
+
+def create_colour_map(boundaries=None, pallet='RdBu_r'):
+    """Creates a custom colour map around the specified boundary values."""
+    # Check we have boundaries, else use default
+    if boundaries is None:
+        boundaries = [0.0, 1.0]
+
+    # Create a list of colours in hex for each boundary value
+    hex_colors = sns.color_palette(pallet, n_colors=len(boundaries) + 2).as_hex()
+    hex_colors = [hex_colors[i] for i in range(0, len(hex_colors), 2)]
+
+    # Map boundaries to colours
+    colors = list(zip(boundaries, hex_colors))
+    # Create the custom map
+    custom_color_map = LinearSegmentedColormap.from_list(name='custom', colors=colors)
+    return custom_color_map
 
 
 def plot_line_chart(data, x='index', y='value', hue='group', style=None, size=None,
@@ -182,6 +200,30 @@ def plot_bar_chart(data, x='index', y='value', hue='variable', title='', y_label
     return g.get_figure()
 
 
+def plot_heatmap(data, title='', y_label='', x_label='', colour='RdBu_r', custom_boundaries=None, center_val=None,
+                 show_cbar=True, annotate=True, num_format='.3f', linewidth=0.5, linecolour=None, x_tick_rotation=0):
+    # Check if creating a custom colour map, else use seaborn
+    if custom_boundaries:
+        # Create custom colour palette for each item in group
+        palette = create_colour_map(boundaries=custom_boundaries, pallet=colour)
+    else:
+        palette = sns.color_palette(colour)
+
+    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
+    g = sns.heatmap(data, annot=annotate, fmt=num_format, linewidths=linewidth, linecolor=linecolour,
+                    cmap=palette, center=center_val, cbar=show_cbar)
+    # Set axis labels
+    g.set_xticklabels(g.get_xticklabels(), rotation=x_tick_rotation)
+    g.set_xlabel(x_label)
+    g.set_ylabel(y_label)
+
+    # Set main title
+    g.set_title(title, fontsize=14, fontweight='bold')
+
+    plt.tight_layout()
+    return g.get_figure()
+
+
 def plot_lmplot_chart(data, x='index', y='value', hue='group', col=None, title='', y_label='', x_label='', xtick_labels=None,
                       share_x=False, share_y=False, num_col=None, colour='Paired', legend_loc='best', num_legend_col=3,
                       scatter=True, sizes=(10, 10), order=2, ci=16, x_estimator=np.mean, x_ci=None, **kwargs):
@@ -279,33 +321,39 @@ def plot_catplot_chart(data, x='index', y='value', hue='group', col='metric', ki
 
 def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='bar', show_bar_value=False,
                    title='', y_label='', x_label='', share_x=False, share_y=False, num_col=2,
-                   colour='Paired', legend_loc='best', num_legend_col=3, all_legend=False, **kwargs):
+                   colour='Paired', legend_loc='best', num_legend_col=3, all_legend=False,
+                   x_tick_rotation=0, y_tick_rotation=0, **kwargs):
 
     # Facet grid plot functions
-    def _catplot(x, y, label='', **kwargs):
+    def _violin(*args, **kwargs):
         ax = plt.gca()
         current_data = kwargs.pop("data")
-        sns.catplot(data=current_data, x=x, y=y, hue=label,
-                    kind="bar", palette=palette, height=6, aspect=2, ax=ax, legend=False, **kwargs)
+        sns.violinplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
 
-    def _violin(x, y, label='', **kwargs):
+    def _barplot(*args, **kwargs):
         ax = plt.gca()
         current_data = kwargs.pop("data")
-        sns.violinplot(data=current_data, x=x, y=y, hue=label, palette=palette, ax=ax, **kwargs)
+        sns.barplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
 
-    def _barplot(x, y, label='', **kwargs):
+    def _heatmap(*args, **kwargs):
         ax = plt.gca()
         current_data = kwargs.pop("data")
-        sns.barplot(data=current_data, x=x, y=y, hue=label, palette=palette, ax=ax, **kwargs)
+        current_data = current_data.pivot(index=args[0], columns=args[1], values=args[2])
+        sns.heatmap(data=current_data,  cmap=palette, ax=ax, **kwargs)
 
     # Get the desired plot function for facetgrid
     plot_types = {'bar': _barplot,
-                  'violin': _violin}
+                  'violin': _violin,
+                  'heatmap': _heatmap}
 
     plot_function = plot_types[kind]
 
+    # Check if creating a custom colour map, elsif using xkcd colours set the pallet, else use seaborn
+    if 'custom_boundaries' in kwargs.keys() and kwargs['custom_boundaries']:
+        palette = create_colour_map(boundaries=kwargs['custom_boundaries'], pallet=colour)
+        del kwargs['custom_boundaries']
     # If using xkcd colours set the pallet, else use seaborn
-    if colour in colour_palettes.keys():
+    elif colour in colour_palettes.keys():
         if hue:
             palette = dict(zip(data[hue].unique(), colour_palettes[colour]))
         else:
@@ -316,19 +364,20 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
     # Create FacetGrid catplot for each item in 'metric'
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
     g = sns.FacetGrid(data=data, col=col, col_wrap=num_col, sharex=share_x, sharey=share_y, height=6, aspect=2)
-    g.map_dataframe(plot_function, x=x, y=y, label=hue, **kwargs)
+    g.map_dataframe(plot_function, x, y, hue, **kwargs)
     g.despine(left=True)
 
-    # Add legend to the plot, either single one or to each plot
-    if len(g.axes) > 1:
-        if all_legend:
-            for i in range(len(g.axes)):
-                g.axes[i].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+    # Add legend to the plot, either a single one or to each plot (if not creating heatmaps)
+    if kind != 'heatmap':
+        if len(g.axes) > 1:
+            if all_legend:
+                for i in range(len(g.axes)):
+                    g.axes[i].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+            else:
+                # Add to top right plot
+                g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
         else:
-            # Add to top right plot
-            g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
-    else:
-        plt.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+            plt.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
 
     # Annotate the bars if using bar chart
     if kind == 'bar' and show_bar_value:
@@ -339,6 +388,8 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
                                    textcoords='offset points')
 
     # Set axis labels
+    g.set_xticklabels(rotation=x_tick_rotation)
+    g.set_yticklabels(rotation=y_tick_rotation)
     g.set_xlabels(x_label)
     g.set_ylabels(y_label)
 

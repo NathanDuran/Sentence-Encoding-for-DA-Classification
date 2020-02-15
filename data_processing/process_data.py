@@ -11,7 +11,7 @@ experiment_type = 'vocab_size'
 # Set data dir
 data_dir = os.path.join('..', task_name)
 # Set and create the output directory if id doesn't exist
-output_dir = os.path.join(data_dir, 'results', experiment_type)
+output_dir = os.path.join(task_name, experiment_type)
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
@@ -22,13 +22,13 @@ data = data.drop('experiment_name', axis='columns')
 data.model_name = data.model_name.str.replace("_", " ")
 
 # Sort by model name and experiment type # TODO do i really need to sort future experiments?
-sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']
-data = sort_dataframe_by_list_and_param(data, 'model_name', sort_order, experiment_type)
+# sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']
+# data = sort_dataframe_by_list_and_param(data, 'model_name', sort_order, experiment_type)
 # Save dataframe with all the data in
 # save_dataframe(os.path.join(output_dir, experiment_type + '_data_raw.csv'), data)
 
 # Get means over all experiments
-data_means = get_means(data, experiment_type)
+# data_means = get_means(data, experiment_type)
 # save_dataframe(os.path.join(output_dir, experiment_type + '_data_means.csv'), data_means)
 
 # # Get test and validation accuracy for each model

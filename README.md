@@ -11,6 +11,7 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 - bert + lstm?
 - bert large?
 
+- How to account for incorrect embedding type (i.e. nnlm) when running in graph mode? (also if I port elmo/bert etc to graph)
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
 - ELMo + LSTM/Bi-LSTM + Attn
