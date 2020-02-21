@@ -5,7 +5,6 @@ import json
 from comet_ml import Experiment
 from metrics import *
 import models
-from layers import custom_layers
 import data_processor
 import embedding_processor
 import check_pointer
@@ -21,11 +20,11 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
-for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi_gru', 'rcnn']:
+for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'gru', 'bi_gru']:
     for i in range(1, 11):
-        exp_name = curr_model_name + '_0.5kvocab_' + str(i)
+        exp_name = curr_model_name + '_20seqlength_' + str(i)
         experiment_params = {'task_name': 'swda',
-                             'experiment_name': exp_name,  # TODO Change experiment results file name?
+                             'experiment_name': exp_name,  # TODO !Change experiment results file name?!
                              'model_name': curr_model_name,
                              'training': True,
                              'testing': True,
@@ -37,8 +36,8 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
                              'evaluate_steps': 500,
                              'early_stopping': False,
                              'patience': 3,
-                             'vocab_size': 500,
-                             'max_seq_length': 128,
+                             'vocab_size': 10000,
+                             'max_seq_length': 20,
                              'to_tokens': True,
                              'train_embeddings': True,
                              'embedding_dim': 50,
@@ -331,7 +330,7 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'lstm', 'bi_lstm', 'gru', 'bi
 
         # TODO remove when all experiments complete
         if training and testing:
-            experiment_file = os.path.join(task_name, task_name + "_vocab_size" + ".csv")
+            experiment_file = os.path.join(task_name, task_name + "_seq_length" + ".csv")
             save_experiment(experiment_file, experiment_params,
                             train_loss.result().numpy(), train_accuracy.result().numpy(),
                             val_loss.result().numpy(), val_accuracy.result().numpy(),

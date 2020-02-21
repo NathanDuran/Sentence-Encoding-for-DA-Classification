@@ -94,6 +94,9 @@ vocabulary, labels = data_set.load_metadata()
 # Loop over each experiment in the optimiser
 for experiment in model_optimiser.get_experiments(project_name=experiment_params['project_name'], workspace="nathanduran", auto_output_logging='simple'):
 
+    # Run Tensorflow session
+    sess = tf.Session()
+
     # Set up comet experiment
     experiment.set_name(experiment_name)
 
@@ -140,10 +143,7 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
     model.summary()
 
     # Initialise early stopping monitor
-    earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.0, minimise=True)
-
-    # Run Tensorflow session
-    sess = tf.Session()
+    earlystopper = early_stopper.EarlyStopper(stopping=early_stopping, patience=patience, min_delta=0.01, minimise=True)
 
     # Initialise variables
     sess.run(tf.local_variables_initializer())
@@ -199,6 +199,10 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
         # Check to stop training early
         if early_stopping and earlystopper.check_early_stop(float(np.mean(val_loss))):
             break
+
+    # Close the current session
+    sess.close()
+    tf.keras.backend.clear_session()
 
     end_time = time.time()
     print("Training took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(num_epochs) + " epochs")

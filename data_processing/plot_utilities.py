@@ -133,7 +133,7 @@ def plot_strip_chart(data, x='index', y='value', hue='group', title='', y_label=
 
 
 def plot_violin_chart(data, x='index', y='value', hue=None, title='', y_label='', x_label='',
-                      colour='Paired', legend_loc='best', x_tick_rotation=0):
+                      colour='Paired', legend=False, legend_loc='best', x_tick_rotation=0):
     # If using xkcd colours set the pallet, else use seaborn
     if colour in colour_palettes.keys():
         # Create colour palette for each item in group
@@ -150,7 +150,8 @@ def plot_violin_chart(data, x='index', y='value', hue=None, title='', y_label=''
     sns.despine(ax=g, left=True)
 
     # Add legend
-    g.legend(frameon=True, shadow=True, loc=legend_loc)
+    if legend:
+        g.legend(frameon=True, shadow=True, loc=legend_loc)
 
     # Set axis labels
     g.set_xticklabels(g.get_xticklabels(), rotation=x_tick_rotation)
@@ -284,7 +285,7 @@ def plot_catplot_chart(data, x='index', y='value', hue='group', col='metric', ki
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
     g = sns.catplot(data=data, x=x, y=y, hue=hue,
                     col=col, col_wrap=num_col, sharex=share_x, sharey=share_y,
-                    kind=kind, palette=palette, height=6, aspect=2, legend=False, **kwargs)
+                    kind=kind, palette=palette, height=6, aspect=2, legend=False)
     g.despine(left=True)
 
     # Add legend to the plot, either single one or to each plot
@@ -299,7 +300,7 @@ def plot_catplot_chart(data, x='index', y='value', hue='group', col='metric', ki
         plt.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
 
     # Annotate the bars if using bar chart
-    if kind == 'bar' and 'show_bar_val' in kwargs and kwargs['show_bar_value']:
+    if kind == 'bar' and 'show_bar_val' in kwargs and kwargs['show_bar_val']:
         for ax in g.axes:
             for p in ax.patches:
                 ax.annotate('{0:.2f}'.format(p.get_height()), (p.get_x() + p.get_width() / 2.0, p.get_height()),
@@ -388,8 +389,20 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
                                    textcoords='offset points')
 
     # Set axis labels
-    g.set_xticklabels(rotation=x_tick_rotation)
-    g.set_yticklabels(rotation=y_tick_rotation)
+    for ax in g.axes.flatten():
+        # If sharing axis labels just get the first, else get each axis labels (because matplotlib/seaborn is why...)
+        if share_y:
+            ytick_labels = g.axes.flatten()[0].get_yticklabels()
+        else:
+            ytick_labels = ax.get_yticklabels()
+        if share_x:
+            xtick_labels = g.axes.flatten()[0].get_xticklabels()
+        else:
+            xtick_labels = ax.get_xticklabels()
+        ax.set_xticklabels(xtick_labels, rotation=x_tick_rotation)
+        ax.set_yticklabels(ytick_labels, rotation=y_tick_rotation)
+
+
     g.set_xlabels(x_label)
     g.set_ylabels(y_label)
 

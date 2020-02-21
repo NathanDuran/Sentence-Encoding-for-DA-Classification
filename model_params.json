@@ -271,7 +271,7 @@
     "optimiser": "adam",
     "output_mode": "mean",
     "batch_size": 32,
-    "max_seq_length": 640,
+    "max_seq_length": 64,
     "dropout_rate": 0.02,
     "dense_units": 256
   }
