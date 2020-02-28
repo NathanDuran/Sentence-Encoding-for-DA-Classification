@@ -118,6 +118,11 @@ class CNN(Model):
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.27
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 224
 
+        # If sequence length is too short need to reduce kernel/pool sizes
+        if kernel_size <= input_shape[0] * 2:
+            kernel_size = 2
+            pool_size = 2
+
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
         x = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
@@ -294,6 +299,11 @@ class DCNN(Model):
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.1
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 128
 
+        k_pool = 10
+        # If sequence length is too short need to reduce kernel/pool size
+        if k_pool <= input_shape[0] * 2:
+            k_pool = int(input_shape[0] / 3)
+
         # Define model
         inputs = tf.keras.Input(shape=input_shape)
         embeddding = tf.keras.layers.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
@@ -321,7 +331,7 @@ class DCNN(Model):
         conv_3 = tf.keras.layers.Conv1D(filters=num_filters, kernel_size=kernel_sizes[1], strides=1, padding='valid',
                                         activation=conv_activation)(zero_padded_3)
         folded = Folding()(conv_3)
-        k_maxpool_3 = KMaxPooling(k=10)(folded)
+        k_maxpool_3 = KMaxPooling(k=k_pool)(folded)  # Default 10
         non_linear_3 = tf.keras.layers.ReLU()(k_maxpool_3)
 
         flatten = tf.keras.layers.Flatten()(non_linear_3)

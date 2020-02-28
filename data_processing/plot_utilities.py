@@ -201,6 +201,39 @@ def plot_bar_chart(data, x='index', y='value', hue='variable', title='', y_label
     return g.get_figure()
 
 
+def plot_box_chart(data, x='index', y='value', hue=None, title='', y_label='', x_label='',
+                   colour='Paired', legend=False, legend_loc='best', x_tick_rotation=0):
+    # If using xkcd colours set the pallet, else use seaborn
+    if colour in colour_palettes.keys():
+        # Create colour palette for each item in group
+        if hue:
+            palette = dict(zip(data[hue].unique(), colour_palettes[colour]))
+        else:
+            palette = dict(zip(data[x].unique(), colour_palettes[colour]))
+    else:
+        palette = sns.color_palette(colour)
+
+    # Create the violin plot
+    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
+    g = sns.boxplot(data=data, x=x, y=y, hue=hue, dodge=True, linewidth=None, palette=palette)
+    sns.despine(ax=g, left=True)
+
+    # Add legend
+    if legend:
+        g.legend(frameon=True, shadow=True, loc=legend_loc)
+
+    # Set axis labels
+    g.set_xticklabels(g.get_xticklabels(), rotation=x_tick_rotation)
+    g.set_xlabel(x_label)
+    g.set_ylabel(y_label)
+
+    # Set main title
+    g.set_title(title, fontsize=14, fontweight='bold')
+
+    plt.tight_layout()
+    return g, g.get_figure()
+
+
 def plot_heatmap(data, title='', y_label='', x_label='', colour='RdBu_r', custom_boundaries=None, center_val=None,
                  show_cbar=True, annotate=True, num_format='.3f', linewidth=0.5, linecolour=None, x_tick_rotation=0):
     # Check if creating a custom colour map, else use seaborn
@@ -326,6 +359,11 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
                    x_tick_rotation=0, y_tick_rotation=0, **kwargs):
 
     # Facet grid plot functions
+    def _scatter(*args, **kwargs):
+        ax = plt.gca()
+        current_data = kwargs.pop("data")
+        sns.scatterplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
+
     def _violin(*args, **kwargs):
         ax = plt.gca()
         current_data = kwargs.pop("data")
@@ -343,8 +381,9 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
         sns.heatmap(data=current_data,  cmap=palette, ax=ax, **kwargs)
 
     # Get the desired plot function for facetgrid
-    plot_types = {'bar': _barplot,
+    plot_types = {'scatter': _scatter,
                   'violin': _violin,
+                  'bar': _barplot,
                   'heatmap': _heatmap}
 
     plot_function = plot_types[kind]
@@ -401,7 +440,6 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
             xtick_labels = ax.get_xticklabels()
         ax.set_xticklabels(xtick_labels, rotation=x_tick_rotation)
         ax.set_yticklabels(ytick_labels, rotation=y_tick_rotation)
-
 
     g.set_xlabels(x_label)
     g.set_ylabels(y_label)
