@@ -1,4 +1,4 @@
-index,model name,val vocab size,val acc,test vocab size,test acc,f1 micro,f1 weighted
+index,model_name,val_vocab_size,val_acc,test_vocab_size,test_acc,f1_micro,f1_weighted
 0,cnn,2500,0.744975,7500,0.718491,0.719735,0.687799
 1,text cnn,5500,0.756117,2500,0.728534,0.729958,0.702382
 2,dcnn,7500,0.751531,8000,0.726971,0.728389,0.697773

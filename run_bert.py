@@ -22,6 +22,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Run Tensorflow session
 sess = tf.Session()
 
+experiment_type = 'max_seq_length'  # TODO !Change experiment_type name?!
+
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'bert_3lyr',
                      'model_name': 'bert',
@@ -335,7 +337,7 @@ if testing:
 
 # TODO remove when all experiments complete
 if training and testing:
-    experiment_file = os.path.join(task_name, task_name + "_vocab_size" + ".csv")
+    experiment_file = os.path.join(task_name, task_name + "_" + experiment_type + ".csv")
     save_experiment(experiment_file, experiment_params,
                     np.mean(train_loss), np.mean(train_accuracy),
                     np.mean(val_loss), np.mean(val_accuracy),

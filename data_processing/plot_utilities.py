@@ -454,6 +454,8 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
 
 def plot_table(data, title=''):
     """Generates a table from a Dataframe."""
+    # Remove '_' from column/model names
+    data.columns = data.columns.str.replace("_", " ")
 
     # Params
     col_width = 2.1
@@ -486,7 +488,7 @@ def plot_table(data, title=''):
         else:
             cell.set_facecolor(row_colors[k[0] % len(row_colors)])
 
-    plt.title(title, fontdict={'fontsize': font_size * 2})
+    plt.title(title, fontdict={'fontsize': font_size * 1.5})
 
     plt.tight_layout()
     return fig

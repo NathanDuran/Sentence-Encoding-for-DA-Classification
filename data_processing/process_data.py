@@ -6,7 +6,8 @@ pd.options.display.width = 0
 
 # Set the task and experiment type
 task_name = 'swda'
-experiment_type = 'vocab_size'
+experiment_type = 'max_seq_length'
+experiment_name = 'Sequence Length'
 
 # Set data dir
 data_dir = os.path.join('..', task_name)
@@ -34,10 +35,10 @@ save_dataframe(os.path.join(output_dir, experiment_type + '_data_means.csv'), da
 # Get test and validation accuracy for each model
 acc_data = data.drop(data.columns.difference(['model_name', experiment_type, 'val_acc', 'test_acc']), axis=1)
 acc_data = acc_data.rename(columns={'val_acc': 'Val Acc', 'test_acc': 'Test Acc'})
-acc_data = acc_data.melt(id_vars=['model_name', 'vocab_size'])
+acc_data = acc_data.melt(id_vars=['model_name', experiment_type])
 
-g, fig = plot_lmplot_chart(acc_data, x="vocab_size", y="value", hue="model_name", col='variable',
-                           order=5, num_legend_col=4, y_label='Accuracy', x_label='Vocabulary Size',
+g, fig = plot_lmplot_chart(acc_data, x=experiment_type, y="value", hue="model_name", col='variable',
+                           order=5, num_legend_col=4, y_label='Accuracy', x_label=experiment_name,
                            share_x=True, num_col=1, colour='Paired')
 fig.show()
 g.savefig(os.path.join(output_dir, experiment_type + '_accuracy.png'))
@@ -47,22 +48,22 @@ print("========================= Raw Data =========================")
 max_of_raw_data = get_max(data, experiment_type) # TODO Don't bother with raw data?
 print(max_of_raw_data)
 print("Best validation accuracy in raw data:")
-print(max_of_raw_data.loc[[max_of_raw_data['val acc'].idxmax()], ['model name', 'val vocab size', 'val acc']])
+print(max_of_raw_data.loc[[max_of_raw_data['val_acc'].idxmax()], ['model_name', 'val_' + experiment_type, 'val_acc']])
 print("Best test accuracy in raw data:")
-print(max_of_raw_data.loc[[max_of_raw_data['test acc'].idxmax()], ['model name', 'test vocab size', 'test acc', 'f1 micro', 'f1 weighted']])
-save_dataframe(os.path.join(output_dir, experiment_type + 'max_of_raw_data.csv'), max_of_raw_data)
-fig = plot_table(max_of_raw_data)
+print(max_of_raw_data.loc[[max_of_raw_data['test_acc'].idxmax()], ['model_name', 'test_' + experiment_type, 'test_acc', 'f1_micro', 'f1_weighted']])
+save_dataframe(os.path.join(output_dir, experiment_type + '_max_of_raw_data.csv'), max_of_raw_data)
+fig = plot_table(max_of_raw_data, title=experiment_name + ' Raw Data')
 fig.show()
 
 print("========================= Mean Data =========================")
 max_of_mean_data = get_max(data_means, experiment_type)
 print(max_of_mean_data)
 print("Best validation accuracy in mean data:")
-print(max_of_mean_data.loc[[max_of_mean_data['val acc'].idxmax()], ['model name', 'val vocab size', 'val acc']])
+print(max_of_mean_data.loc[[max_of_mean_data['val_acc'].idxmax()], ['model_name', 'val_' + experiment_type, 'val_acc']])
 print("Best test accuracy in mean data:")
-print(max_of_mean_data.loc[[max_of_mean_data['test acc'].idxmax()], ['model name', 'test vocab size', 'test acc', 'f1 micro', 'f1 weighted']])
+print(max_of_mean_data.loc[[max_of_mean_data['test_acc'].idxmax()], ['model_name', 'test_' + experiment_type, 'test_acc', 'f1_micro', 'f1_weighted']])
 save_dataframe(os.path.join(output_dir, experiment_type + '_max_of_mean_data.csv'), max_of_mean_data)
-fig = plot_table(max_of_mean_data)
+fig = plot_table(max_of_mean_data, title=experiment_name + ' Mean Data')
 fig.show()
 
 # Pairwise t-test between experiment parameters
@@ -86,9 +87,10 @@ for metric in ['val_acc', 'test_acc']:
     save_dataframe(os.path.join(output_dir, experiment_type + '_' + metric + '_anova.csv'), tukey_frame)
 
     # Drop the un-needed columns and generate heatmaps
+    title = experiment_name + ' Validation Accuracy' if metric == 'val_acc' else experiment_name + ' Test Accuracy'
     tukey_frame = tukey_frame.drop(columns=['meandiff', 'lower', 'upper', 'reject'], axis=1)
     g, fig = plot_facetgrid(tukey_frame, x='group1', y='group2', hue='p-value', col='model_name', kind='heatmap',
-                            title='', y_label='', x_label='', num_col=2, colour='RdBu_r',
+                            title=title, y_label='', x_label='', num_col=2, colour='RdBu_r',
                             annot=True, fmt='0.3', linewidths=0.5, cbar=False, custom_boundaries=[0.0, 0.05, 1.0],
                             y_tick_rotation=45)
     fig.show()

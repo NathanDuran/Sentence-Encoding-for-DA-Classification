@@ -115,8 +115,6 @@ def get_max(data, experiment_type):
     max_data = pd.concat([max_val, max_test], axis=1, ignore_index=False, sort=False)
     # Remove duplicate columns i.e. model_name
     max_data = max_data.loc[:, ~max_data.columns.duplicated()]
-    # Remove '_' from column/model names
-    max_data.columns = max_data.columns.str.replace("_", " ")
     # Round data to 6 decimals
     max_data = max_data.round(6)
 
