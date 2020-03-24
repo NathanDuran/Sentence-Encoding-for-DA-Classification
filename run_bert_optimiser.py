@@ -21,7 +21,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 sess = tf.Session()
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'bert_base_opt',
+                     'experiment_name': 'bert_layer_opt',
                      'model_name': 'bert',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,

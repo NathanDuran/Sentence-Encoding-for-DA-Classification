@@ -24,7 +24,7 @@ tf.enable_eager_execution()
 experiment_type = 'use_punct'  # TODO !Change experiment_type name?!
 for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'gru', 'bi_gru']:
     for i in range(1, 11):
-        exp_name = curr_model_name + '_punct_' + str(i)
+        exp_name = curr_model_name + '_no_punct_' + str(i)
         experiment_params = {'task_name': 'swda',
                              'experiment_name': exp_name,
                              'model_name': curr_model_name,
@@ -41,7 +41,7 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'g
                              'vocab_size': 10000,
                              'max_seq_length': 128,
                              'to_tokens': True,
-                             'no_punct': False,
+                             'no_punct': True,
                              'train_embeddings': True,
                              'embedding_dim': 50,
                              'embedding_type': 'glove',

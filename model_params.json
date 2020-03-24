@@ -249,7 +249,7 @@
     "bert": {
     "learning_rate": 0.0015,
     "optimiser": "adagrad",
-    "num_fine_tune_layers": 3,
+    "num_fine_tune_layers": 12,
     "output_mode": "sequence",
     "dropout_rate": 0.05,
     "dense_units": 256
