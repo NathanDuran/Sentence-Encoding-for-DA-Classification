@@ -163,7 +163,7 @@ def save_experiment(file_name, params, train_loss, train_acc, val_loss, val_acc,
     if not os.path.exists(file_name):
         with open(file_name, 'w+') as file:
             file.write("'experiment_name','model_name',"
-                       "'vocab_size','max_seq_length','no_punct',"
+                       "'vocab_size','max_seq_length','use_punct',"
                        "'embedding_dim','embedding_type','embedding_source',"
                        "'train_loss','train_acc','val_loss','val_acc','test_loss','test_acc'")
             for key, value in metrics.items():
@@ -172,7 +172,7 @@ def save_experiment(file_name, params, train_loss, train_acc, val_loss, val_acc,
 
     with open(file_name, 'a') as file:
         file.write(params['experiment_name'] + "," + params['model_name'] + "," +
-                   str(params['vocab_size']) + "," + str(params['max_seq_length']) + "," + str(params['no_punct']) + "," +
+                   str(params['vocab_size']) + "," + str(params['max_seq_length']) + "," + str(params['use_punct']) + "," +
                    str(params['embedding_dim']) + "," + params['embedding_type'] + "," + params['embedding_source'] + "," +
                    str(train_loss) + "," + str(train_acc) + "," +
                    str(val_loss) + "," + str(val_acc) + "," +

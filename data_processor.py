@@ -36,7 +36,7 @@ class InputExample(object):
 class DataProcessor:
     """Converts sentences for dialogue act classification into data sets."""
 
-    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, to_indices=True, pad_seq=True, to_lower=True, no_punct=False, label_index=2):
+    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, to_indices=True, pad_seq=True, to_lower=True, use_punct=False, label_index=2):
         """Constructs a DataProcessor for the specified dataset.
 
         Note: For MRDA data there is the option to choose which type of labelling is used.
@@ -53,7 +53,7 @@ class DataProcessor:
             to_indices (bool): Flag for converting input sentences, if true converts word tokens to indices
             pad_seq (bool): Flag for padding sequences to max_seq_length
             to_lower (bool): Flag to convert words to lowercase
-            no_punct (bool): Flag to remove punctuation from sentences
+            use_punct (bool): Flag to remove punctuation from sentences
             label_index (int): Determines the label type is used if there is more than one type
 
         Attributes:
@@ -70,7 +70,7 @@ class DataProcessor:
         self.to_indices = to_indices
         self.pad_seq = pad_seq
         self.to_lower = to_lower
-        self.no_punct = no_punct
+        self.use_punct = use_punct
         self.label_index = label_index
 
         self.metadata_file = os.path.join(self.output_dir, 'metadata.pkl')
@@ -201,7 +201,7 @@ class DataProcessor:
 
         Tokenizes all text and strips whitespace.
         Converts to lowercase if to_lower=True.
-        Removes punctuation if no_punct=True.
+        Removes punctuation if use_punct=False.
         Keeps only vocab_size number of words.
 
         Counts labels and creates list of strings sorted in descending order of frequency
@@ -231,7 +231,7 @@ class DataProcessor:
 
                     # Tokenize, convert to lowercase and remove punctuation
                     sentence_tokens = tokenizer(sentence)
-                    if self.no_punct:
+                    if not self.use_punct:
                         sentence_tokens = [token for token in sentence_tokens if not token.is_punct]
                     if self.to_lower:
                         sentence_tokens = [token.orth_.lower() for token in sentence_tokens]
@@ -324,7 +324,7 @@ class DataProcessor:
         if to_tokens is True
             Tokenizes all text and strips whitespace.
             Converts to lowercase if to_lower=True.
-            Removes punctuation if no_punct=True.
+            Removes punctuation if use_punct=False.
             Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
             Converts sentence tokens to indices.
 
@@ -346,7 +346,7 @@ class DataProcessor:
         for example in examples:
 
             # Convert to lowercase and remove punctuation
-            if self.no_punct:
+            if not self.use_punct:
                 example.text = example.text.translate(str.maketrans('', '', string.punctuation))
             if self.to_lower:
                 example.text = example.text.lower()
@@ -508,7 +508,7 @@ class DataProcessor:
         if to_tokens is True
             Tokenizes all text and strips whitespace.
             Converts to lowercase if to_lower=True.
-            Removes punctuation if no_punct=True.
+            Removes punctuation if use_punct=False.
             Pads sentence with <unk> tokens to max_seq_length if pad_seq=True
             Converts sentence tokens to indices.
 
@@ -548,7 +548,7 @@ class DataProcessor:
             if self.to_tokens:
                 # Tokenize, convert to lowercase and remove punctuation
                 tokens = tokenizer(example.text)
-                if self.no_punct:
+                if not self.use_punct:
                     tokens = [token for token in tokens if not token.is_punct]
                 if self.to_lower:
                     tokens = [token.orth_.lower() for token in tokens]

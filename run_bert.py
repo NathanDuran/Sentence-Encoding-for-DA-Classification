@@ -40,7 +40,7 @@ experiment_params = {'task_name': 'swda',
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': False,
-                     'no_punct': True,
+                     'use_punct': True,
                      'embedding_dim': 768,
                      'embedding_type': 'bert',
                      'embedding_source': 'bert'}
@@ -119,13 +119,13 @@ print("Learning rate: " + str(learning_rate))
 vocab_size = experiment_params['vocab_size']
 max_seq_length = experiment_params['max_seq_length']
 to_tokens = experiment_params['to_tokens']
-no_punct = experiment_params['no_punct']
+use_punct = experiment_params['use_punct']
 embedding_dim = experiment_params['embedding_dim']
 embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, no_punct=no_punct)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_punct=use_punct)
 
 # Get the BERT vocab file and casing info from the Hub module
 bert_module = hub.Module("https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1")
@@ -155,7 +155,7 @@ print("Created data sets and embeddings...")
 print("Vocabulary size: " + str(vocab_size))
 print("Maximum sequence length: " + str(max_seq_length))
 print("Using sequence tokens: " + str(to_tokens))
-print("Using punctuation: " + str(no_punct))
+print("Using punctuation: " + str(use_punct))
 print("Embedding dimension: " + str(embedding_dim))
 print("Embedding type: " + embedding_type)
 print("Embedding source: " + embedding_source)
