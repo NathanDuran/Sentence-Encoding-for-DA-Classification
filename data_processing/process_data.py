@@ -6,8 +6,8 @@ pd.options.display.width = 0
 
 # Set the task and experiment type
 task_name = 'swda'
-experiment_type = 'max_seq_length'
-experiment_name = 'Sequence Length'
+experiment_type = 'use_punct'
+experiment_name = 'Punctuation'
 
 # Set data dir
 data_dir = os.path.join('..', task_name)
@@ -22,7 +22,7 @@ data = load_dataframe(os.path.join(data_dir, task_name + '_' + experiment_type +
 data = data.drop('experiment_name', axis='columns')
 data.model_name = data.model_name.str.replace("_", " ")
 
-# Sort by model name and experiment type # TODO do i really need to sort future experiments?
+# Sort by model name and experiment type
 sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']
 data = sort_dataframe_by_list_and_param(data, 'model_name', sort_order, experiment_type)
 # Save dataframe with all the data in
@@ -37,9 +37,14 @@ acc_data = data.drop(data.columns.difference(['model_name', experiment_type, 'va
 acc_data = acc_data.rename(columns={'val_acc': 'Val Acc', 'test_acc': 'Test Acc'})
 acc_data = acc_data.melt(id_vars=['model_name', experiment_type])
 
-g, fig = plot_lmplot_chart(acc_data, x=experiment_type, y="value", hue="model_name", col='variable',
-                           order=5, num_legend_col=4, y_label='Accuracy', x_label=experiment_name,
-                           share_x=True, num_col=1, colour='Paired')
+if experiment_type != 'use_punct':
+    g, fig = plot_lmplot_chart(acc_data, x=experiment_type, y="value", hue="model_name", col='variable',
+                               order=5, num_legend_col=4, y_label='Accuracy', x_label=experiment_name,
+                               share_x=True, num_col=1, colour='Paired')
+else:
+    g, fig = plot_facetgrid(acc_data, x=experiment_type, y="value", hue="model_name", col='variable', kind='violin',
+                            num_legend_col=4, y_label='Accuracy', x_label=experiment_name,
+                            share_y=True, num_col=1, colour='Paired')
 fig.show()
 g.savefig(os.path.join(output_dir, experiment_type + '_accuracy.png'))
 
@@ -66,32 +71,39 @@ save_dataframe(os.path.join(output_dir, experiment_type + '_max_of_mean_data.csv
 fig = plot_table(max_of_mean_data, title=experiment_name + ' Mean Data')
 fig.show()
 
+# TODO Need these?
 # Pairwise t-test between experiment parameters
 # Bonferroni correction post-hoc comparison
 # p-value/# of comparisons = 0.05/15 = 0.00333
 # t_test_frame = pairwise_t_test(data, experiment_type, 'test_acc')
 # print(t_test_frame)
-#
-# # One way ANOVA
-# f_one_way_frame = f_oneway_test(data, experiment_type, 'test_acc')
-# print(f_one_way_frame)
-#
-# # Pairwise ANOVA
+
+# Pairwise ANOVA
 # anova_test_frame = anova_test(data, experiment_type, 'test_acc')
 # print(anova_test_frame)
 
-# Tukeys HSD post-hoc comparison
-for metric in ['val_acc', 'test_acc']:
-    # Calculate the anova
-    tukey_frame = tukey_hsd(data, experiment_type, metric)
-    save_dataframe(os.path.join(output_dir, experiment_type + '_' + metric + '_anova.csv'), tukey_frame)
 
-    # Drop the un-needed columns and generate heatmaps
+for metric in ['val_acc', 'test_acc']:
+    # Set the title for graphs and dataframes
     title = experiment_name + ' Validation Accuracy' if metric == 'val_acc' else experiment_name + ' Test Accuracy'
-    tukey_frame = tukey_frame.drop(columns=['meandiff', 'lower', 'upper', 'reject'], axis=1)
-    g, fig = plot_facetgrid(tukey_frame, x='group1', y='group2', hue='p-value', col='model_name', kind='heatmap',
-                            title=title, y_label='', x_label='', num_col=2, colour='RdBu_r',
-                            annot=True, fmt='0.3', linewidths=0.5, cbar=False, custom_boundaries=[0.0, 0.05, 1.0],
-                            y_tick_rotation=45)
-    fig.show()
-    g.savefig(os.path.join(output_dir, experiment_type + '_' + metric + '_anova.png'))
+
+    if experiment_type != 'use_punct':
+        # Tukeys HSD post-hoc comparison
+        tukey_frame = tukey_hsd(data, experiment_type, metric)
+        save_dataframe(os.path.join(output_dir, experiment_type + '_' + metric + '_anova.csv'), tukey_frame)
+
+        # Drop the un-needed columns and generate heatmaps
+
+        tukey_frame = tukey_frame.drop(columns=['meandiff', 'lower', 'upper', 'reject'], axis=1)
+        g, fig = plot_facetgrid(tukey_frame, x='group1', y='group2', hue='p-value', col='model_name', kind='heatmap',
+                                title=title, y_label='', x_label='', num_col=2, colour='RdBu_r',
+                                annot=True, fmt='0.3', linewidths=0.5, cbar=False, custom_boundaries=[0.0, 0.05, 1.0],
+                                y_tick_rotation=45)
+        fig.show()
+        g.savefig(os.path.join(output_dir, experiment_type + '_' + metric + '_anova.png'))
+    else:
+        # One way t-test
+        f_one_way_frame = f_oneway_test(data, experiment_type, 'test_acc')
+        f_one_way_frame.columns = pd.MultiIndex.from_product([[title], f_one_way_frame.columns])
+        print(f_one_way_frame)
+        save_dataframe(os.path.join(output_dir, experiment_type + '_' + metric + '_t-test.csv'), f_one_way_frame)

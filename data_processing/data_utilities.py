@@ -1,13 +1,17 @@
 import pandas as pd
 
 
-def save_dataframe(path, data, index_name='index'):
-    data.to_csv(path, index_label=index_name)
+def load_dataframe(path, multi_index=False, num_header_rows=1):
+    # Create list for the number of rows with headers
+    header_rows = [0 + i for i in range(num_header_rows + 1)]
+    if multi_index:
+        return pd.read_csv(path, header=header_rows, index_col=[0], skipinitialspace=True)
+    else:
+        return pd.read_csv(path, index_col=False, header=0, quotechar="'")
 
 
-def load_dataframe(path):
-    data = pd.read_csv(path, index_col=False, header=0, quotechar="'")
-    return data
+def save_dataframe(path, data, index_label=None):
+    data.to_csv(path, index_label=index_label)
 
 
 def dataframe_wide_to_long(data):

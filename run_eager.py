@@ -24,7 +24,7 @@ tf.enable_eager_execution()
 experiment_type = 'use_punct'  # TODO !Change experiment_type name?!
 for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'gru', 'bi_gru']:
     for i in range(1, 11):
-        exp_name = curr_model_name + '_no_punct_' + str(i)
+        exp_name = curr_model_name + '_punct_' + str(i)
         experiment_params = {'task_name': 'swda',
                              'experiment_name': exp_name,
                              'model_name': curr_model_name,
@@ -41,7 +41,7 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'g
                              'vocab_size': 10000,
                              'max_seq_length': 128,
                              'to_tokens': True,
-                             'no_punct': True,
+                             'use_punct': True,
                              'train_embeddings': True,
                              'embedding_dim': 50,
                              'embedding_type': 'glove',
@@ -121,14 +121,14 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'g
         vocab_size = experiment_params['vocab_size']
         max_seq_length = experiment_params['max_seq_length']
         to_tokens = experiment_params['to_tokens']
-        no_punct = experiment_params['no_punct']
+        use_punct = experiment_params['use_punct']
         train_embeddings = experiment_params['train_embeddings']
         embedding_dim = experiment_params['embedding_dim']
         embedding_type = experiment_params['embedding_type']
         embedding_source = experiment_params['embedding_source']
 
         # Initialize the dataset processor
-        data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, no_punct=no_punct)
+        data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_punct=use_punct)
 
         # If dataset folder is empty get the metadata and datasets to .npz files
         if not os.listdir(dataset_dir):
@@ -156,7 +156,7 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'g
         print("Vocabulary size: " + str(vocab_size))
         print("Maximum sequence length: " + str(max_seq_length))
         print("Using sequence tokens: " + str(to_tokens))
-        print("Using punctuation: " + str(no_punct))
+        print("Using punctuation: " + str(use_punct))
         print("Embedding dimension: " + str(embedding_dim))
         print("Embedding type: " + embedding_type)
         print("Embedding source: " + embedding_source)

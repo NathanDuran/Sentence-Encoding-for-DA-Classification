@@ -1,0 +1,9 @@
+,model_name,val_use_punct,val_acc,test_use_punct,test_acc,f1_micro,f1_weighted
+0,cnn,False,0.744598,False,0.715265,0.716524,0.685723
+1,text cnn,False,0.75611,False,0.727905,0.729272,0.701429
+2,dcnn,False,0.750176,False,0.72798,0.729542,0.70222
+3,rcnn,False,0.740616,False,0.719982,0.7215,0.682853
+4,lstm,False,0.75252,False,0.723397,0.724884,0.692714
+5,bi lstm,False,0.748794,False,0.722832,0.724344,0.691359
+6,gru,False,0.736974,False,0.71436,0.715837,0.678844
+7,bi gru,False,0.729192,False,0.715492,0.717112,0.680325

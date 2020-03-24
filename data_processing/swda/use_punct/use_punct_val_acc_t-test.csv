@@ -1,0 +1,10 @@
+,Punctuation Validation Accuracy,Punctuation Validation Accuracy
+,statistic,pvalue
+cnn,19.498907,0.000334
+text cnn,28.456083,4.5e-05
+dcnn,29.16077,3.9e-05
+rcnn,12.914042,0.002076
+lstm,8.499982,0.009232
+bi lstm,7.620707,0.012879
+gru,1.602772,0.221651
+bi gru,6.771713,0.018014
