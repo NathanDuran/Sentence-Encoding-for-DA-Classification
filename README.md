@@ -7,15 +7,15 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 
 - Make bi-directional a parameter?
 
-- bert Different num layers (concat last four hidden?)
-- bert + lstm?
-- bert large?
+- mlstm_char_lm seq length / output mode? Can I run it in a loop?
+- FIX HEATMAP TITLES OVERLAPPING GRAPH
 
-- How to account for incorrect embedding type (i.e. nnlm) when running in graph mode? (also if I port elmo/bert etc to graph)
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
 - ELMo + LSTM/Bi-LSTM + Attn
 - ELMo + Attn
+- BERT + LSTM
+- BERT Large
 - Albert 
 - Distillbert
 - https://github.com/AlexYangLi/TextClassification
@@ -23,6 +23,7 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 ## Misc
 - Document the models in readme
 - elmo needs to be strings (or tokenised strings - but those suck)
+
 #### graph models
 - elmo
 - bert

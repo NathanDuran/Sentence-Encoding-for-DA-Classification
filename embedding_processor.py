@@ -16,12 +16,13 @@ def get_embedding_processor(processor_type):
     Returns:
         processor (EmbeddingProcessor): An instance of the selected EmbeddingProcessor
     """
-    embeddings = {'random': RandomEmbedding(),
-                  'glove': GloveEmbedding(),
-                  'word2vec': Word2VecEmbedding(),
-                  'fasttext': FastTextEmbedding(),
+    embeddings = {'random': Random(),
+                  'glove': Glove(),
+                  'word2vec': Word2Vec(),
+                  'fasttext': FastText(),
                   'numberbatch': Numberbatch(),
-                  'deps': Dependency()}
+                  'deps': Dependency(),
+                  'nnlm': Default()}
 
     if processor_type.lower() not in embeddings.keys():
         raise Exception("The given embedding processor type: '" + processor_type + "' is not valid!\n" +
@@ -48,7 +49,14 @@ class EmbeddingProcessor:
         raise NotImplementedError()
 
 
-class RandomEmbedding(EmbeddingProcessor):
+class Default(EmbeddingProcessor):
+    """Returns the default empty matrix for models that do not use embeddings."""
+
+    def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
+        return []
+
+
+class Random(EmbeddingProcessor):
     """Generates random embeddings matrix."""
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
@@ -61,7 +69,7 @@ class RandomEmbedding(EmbeddingProcessor):
         return matrix
 
 
-class GloveEmbedding(EmbeddingProcessor):
+class Glove(EmbeddingProcessor):
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
         """Loads GloVe embeddings and maps word tokens to embedding vectors.
@@ -103,7 +111,7 @@ class GloveEmbedding(EmbeddingProcessor):
         return matrix
 
 
-class Word2VecEmbedding(EmbeddingProcessor):
+class Word2Vec(EmbeddingProcessor):
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
         """Loads Word2Vec embeddings and maps word tokens to embedding vectors.
@@ -143,7 +151,7 @@ class Word2VecEmbedding(EmbeddingProcessor):
         return matrix
 
 
-class FastTextEmbedding(EmbeddingProcessor):
+class FastText(EmbeddingProcessor):
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
         """Loads FastText embeddings and maps word tokens to embedding vectors.
