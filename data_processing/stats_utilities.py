@@ -79,6 +79,7 @@ def f_oneway_test(data, experiment_type, metric):
 
     # Create dataframe
     f_one_way_frame = pd.DataFrame.from_dict(results_dict, orient='index')
+    f_one_way_frame = f_one_way_frame.reset_index().rename(columns={'index': 'model_name'})
     # Round to 6 decimal places
     f_one_way_frame = f_one_way_frame.round(6)
     return f_one_way_frame

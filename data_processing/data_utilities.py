@@ -10,7 +10,7 @@ def load_dataframe(path, multi_index=False, num_header_rows=1):
         return pd.read_csv(path, index_col=False, header=0, quotechar="'")
 
 
-def save_dataframe(path, data, index_label=None):
+def save_dataframe(path, data, index_label='index'):
     data.to_csv(path, index_label=index_label)
 
 

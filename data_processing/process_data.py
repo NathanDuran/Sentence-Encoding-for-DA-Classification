@@ -95,10 +95,13 @@ for metric in ['val_acc', 'test_acc']:
         # Drop the un-needed columns and generate heatmaps
 
         tukey_frame = tukey_frame.drop(columns=['meandiff', 'lower', 'upper', 'reject'], axis=1)
+        # TODO Remove vocab_size > 5000 to make plots nicer
+        if experiment_type == 'vocab_size':
+            tukey_frame.drop(tukey_frame[(tukey_frame.group1 > 5000) | (tukey_frame.group2 > 5000)].index, inplace=True)
         g, fig = plot_facetgrid(tukey_frame, x='group1', y='group2', hue='p-value', col='model_name', kind='heatmap',
                                 title=title, y_label='', x_label='', num_col=2, colour='RdBu_r',
                                 annot=True, fmt='0.3', linewidths=0.5, cbar=False, custom_boundaries=[0.0, 0.05, 1.0],
-                                y_tick_rotation=45)
+                                y_tick_rotation=45, height=4)
         fig.show()
         g.savefig(os.path.join(output_dir, experiment_type + '_' + metric + '_anova.png'))
     else:

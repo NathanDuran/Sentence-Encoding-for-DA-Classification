@@ -8,7 +8,6 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 - Make bi-directional a parameter?
 
 - mlstm_char_lm seq length / output mode? Can I run it in a loop?
-- FIX HEATMAP TITLES OVERLAPPING GRAPH
 
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM

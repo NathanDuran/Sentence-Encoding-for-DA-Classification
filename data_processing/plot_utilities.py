@@ -355,7 +355,7 @@ def plot_catplot_chart(data, x='index', y='value', hue='group', col='metric', ki
 
 def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='bar', show_bar_value=False,
                    title='', y_label='', x_label='', share_x=False, share_y=False, num_col=2,
-                   colour='Paired', legend_loc='best', num_legend_col=3, all_legend=False,
+                   colour='Paired', legend_loc='best', num_legend_col=3, all_legend=False, height=6, aspect=2,
                    x_tick_rotation=0, y_tick_rotation=0, **kwargs):
 
     # Facet grid plot functions
@@ -403,7 +403,7 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
 
     # Create FacetGrid catplot for each item in 'metric'
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
-    g = sns.FacetGrid(data=data, col=col, col_wrap=num_col, sharex=share_x, sharey=share_y, height=6, aspect=2)
+    g = sns.FacetGrid(data=data, col=col, col_wrap=num_col, sharex=share_x, sharey=share_y, height=height, aspect=aspect)
     g.map_dataframe(plot_function, x, y, hue, **kwargs)
     g.despine(left=True)
 
@@ -446,7 +446,7 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
 
     # Set individual plot titles and main title
     g.set_titles("{col_name}", fontsize=14, fontweight='bold')
-    g.fig.suptitle(title, fontsize=18, fontweight='bold', y=0.99)
+    g.fig.suptitle(title, fontsize=16, fontweight='bold', y=0.99)
 
     plt.tight_layout()
     return g, g.fig
