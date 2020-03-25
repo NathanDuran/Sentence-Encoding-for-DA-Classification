@@ -85,7 +85,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset and embedding processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size, to_tokens=to_tokens)
 embedding = embedding_processor.get_embedding_processor(embedding_type)
 
 # If dataset folder is empty get the metadata and datasets

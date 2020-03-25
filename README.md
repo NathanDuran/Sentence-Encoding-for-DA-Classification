@@ -21,7 +21,11 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 
 ## Misc
 - Document the models in readme
-- elmo needs to be strings (or tokenised strings - but those suck)
+
+Language models need to be strings to_tokens=false
+- elmo: (or tokenised strings - but those suck)
+- use:
+- mlstm_char_lm:
 
 #### graph models
 - elmo

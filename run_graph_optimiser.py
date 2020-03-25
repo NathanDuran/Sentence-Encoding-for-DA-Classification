@@ -25,7 +25,7 @@ experiment_params = {'task_name': 'swda',
                      'early_stopping': True,
                      'patience': 2,
                      'vocab_size': 10000,
-                     'max_seq_length': 1,
+                     'max_seq_length': 128,
                      'to_tokens': False,
                      'embedding_dim': 4096,
                      'embedding_type': 'mlstm_char_lm',
@@ -82,7 +82,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, to_indices=False, vocab_size=vocab_size)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size, to_tokens=to_tokens)
 
 # If dataset folder is empty get the metadata and datasets
 if not os.listdir(dataset_dir):

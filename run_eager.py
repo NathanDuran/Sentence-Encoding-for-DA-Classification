@@ -128,7 +128,7 @@ for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'g
         embedding_source = experiment_params['embedding_source']
 
         # Initialize the dataset processor
-        data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_punct=use_punct)
+        data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size, to_tokens=to_tokens,  use_punct=use_punct)
 
         # If dataset folder is empty get the metadata and datasets to .npz files
         if not os.listdir(dataset_dir):

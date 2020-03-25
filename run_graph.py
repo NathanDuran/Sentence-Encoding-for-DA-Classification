@@ -23,8 +23,8 @@ sess = tf.Session()
 experiment_type = 'max_seq_length'  # TODO !Change experiment_type name?!
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'elmo',
-                     'model_name': 'elmo',
+                     'experiment_name': 'mlstm_char_lm',
+                     'model_name': 'mlstm_char_lm',
                      'training': True,
                      'testing': True,
                      'save_model': True,
@@ -36,12 +36,12 @@ experiment_params = {'task_name': 'swda',
                      'early_stopping': False,
                      'patience': 3,
                      'vocab_size': 10000,
-                     'max_seq_length': 1,
+                     'max_seq_length': 128,
                      'to_tokens': False,
                      'use_punct': True,
-                     'embedding_dim': 1024,
-                     'embedding_type': 'elmo',
-                     'embedding_source': 'elmo'}
+                     'embedding_dim': 4096,
+                     'embedding_type': 'mlstm_char_lm',
+                     'embedding_source': 'mlstm_char_lm'}
 
 # Load model params if file exists otherwise defaults will be used
 model_param_file = 'model_params.json'
@@ -123,7 +123,7 @@ embedding_type = experiment_params['embedding_type']
 embedding_source = experiment_params['embedding_source']
 
 # Initialize the dataset processor
-data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, to_tokens=to_tokens, vocab_size=vocab_size, use_punct=use_punct)
+data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size, to_tokens=to_tokens, use_punct=use_punct)
 
 # If dataset folder is empty get the metadata and datasets to .npz files
 if not os.listdir(dataset_dir):
@@ -162,7 +162,7 @@ print("Creating model...")
 
 # Build model with supplied parameters
 model_class = models.get_model(experiment_params['model_name'])
-model = model_class.build_model((max_seq_length,), len(labels), [], **model_params)
+model = model_class.build_model((1,), len(labels), [], **model_params)
 print("Built model using parameters:")
 for key, value in model_params.items():
     print("{}: {}".format(key, value))

@@ -351,11 +351,15 @@ class DataProcessor:
             if self.to_lower:
                 example.text = example.text.lower()
 
-            # Tokenize, else return full sentence
-            if self.to_tokens:
+            # Tokenize sentence
+            tokens = tokenizer(example.text)
+            tokens = [token.orth_ for token in tokens]
 
-                tokens = tokenizer(example.text)
-                tokens = [token.orth_ for token in tokens]
+            # Replace words not in vocabulary with unknown token (0 = <unk> token in vocabulary)
+            tokens = [token if vocabulary[token] else vocabulary.unknown_token for token in tokens]
+
+            # If tokens pad/truncate and convert to indices, else join to full sentence string
+            if self.to_tokens:
 
                 # Pad/truncate sequences to max_sequence_length (1 = <pad> token in vocabulary)
                 if self.pad_seq:
@@ -366,8 +370,8 @@ class DataProcessor:
                 # Convert word tokens to indices or keep as words
                 if self.to_indices:
                     example.text = vocabulary.to_indices(tokens)
-                else:
-                    example.text = [token if vocabulary[token] else vocabulary.unknown_token for token in tokens]
+            else:
+                example.text = ' '.join(join_punctuation(tokens))
 
             # Convert labels to indices
             example.label = [labels.index(example.label)]
@@ -694,3 +698,17 @@ def to_one_hot(label, labels):
 def from_one_hot(one_hot, labels):
     """Converts one-hot encoded label list into its string representation."""
     return labels[int(np.argmax(one_hot))]
+
+def join_punctuation(tokens, characters='.,;?!'):
+    #characters = set(characters)
+    tokens = iter(tokens)
+    current = next(tokens)
+
+    for char in tokens:
+        if char in string.punctuation:
+            current += char
+        else:
+            yield current
+            current = char
+
+    yield current
