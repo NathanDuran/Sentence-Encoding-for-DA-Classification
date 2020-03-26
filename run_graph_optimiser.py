@@ -134,7 +134,7 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
     print("------------------------------------")
     print("Creating model...")
     model_class = models.get_model(experiment_params['model_name'])
-    model = model_class.build_model((max_seq_length,), len(labels), [], **model_params)
+    model = model_class.build_model((1,), len(labels), [], **model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))

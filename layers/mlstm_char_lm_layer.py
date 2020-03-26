@@ -2,149 +2,6 @@ import html
 import numpy as np
 import tensorflow as tf
 
-global nloaded
-nloaded = 0
-
-
-def preprocess(text, max_seq_length, front_pad='\n ', end_pad=' '):
-    text = text[0].decode('UTF-8')
-    text = html.unescape(text)
-    text = text.replace('\n', ' ').strip()
-    # Truncate to max_seq_len - 3 to account for front/end padding
-    text = text[:max_seq_length - 3] if len(text) > max_seq_length - 3 else text
-    text = front_pad + text + end_pad
-    text = text.encode()
-    return text
-
-
-def iter_data(*data, **kwargs):
-    size = kwargs.get('size', 128)
-    try:
-        n = len(data[0])
-    except:
-        n = data[0].shape[0]
-    batches = n // size
-    if n % size != 0:
-        batches += 1
-
-    for b in range(batches):
-        start = b * size
-        end = (b + 1) * size
-        if end > n:
-            end = n
-        if len(data) == 1:
-            yield data[0][start:end]
-        else:
-            yield tuple([d[start:end] for d in data])
-
-
-class HParams(object):
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
-
-def load_params(shape, dtype, *args, **kwargs):
-    global nloaded
-    nloaded += 1
-    return params[nloaded - 1]
-
-
-def embd(X, ndim, scope='embedding'):
-    with tf.variable_scope(scope):
-        embd = tf.get_variable("w", [hps.nvocab, ndim], initializer=load_params)
-        h = tf.nn.embedding_lookup(embd, X)
-        return h
-
-
-def fc(x, nout, act, wn=False, bias=True, scope='fc'):
-    with tf.variable_scope(scope):
-        nin = x.get_shape()[-1].value
-        w = tf.get_variable("w", [nin, nout], initializer=load_params)
-        if wn:
-            g = tf.get_variable("g", [nout], initializer=load_params)
-        if wn:
-            w = tf.nn.l2_normalize(w, dim=0) * g
-        z = tf.matmul(x, w)
-        if bias:
-            b = tf.get_variable("b", [nout], initializer=load_params)
-            z = z + b
-        h = act(z)
-        return h
-
-
-def mlstm(inputs, c, h, M, ndim, scope='lstm', wn=False):
-    nin = inputs[0].get_shape()[1].value
-    with tf.variable_scope(scope):
-        wx = tf.get_variable("wx", [nin, ndim * 4], initializer=load_params)
-        wh = tf.get_variable("wh", [ndim, ndim * 4], initializer=load_params)
-        wmx = tf.get_variable("wmx", [nin, ndim], initializer=load_params)
-        wmh = tf.get_variable("wmh", [ndim, ndim], initializer=load_params)
-        b = tf.get_variable("b", [ndim * 4], initializer=load_params)
-        if wn:
-            gx = tf.get_variable("gx", [ndim * 4], initializer=load_params)
-            gh = tf.get_variable("gh", [ndim * 4], initializer=load_params)
-            gmx = tf.get_variable("gmx", [ndim], initializer=load_params)
-            gmh = tf.get_variable("gmh", [ndim], initializer=load_params)
-
-    if wn:
-        wx = tf.nn.l2_normalize(wx, dim=0) * gx
-        wh = tf.nn.l2_normalize(wh, dim=0) * gh
-        wmx = tf.nn.l2_normalize(wmx, dim=0) * gmx
-        wmh = tf.nn.l2_normalize(wmh, dim=0) * gmh
-
-    cs = []
-    for idx, x in enumerate(inputs):
-        m = tf.matmul(x, wmx) * tf.matmul(h, wmh)
-        z = tf.matmul(x, wx) + tf.matmul(m, wh) + b
-        i, f, o, u = tf.split(z, 4, 1)
-        i = tf.nn.sigmoid(i)
-        f = tf.nn.sigmoid(f)
-        o = tf.nn.sigmoid(o)
-        u = tf.tanh(u)
-        if M is not None:
-            ct = f * c + i * u
-            ht = o * tf.tanh(ct)
-            m = M[:, idx, :]
-            c = ct * m + c * (1 - m)
-            h = ht * m + h * (1 - m)
-        else:
-            c = f * c + i * u
-            h = o * tf.tanh(c)
-        inputs[idx] = h
-        cs.append(c)
-    cs = tf.stack(cs)
-    return inputs, cs, c, h
-
-
-def model(X, S, M=None, reuse=False):
-    nsteps = X.get_shape()[1]
-    cstart, hstart = tf.unstack(S, num=hps.nstates)
-    with tf.variable_scope('model', reuse=reuse):
-        words = embd(X, hps.nembd)
-        inputs = tf.unstack(words, nsteps, 1)
-        hs, cells, cfinal, hfinal = mlstm(inputs, cstart, hstart, M, hps.hidden_dim, scope='rnn', wn=hps.rnn_wn)
-        hs = tf.reshape(tf.concat(hs, 1), [-1, hps.hidden_dim])
-        logits = fc(hs, hps.nvocab, act=lambda x: x, wn=hps.out_wn, scope='out')
-    states = tf.stack([cfinal, hfinal], 0)
-    return cells, states, logits
-
-
-def ceil_round_step(n, step):
-    return int(np.ceil(n / step) * step)
-
-
-def batch_pad(xs, nbatch, nsteps):
-    xmb = np.zeros((nbatch, nsteps), dtype=np.int32)
-    mmb = np.ones((nbatch, nsteps, 1), dtype=np.float32)
-    for i, x in enumerate(xs):
-        l = len(x)
-        npad = nsteps - l
-        xmb[i, -l:] = list(x)
-        mmb[i, :npad] = 0
-    return xmb, mmb
-
 
 class Model(object):
 
@@ -153,86 +10,204 @@ class Model(object):
         self.batch_size = batch_size
         self.max_seq_length = max_seq_length
         self.hidden_dim = hidden_dim
-        global hps
-        hps = HParams(
-            load_path='model_params/params.jl',
-            hidden_dim=hidden_dim,
-            nembd=64,
-            max_seq_length=max_seq_length,
-            batch_size=batch_size,
-            nstates=2,
-            nvocab=256,
-            out_wn=False,
-            rnn_wn=True,
-            rnn_type='mlstm',
-            embd_wn=True,
-        )
-        global params
-        params = [np.load(self.weights_path + '/%d.npy' % i) for i in range(15)]
-        params[2] = np.concatenate(params[2:6], axis=1)
-        params[3:6] = []
+        self.nembd = 64
+        self.nstates = 2
+        self.nvocab = 256
+        self.out_wn = False
+        self.rnn_wn = True
+        self.embd_wn = True
+        self.n_loaded = 0
 
-        X = tf.placeholder(tf.int32, [None, self.max_seq_length])
-        M = tf.placeholder(tf.float32, [None, self.max_seq_length, 1])
-        S = tf.placeholder(tf.float32, [hps.nstates, None, self.hidden_dim])
-        cells, states, logits = model(X, S, M, reuse=False)
+        # Load Weights
+        self.weights = [np.load(self.weights_path + '/%d.npy' % i) for i in range(15)]
+        self.weights[2] = np.concatenate(self.weights[2:6], axis=1)
+        self.weights[3:6] = []
 
-        sess = tf.Session()
-        tf.global_variables_initializer().run(session=sess)
+        self.X = tf.placeholder(tf.int32, [None, self.max_seq_length])
+        self.M = tf.placeholder(tf.float32, [None, self.max_seq_length, 1])
+        self.S = tf.placeholder(tf.float32, [self.nstates, None, self.hidden_dim])
+        self.cells, self.states, self.logits = self.model(self.X, self.S, self.M, reuse=False)
 
-        def seq_rep(xmb, mmb, smb):
-            return sess.run(states, {X: xmb, M: mmb, S: smb})
+        self.sess = tf.Session()
+        tf.global_variables_initializer().run(session=self.sess)
 
-        def seq_cells(xmb, mmb, smb):
-            return sess.run(cells, {X: xmb, M: mmb, S: smb})
+    def seq_rep(self, xmb, mmb, smb):
+        return self.sess.run(self.states, {self.X: xmb, self.M: mmb, self.S: smb})
 
-        def transform(xs):
-            xs = [preprocess(x, hps.max_seq_length) for x in xs]
-            lens = np.asarray([len(x) for x in xs])
-            sorted_idxs = np.argsort(lens)
-            unsort_idxs = np.argsort(sorted_idxs)
-            sorted_xs = [xs[i] for i in sorted_idxs]
-            maxlen = np.max(lens)
-            offset = 0
-            n = len(xs)
-            smb = np.zeros((2, n, hps.hidden_dim), dtype=np.float32)
-            for step in range(0, ceil_round_step(maxlen, max_seq_length), max_seq_length):
-                start = step
-                end = step + max_seq_length
-                xsubseq = [x[start:end] for x in sorted_xs]
-                ndone = sum([x == b'' for x in xsubseq])
-                offset += ndone
-                xsubseq = xsubseq[ndone:]
-                sorted_xs = sorted_xs[ndone:]
-                nsubseq = len(xsubseq)
-                xmb, mmb = batch_pad(xsubseq, nsubseq, max_seq_length)
-                for batch in range(0, nsubseq, batch_size):
-                    start = batch
-                    end = batch + batch_size
-                    batch_smb = seq_rep(xmb[start:end], mmb[start:end], smb[:, offset + start:offset + end, :])
-                    smb[:, offset + start:offset + end, :] = batch_smb
-            features = smb[0, unsort_idxs, :]
+    def seq_cells(self, xmb, mmb, smb):
+        return self.sess.run(self.cells, {self.X: xmb, self.M: mmb, self.S: smb})
 
-            return features
+    def transform(self, xs):
+        xs = [self.preprocess(x, self.max_seq_length) for x in xs]
+        lens = np.asarray([len(x) for x in xs])
+        sorted_idxs = np.argsort(lens)
+        unsort_idxs = np.argsort(sorted_idxs)
+        sorted_xs = [xs[i] for i in sorted_idxs]
+        maxlen = np.max(lens)
+        offset = 0
+        n = len(xs)
+        smb = np.zeros((2, n, self.hidden_dim), dtype=np.float32)
+        for step in range(0, self.ceil_round_step(maxlen, self.max_seq_length), self.max_seq_length):
+            start = step
+            end = step + self.max_seq_length
+            xsubseq = [x[start:end] for x in sorted_xs]
+            ndone = sum([x == b'' for x in xsubseq])
+            offset += ndone
+            xsubseq = xsubseq[ndone:]
+            sorted_xs = sorted_xs[ndone:]
+            nsubseq = len(xsubseq)
+            xmb, mmb = self.batch_pad(xsubseq, nsubseq, self.max_seq_length)
+            for batch in range(0, nsubseq, self.batch_size):
+                start = batch
+                end = batch + self.batch_size
+                batch_smb = self.seq_rep(xmb[start:end], mmb[start:end], smb[:, offset + start:offset + end, :])
+                smb[:, offset + start:offset + end, :] = batch_smb
+        features = smb[0, unsort_idxs, :]
 
-        def cell_transform(xs, indexes=None):
-            Fs = []
-            xs = [preprocess(x, hps.max_seq_length) for x in xs]
-            for xmb in iter_data(xs, size=hps.batch_size):
-                smb = np.zeros((2, hps.batch_size, hps.hidden_dim))
-                n = len(xmb)
-                xmb, mmb = batch_pad(xmb, hps.batch_size, hps.max_seq_length)
-                smb = seq_cells(xmb, mmb, smb)
-                smb = smb[:, :n, :]
-                if indexes is not None:
-                    smb = smb[:, :, indexes]
-                Fs.append(smb)
-            Fs = np.concatenate(Fs, axis=1).transpose(1, 0, 2)
+        return features
 
-            return Fs
+    def cell_transform(self, xs, indexes=None):
+        fs = []
+        xs = [self.preprocess(x, self.max_seq_length) for x in xs]
+        for xmb in self.iter_data(xs, size=self.batch_size):
+            smb = np.zeros((2, self.batch_size, self.hidden_dim))
+            n = len(xmb)
+            xmb, mmb = self.batch_pad(xmb, self.batch_size, self.max_seq_length)
+            smb = self.seq_cells(xmb, mmb, smb)
+            smb = smb[:, :n, :]
+            if indexes is not None:
+                smb = smb[:, :, indexes]
+            fs.append(smb)
+        fs = np.concatenate(fs, axis=1).transpose(1, 0, 2)
 
-        self.transform = transform
-        self.cell_transform = cell_transform
+        return fs
+
+    def model(self, X, S, M=None, reuse=False):
+        nsteps = X.get_shape()[1]
+        cstart, hstart = tf.unstack(S, num=self.nstates)
+        with tf.variable_scope('model', reuse=reuse):
+            words = self.embd(X, self.nembd)
+            inputs = tf.unstack(words, nsteps, 1)
+            hs, cells, cfinal, hfinal = self.mlstm(inputs, cstart, hstart, M, self.hidden_dim, scope='rnn', wn=self.rnn_wn)
+            hs = tf.reshape(tf.concat(hs, 1), [-1, self.hidden_dim])
+            logits = self.fc(hs, self.nvocab, act=lambda x: x, wn=self.out_wn, scope='out')
+        states = tf.stack([cfinal, hfinal], 0)
+        return cells, states, logits
+
+    def embd(self, X, ndim, scope='embedding'):
+        with tf.variable_scope(scope):
+            embd = tf.get_variable("w", [self.nvocab, ndim], initializer=self.load_params)
+            h = tf.nn.embedding_lookup(embd, X)
+            return h
+
+    def mlstm(self, inputs, c, h, M, n_dim, scope='lstm', wn=False):
+        n_in = inputs[0].get_shape()[1].value
+        with tf.variable_scope(scope):
+            wx = tf.get_variable("wx", [n_in, n_dim * 4], initializer=self.load_params)
+            wh = tf.get_variable("wh", [n_dim, n_dim * 4], initializer=self.load_params)
+            wmx = tf.get_variable("wmx", [n_in, n_dim], initializer=self.load_params)
+            wmh = tf.get_variable("wmh", [n_dim, n_dim], initializer=self.load_params)
+            b = tf.get_variable("b", [n_dim * 4], initializer=self.load_params)
+            if wn:
+                gx = tf.get_variable("gx", [n_dim * 4], initializer=self.load_params)
+                gh = tf.get_variable("gh", [n_dim * 4], initializer=self.load_params)
+                gmx = tf.get_variable("gmx", [n_dim], initializer=self.load_params)
+                gmh = tf.get_variable("gmh", [n_dim], initializer=self.load_params)
+
+        if wn:
+            wx = tf.nn.l2_normalize(wx, dim=0) * gx
+            wh = tf.nn.l2_normalize(wh, dim=0) * gh
+            wmx = tf.nn.l2_normalize(wmx, dim=0) * gmx
+            wmh = tf.nn.l2_normalize(wmh, dim=0) * gmh
+
+        cs = []
+        for idx, x in enumerate(inputs):
+            m = tf.matmul(x, wmx) * tf.matmul(h, wmh)
+            z = tf.matmul(x, wx) + tf.matmul(m, wh) + b
+            i, f, o, u = tf.split(z, 4, 1)
+            i = tf.nn.sigmoid(i)
+            f = tf.nn.sigmoid(f)
+            o = tf.nn.sigmoid(o)
+            u = tf.tanh(u)
+            if M is not None:
+                ct = f * c + i * u
+                ht = o * tf.tanh(ct)
+                m = M[:, idx, :]
+                c = ct * m + c * (1 - m)
+                h = ht * m + h * (1 - m)
+            else:
+                c = f * c + i * u
+                h = o * tf.tanh(c)
+            inputs[idx] = h
+            cs.append(c)
+        cs = tf.stack(cs)
+        return inputs, cs, c, h
+
+    def fc(self, x, n_out, act, wn=False, bias=True, scope='fc'):
+        with tf.variable_scope(scope):
+            nin = x.get_shape()[-1].value
+            w = tf.get_variable("w", [nin, n_out], initializer=self.load_params)
+            if wn:
+                g = tf.get_variable("g", [n_out], initializer=self.load_params)
+            if wn:
+                w = tf.nn.l2_normalize(w, dim=0) * g
+            z = tf.matmul(x, w)
+            if bias:
+                b = tf.get_variable("b", [n_out], initializer=self.load_params)
+                z = z + b
+            h = act(z)
+            return h
+
+    def load_params(self, shape, dtype, *args, **kwargs):
+        self.n_loaded += 1
+        return self.weights[self.n_loaded - 1]
+
+    @staticmethod
+    def preprocess(text, max_seq_length, front_pad='\n ', end_pad=' '):
+        text = text[0].decode('UTF-8')
+        text = html.unescape(text)
+        text = text.replace('\n', ' ').strip()
+        # Truncate to max_seq_len - 3 to account for front/end padding
+        text = text[:max_seq_length - 3] if len(text) > max_seq_length - 3 else text
+        text = front_pad + text + end_pad
+        text = text.encode()
+        return text
+
+    @staticmethod
+    def iter_data(*data, **kwargs):
+        size = kwargs.get('size', 128)
+        try:
+            n = len(data[0])
+        except:
+            n = data[0].shape[0]
+        batches = n // size
+        if n % size != 0:
+            batches += 1
+
+        for b in range(batches):
+            start = b * size
+            end = (b + 1) * size
+            if end > n:
+                end = n
+            if len(data) == 1:
+                yield data[0][start:end]
+            else:
+                yield tuple([d[start:end] for d in data])
+
+    @staticmethod
+    def ceil_round_step(n, step):
+        return int(np.ceil(n / step) * step)
+
+    @staticmethod
+    def batch_pad(xs, n_batch, n_steps):
+        xmb = np.zeros((n_batch, n_steps), dtype=np.int32)
+        mmb = np.ones((n_batch, n_steps, 1), dtype=np.float32)
+        for i, x in enumerate(xs):
+            l = len(x)
+            n_pad = n_steps - l
+            xmb[i, -l:] = list(x)
+            mmb[i, :n_pad] = 0
+        return xmb, mmb
 
 
 class MLSTMCharLMLayer(tf.keras.layers.Layer):
