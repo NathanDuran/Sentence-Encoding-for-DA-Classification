@@ -245,7 +245,7 @@ class Numberbatch(EmbeddingProcessor):
 class Dependency(EmbeddingProcessor):
     """Generates Dependency-based embeddings matrix.
     Levy, O., & Goldberg, Y. (2014). Dependency-Based Word Embeddings.
-    Proceedings Ofthe 52nd Annual Meeting Ofthe Association for Computational Linguistics, 302–308.
+    Proceedings Of the 52nd Annual Meeting Ofthe Association for Computational Linguistics, 302–308.
 
     Embedding source available from: https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/
 
