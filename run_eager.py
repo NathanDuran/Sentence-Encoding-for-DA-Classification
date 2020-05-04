@@ -26,9 +26,10 @@ embedding_source_files = {'random': 'random',
                           'fasttext': 'crawl-300d-2M',
                           'numberbatch': 'numberbatch-en',
                           'deps': 'deps'}
-experiment_type = 'glove_embeddings'  # TODO !Change experiment_type name?!
-embedding_type = 'glove'
-for embedding_dim in [100, 150, 200, 250, 300]:
+experiment_type = 'fasttext_embeddings'  # TODO !Change experiment_type name?!
+embedding_type = 'fasttext'
+# for embedding_dim in [100, 150, 200]:
+for embedding_dim in [250, 300]:
     for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'gru']:
         for i in range(1, 11):
             exp_name = curr_model_name + '_' + embedding_type + '_' + str(embedding_dim) + '_' + str(i)
