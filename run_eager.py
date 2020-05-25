@@ -25,11 +25,11 @@ embedding_source_files = {'random': 'random',
                           'word2vec': 'GoogleNews-vectors-negative300',
                           'fasttext': 'crawl-300d-2M',
                           'numberbatch': 'numberbatch-en',
-                          'dependency': 'deps'}
-experiment_type = 'dependency_embeddings'  # TODO !Change experiment_type name?!
-embedding_type = 'dependency'
-for embedding_dim in [100, 150, 200]:
-# for embedding_dim in [250, 300]:
+                          'deps': 'deps'}
+experiment_type = 'deps_embeddings'  # TODO !Change experiment_type name?!
+embedding_type = 'deps'
+#for embedding_dim in [100, 150, 200]:
+for embedding_dim in [250, 300]:
     for curr_model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'gru']:
         for i in range(1, 11):
             exp_name = curr_model_name + '_' + embedding_type + '_' + str(embedding_dim) + '_' + str(i)
