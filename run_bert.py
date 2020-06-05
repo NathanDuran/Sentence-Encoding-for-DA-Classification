@@ -22,7 +22,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Run Tensorflow session
 sess = tf.Session()
 
-experiment_type = 'max_seq_length'  # TODO !Change experiment_type name?!
+experiment_type = 'bert'  # TODO !Change experiment_type name?!
 
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'bert_3lyr',
@@ -40,7 +40,7 @@ experiment_params = {'task_name': 'swda',
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': False,
-                     'use_punct': True,
+                     'use_punct': False,
                      'embedding_dim': 768,
                      'embedding_type': 'bert',
                      'embedding_source': 'bert'}

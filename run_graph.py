@@ -17,11 +17,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-# Run Tensorflow session
-sess = tf.Session()
 
-experiment_type = 'elmo'  # TODO !Change experiment_type name?!
+experiment_type = 'language_models'  # TODO !Change experiment_type name?!
 for i in range(1, 11):
+
+    # Run Tensorflow session
+    sess = tf.Session()
+
     experiment_params = {'task_name': 'swda',
                          'experiment_name': 'elmo' + '_' + str(i),
                          'model_name': 'elmo',
@@ -35,10 +37,10 @@ for i in range(1, 11):
                          'evaluate_steps': 500,
                          'early_stopping': False,
                          'patience': 3,
-                         'vocab_size': 5000,
-                         'max_seq_length': 25,
+                         'vocab_size': 10000,
+                         'max_seq_length': 128,
                          'to_tokens': False,
-                         'use_punct': False,
+                         'use_punct': True,
                          'embedding_dim': 1024,
                          'embedding_type': 'elmo',
                          'embedding_source': 'elmo'}
@@ -329,6 +331,10 @@ for i in range(1, 11):
 
             end_time = time.time()
             print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
+
+    # Close the current session
+    sess.close()
+    tf.keras.backend.clear_session()
 
     # TODO remove when all experiments complete
     if training and testing:
