@@ -25,8 +25,8 @@ for i in range(1, 11):
     sess = tf.Session()
 
     experiment_params = {'task_name': 'swda',
-                         'experiment_name': 'elmo' + '_' + str(i),
-                         'model_name': 'elmo',
+                         'experiment_name': 'use' + '_' + str(i),
+                         'model_name': 'use',
                          'training': True,
                          'testing': True,
                          'save_model': True,
@@ -41,9 +41,9 @@ for i in range(1, 11):
                          'max_seq_length': 128,
                          'to_tokens': False,
                          'use_punct': True,
-                         'embedding_dim': 1024,
-                         'embedding_type': 'elmo',
-                         'embedding_source': 'elmo'}
+                         'embedding_dim': 512,
+                         'embedding_type': 'use',
+                         'embedding_source': 'use'}
 
     # Load model params if file exists otherwise defaults will be used
     model_param_file = 'model_params.json'
