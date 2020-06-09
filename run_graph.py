@@ -17,7 +17,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-
 experiment_type = 'language_models'  # TODO !Change experiment_type name?!
 for i in range(1, 11):
 
@@ -25,8 +24,8 @@ for i in range(1, 11):
     sess = tf.Session()
 
     experiment_params = {'task_name': 'swda',
-                         'experiment_name': 'use' + '_' + str(i),
-                         'model_name': 'use',
+                         'experiment_name': 'mlstm_char_lm' + '_' + str(i),
+                         'model_name': 'mlstm_char_lm',
                          'training': True,
                          'testing': True,
                          'save_model': True,
@@ -41,9 +40,9 @@ for i in range(1, 11):
                          'max_seq_length': 128,
                          'to_tokens': False,
                          'use_punct': True,
-                         'embedding_dim': 512,
-                         'embedding_type': 'use',
-                         'embedding_source': 'use'}
+                         'embedding_dim': 4096,
+                         'embedding_type': 'mlstm_char_lm',
+                         'embedding_source': 'mlstm_char_lm'}
 
     # Load model params if file exists otherwise defaults will be used
     model_param_file = 'model_params.json'
