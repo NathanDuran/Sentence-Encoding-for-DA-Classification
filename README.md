@@ -25,6 +25,8 @@ Language models need to be strings to_tokens=false
 - use:
 - mlstm_char_lm:
 
+- Document datasets in readme
+
 #### graph models
 - elmo
 - bert
