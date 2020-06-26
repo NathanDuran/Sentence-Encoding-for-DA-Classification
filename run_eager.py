@@ -22,12 +22,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.enable_eager_execution()
 
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
-for model in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'gru']:
+for model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'gru']:
     for embedd_dim in [100, 150, 200, 250, 300]:
         for i in range(1, 11):
             experiment_params = {'task_name': 'swda',
-                                 'experiment_name': model + '_glove' + '_' + str(embedd_dim) + '_' + str(i),
-                                 'model_name': model,
+                                 'experiment_name': model_name + '_glove' + '_' + str(embedd_dim) + '_' + str(i),
+                                 'model_name': model_name,
                                  'training': True,
                                  'testing': True,
                                  'save_model': True,
@@ -143,7 +143,6 @@ for model in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'gru']:
 
             # Build datasets from .npz files
             train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
-            # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
             val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
             test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=False)
             global_steps = int(len(list(train_text)) * num_epochs)

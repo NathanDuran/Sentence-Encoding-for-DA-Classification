@@ -6,6 +6,7 @@ from comet_ml import Experiment
 from metrics import *
 import models
 import data_processor
+import embedding_processor
 import check_pointer
 import early_stopper
 import numpy as np
@@ -17,32 +18,33 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-experiment_type = 'language_models'  # TODO !Change experiment_type name?!
-for i in range(1, 11):
+# Enable Tensorflow eager execution
+tf.enable_eager_execution()
 
-    # Run Tensorflow session
-    sess = tf.Session()
+experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 
-    experiment_params = {'task_name': 'swda',
-                         'experiment_name': 'mlstm_char_lm' + '_' + str(i),
-                         'model_name': 'mlstm_char_lm',
+for i in range(1, 6):
+    experiment_params = {'task_name': 'kvret',
+                         'experiment_name': 'lstm_' + str(i),
+                         'model_name': 'lstm',
                          'training': True,
                          'testing': True,
                          'save_model': True,
                          'load_model': True,
                          'init_ckpt_file': None,
                          'batch_size': 32,
-                         'num_epochs': 15,
-                         'evaluate_steps': 500,
-                         'early_stopping': False,
+                         'num_epochs': 30,
+                         'evaluate_steps': 50,
+                         'early_stopping': True,
                          'patience': 3,
                          'vocab_size': 10000,
-                         'max_seq_length': 128,
-                         'to_tokens': False,
+                         'max_seq_length': 90,
+                         'to_tokens': True,
                          'use_punct': True,
-                         'embedding_dim': 4096,
-                         'embedding_type': 'mlstm_char_lm',
-                         'embedding_source': 'mlstm_char_lm'}
+                         'train_embeddings': True,
+                         'embedding_dim': 50,
+                         'embedding_type': 'glove',
+                         'embedding_source': 'glove.6B.50d'}
 
     # Load model params if file exists otherwise defaults will be used
     model_param_file = 'model_params.json'
@@ -63,8 +65,8 @@ for i in range(1, 11):
     init_ckpt_file = experiment_params['init_ckpt_file']
 
     # Set up comet experiment
-    experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    # experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+    # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
+    experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)
@@ -119,12 +121,14 @@ for i in range(1, 11):
     max_seq_length = experiment_params['max_seq_length']
     to_tokens = experiment_params['to_tokens']
     use_punct = experiment_params['use_punct']
+    train_embeddings = experiment_params['train_embeddings']
     embedding_dim = experiment_params['embedding_dim']
     embedding_type = experiment_params['embedding_type']
     embedding_source = experiment_params['embedding_source']
 
     # Initialize the dataset processor
-    data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size, to_tokens=to_tokens, use_punct=use_punct)
+    data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length,
+                                            vocab_size=vocab_size, to_tokens=to_tokens,  use_punct=use_punct, label_index=3)
 
     # If dataset folder is empty get the metadata and datasets to .npz files
     if not os.listdir(dataset_dir):
@@ -133,10 +137,14 @@ for i in range(1, 11):
     # Load the metadata
     vocabulary, labels = data_set.load_metadata()
 
+    # Generate the embedding matrix
+    embedding = embedding_processor.get_embedding_processor(embedding_type)
+    embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
+
     # Build datasets from .npz files
-    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
-    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)
-    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False)
+    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
+    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
+    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=False)
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))
     val_steps = int(len(list(val_text)))
@@ -156,13 +164,13 @@ for i in range(1, 11):
     print("Val steps: " + str(val_steps))
     print("Test steps: " + str(test_steps))
 
-    # Build the model
+    # Build or load the model
     print("------------------------------------")
     print("Creating model...")
 
     # Build model with supplied parameters
     model_class = models.get_model(experiment_params['model_name'])
-    model = model_class.build_model((1,), len(labels), [], **model_params)
+    model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, train_embeddings, **model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
@@ -173,12 +181,6 @@ for i in range(1, 11):
     tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=False, show_shapes=True)
     experiment.log_image(model_image_file)
     experiment.set_model_graph(model.to_json())
-
-    # Initialise variables
-    sess.run(tf.local_variables_initializer())
-    sess.run(tf.global_variables_initializer())
-    sess.run(tf.tables_initializer())
-    tf.keras.backend.set_session(sess)
 
     # Load initialisation weights if set
     if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):
@@ -197,10 +199,10 @@ for i in range(1, 11):
         print("Training started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(num_epochs) + " epochs")
 
         # Initialise train and validation metrics
-        train_loss = []
-        train_accuracy = []
-        val_loss = []
-        val_accuracy = []
+        train_loss = tf.keras.metrics.Mean()
+        train_accuracy = tf.keras.metrics.Mean()
+        val_loss = tf.keras.metrics.Mean()
+        val_accuracy = tf.keras.metrics.Mean()
         history = {'step': [], 'train_loss': [], 'train_accuracy': [], 'val_loss': [], 'val_accuracy': []}
         global_step = 0
         for epoch in range(1, num_epochs + 1):
@@ -212,11 +214,11 @@ for i in range(1, 11):
 
                     # Perform training step on batch and record metrics
                     loss, accuracy = model.train_on_batch(train_text[train_step], train_labels[train_step])
-                    train_loss.append(loss)
-                    train_accuracy.append(accuracy)
+                    train_loss(loss)
+                    train_accuracy(accuracy)
 
-                    experiment.log_metric('loss', np.mean(train_loss), step=global_step)
-                    experiment.log_metric('accuracy', np.mean(train_accuracy), step=global_step)
+                    experiment.log_metric('loss', train_loss.result().numpy(), step=global_step)
+                    experiment.log_metric('accuracy', train_accuracy.result().numpy(), step=global_step)
 
                     # Every evaluate_steps evaluate model on validation set
                     if (train_step + 1) % evaluate_steps == 0 or (train_step + 1) == train_steps:
@@ -225,28 +227,28 @@ for i in range(1, 11):
 
                                 # Perform evaluation step on batch and record metrics
                                 loss, accuracy = model.test_on_batch(val_text[val_step], val_labels[val_step])
-                                val_loss.append(loss)
-                                val_accuracy.append(accuracy)
+                                val_loss(loss)
+                                val_accuracy(accuracy)
 
-                                experiment.log_metric('loss', np.mean(val_loss), step=global_step)
-                                experiment.log_metric('accuracy', np.mean(val_accuracy), step=global_step)
+                                experiment.log_metric('loss', val_loss.result().numpy(), step=global_step)
+                                experiment.log_metric('accuracy', val_accuracy.result().numpy(), step=global_step)
 
                         # Print current loss/accuracy and add to history
                         result_str = "Step: {}/{} - Train loss: {:.3f} - acc: {:.3f} - Val loss: {:.3f} - acc: {:.3f}"
                         print(result_str.format(global_step, global_steps,
-                                                np.mean(train_loss), np.mean(train_accuracy) * 100,
-                                                np.mean(val_loss), np.mean(val_accuracy) * 100))
+                                                train_loss.result(), train_accuracy.result() * 100,
+                                                val_loss.result(), val_accuracy.result() * 100))
                         history['step'].append(global_step)
-                        history['train_loss'].append(np.mean(train_loss))
-                        history['train_accuracy'].append(np.mean(train_accuracy))
-                        history['val_loss'].append(np.mean(val_loss))
-                        history['val_accuracy'].append(np.mean(val_accuracy))
+                        history['train_loss'].append(train_loss.result().numpy())
+                        history['train_accuracy'].append(train_accuracy.result().numpy())
+                        history['val_loss'].append(val_loss.result().numpy())
+                        history['val_accuracy'].append(val_accuracy.result().numpy())
 
                         # Save checkpoint if checkpointer metric improves
-                        checkpointer.save_best(float(np.mean(val_loss)), global_step)
+                        checkpointer.save_best(val_loss.result(), global_step)
 
             # Check to stop training early
-            if early_stopping and earlystopper.check_early_stop(float(np.mean(val_loss))):
+            if early_stopping and earlystopper.check_early_stop(val_loss.result().numpy()):
                 break
 
         # Save training history
@@ -277,8 +279,8 @@ for i in range(1, 11):
         print("Testing started: " + datetime.datetime.now().strftime("%b %d %T") + " for " + str(test_steps) + " steps")
 
         # Initialise test metrics
-        test_loss = []
-        test_accuracy = []
+        test_loss = tf.keras.metrics.Mean()
+        test_accuracy = tf.keras.metrics.Mean()
         # Keep a copy of all true and predicted labels for creating evaluation metrics
         true_labels = np.empty(shape=0)
         predicted_labels = np.empty(shape=0)
@@ -289,11 +291,11 @@ for i in range(1, 11):
                 # Perform test step on batch and record metrics
                 loss, accuracy = model.test_on_batch(test_text[test_step], test_labels[test_step])
                 batch_predictions = model.predict_on_batch(test_text[test_step])
-                test_loss.append(loss)
-                test_accuracy.append(accuracy)
+                test_loss(loss)
+                test_accuracy(accuracy)
 
-                experiment.log_metric('step_loss', np.mean(test_loss), step=test_step)
-                experiment.log_metric('step_accuracy', np.mean(test_accuracy), step=test_step)
+                experiment.log_metric('step_loss', test_loss.result().numpy(), step=test_step)
+                experiment.log_metric('step_accuracy', test_accuracy.result().numpy(), step=test_step)
 
                 # Append to lists for creating metrics
                 true_labels = np.append(true_labels, test_labels[test_step].flatten())
@@ -301,11 +303,11 @@ for i in range(1, 11):
                 predictions.append(batch_predictions)
 
             # Log final test result
-            experiment.log_metric('loss', np.mean(test_loss), step=test_steps)
-            experiment.log_metric('accuracy', np.mean(test_accuracy), step=test_steps)
+            experiment.log_metric('loss', test_loss.result().numpy(), step=test_steps)
+            experiment.log_metric('accuracy', test_accuracy.result().numpy(), step=test_steps)
 
             result_str = "Steps: {} - Test loss: {:.3f} - acc: {:.3f}"
-            print(result_str.format(test_steps, np.mean(test_loss), np.mean(test_accuracy) * 100))
+            print(result_str.format(test_steps, test_loss.result(), test_accuracy.result() * 100))
 
             # Write predictions to file
             predictions = np.vstack(predictions)
@@ -316,7 +318,7 @@ for i in range(1, 11):
             # Generate metrics and confusion matrix
             test_results_file = os.path.join(output_dir, experiment_name + "_results.txt")
             metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)
-            save_results(test_results_file, np.mean(test_loss), np.mean(test_accuracy), metrics)
+            save_results(test_results_file, test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)
             experiment.log_asset(test_results_file)
             experiment.log_metrics(metrics)
             print(metric_str)
@@ -330,14 +332,10 @@ for i in range(1, 11):
             end_time = time.time()
             print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
 
-    # Close the current session
-    sess.close()
-    tf.keras.backend.clear_session()
-
-    # TODO remove when all experiments complete
-    if training and testing:
-        experiment_file = os.path.join(task_name, task_name + "_" + experiment_type + ".csv")
-        save_experiment(experiment_file, experiment_params,
-                        np.mean(train_loss), np.mean(train_accuracy),
-                        np.mean(val_loss), np.mean(val_accuracy),
-                        np.mean(test_loss), np.mean(test_accuracy), metrics)
+    # # TODO remove when all experiments complete
+    # if training and testing:
+    #     experiment_file = os.path.join(task_name, task_name + "_" + experiment_type + ".csv")
+    #     save_experiment(experiment_file, experiment_params,
+    #                     train_loss.result().numpy(), train_accuracy.result().numpy(),
+    #                     val_loss.result().numpy(), val_accuracy.result().numpy(),
+    #                     test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)

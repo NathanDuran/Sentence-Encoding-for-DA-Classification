@@ -36,7 +36,8 @@ class InputExample(object):
 class DataProcessor:
     """Converts sentences for dialogue act classification into data sets."""
 
-    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, to_indices=True, pad_seq=True, to_lower=True, use_punct=False, label_index=2):
+    def __init__(self, set_name, output_dir, max_seq_length, vocab_size=None, to_tokens=True, to_indices=True,
+                 pad_seq=True, to_lower=True, use_punct=False, label_index=2):
         """Constructs a DataProcessor for the specified dataset.
 
         Note: For MRDA data there is the option to choose which type of labelling is used.
@@ -76,7 +77,7 @@ class DataProcessor:
         self.metadata_file = os.path.join(self.output_dir, 'metadata.pkl')
 
         # Check the set name is valid
-        self.valid_set_names = ['swda', 'mrda', 'maptask', 'oasis']
+        self.valid_set_names = ['swda', 'mrda', 'maptask', 'oasis', 'kvret']
         if not any(substring in self.set_name.lower() for substring in self.valid_set_names):
             raise Exception("Specified dataset name: " + self.set_name + " is not valid! "
                             "Must contain a name from the following list: " + str(self.valid_set_names))
@@ -91,6 +92,8 @@ class DataProcessor:
             self.base_url = 'https://raw.github.com/NathanDuran/Maptask-Corpus/master/maptask_data/'
         elif 'oasis' in self.set_name.lower():
             self.base_url = 'https://raw.github.com/NathanDuran/BT-Oasis-Corpus/master/oasis_data/'
+        elif 'kvret' in self.set_name.lower():
+            self.base_url = 'https://raw.github.com/NathanDuran/CAMS-KVRET/master/cams-kvret_data/'
 
     def get_train_examples(self):
         """Gets the Training set from Github repository.
@@ -151,26 +154,6 @@ class DataProcessor:
             with open(temp_file) as file:
                 lines = [line.rstrip('\r\n') for line in file.readlines()]
         return self._get_examples(lines, "test")
-
-    def get_dev_examples(self):
-        """Gets the Development set from Github repository. Smaller version of the training set.
-
-        Returns:
-             examples (list): A list of InputExamples for the training set
-        """
-
-        # Create a temporary directory
-        with tempfile.TemporaryDirectory(dir=self.output_dir) as tmp_dir:
-            temp_file = os.path.join(tmp_dir, 'temp')
-
-            # Get the file from Github repo
-            url = self.base_url + 'dev_set.txt'
-            urllib.request.urlretrieve(url, filename=temp_file)
-
-            # Read lines and get examples
-            with open(temp_file) as file:
-                lines = [line.rstrip('\r\n') for line in file.readlines()]
-        return self._get_examples(lines, "dev")
 
     def _get_examples(self, lines, set_type):
         """Gets examples for the training, val and test sets from plain text files.
@@ -311,12 +294,10 @@ class DataProcessor:
         train_examples = self.get_train_examples()
         test_examples = self.get_test_examples()
         val_examples = self.get_val_examples()
-        dev_examples = self.get_dev_examples()
 
         self.convert_examples_to_numpy('train', train_examples, vocabulary, labels)
         self.convert_examples_to_numpy('test', test_examples, vocabulary, labels)
         self.convert_examples_to_numpy('val', val_examples, vocabulary, labels)
-        self.convert_examples_to_numpy('dev', dev_examples, vocabulary, labels)
 
     def convert_examples_to_numpy(self, set_type, examples, vocabulary, labels):
         """Converts InputExamples to features and saves as .npz file.
@@ -699,8 +680,8 @@ def from_one_hot(one_hot, labels):
     """Converts one-hot encoded label list into its string representation."""
     return labels[int(np.argmax(one_hot))]
 
+
 def join_punctuation(tokens, characters='.,;?!'):
-    #characters = set(characters)
     tokens = iter(tokens)
     current = next(tokens)
 
