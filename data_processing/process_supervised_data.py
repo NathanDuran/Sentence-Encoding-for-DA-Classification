@@ -6,8 +6,8 @@ pd.options.display.width = 0
 
 # Set the task and experiment type
 task_name = 'swda'
-experiment_type = 'deps_embeddings'
-experiment_name = 'Dependency Embeddings'
+experiment_type = 'vocab_size'
+experiment_name = 'Vocabulary Size'
 
 # Set data dir
 data_dir = os.path.join('..', task_name)
@@ -44,9 +44,9 @@ if exp_param == 'use_punct':
                             num_legend_col=4, y_label='Accuracy', x_label=experiment_name,
                             share_y=True, num_col=1, colour='Paired')
 else:
-    g, fig = plot_lmplot_chart(acc_data, x=exp_param, y="value", hue="model_name", col='variable',
-                               order=5, num_legend_col=4, y_label='Accuracy', x_label=experiment_name,
-                               share_x=True, num_col=1, colour='Paired')
+    g, fig = plot_relplot(acc_data, x=exp_param, y='value', hue='model_name', col='variable', kind='line', ci=95,
+                          title='', y_label='Accuracy', x_label='Vocabulary Size',  share_x=True, share_y=False, num_col=1,
+                          legend_loc='lower right', num_legend_col=4, colour='Paired')
 fig.show()
 g.savefig(os.path.join(output_dir, experiment_type + '_accuracy.png'))
 

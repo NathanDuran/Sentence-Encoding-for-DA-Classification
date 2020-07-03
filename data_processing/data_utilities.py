@@ -103,17 +103,17 @@ def get_means(data, experiment_type):
     return mean_data
 
 
-def get_max(data, experiment_type):
+def get_max(data, exp_param):
     """Creates dataframe of the max validation/test/F1 and corresponding experiment value for an experiment_type."""
     # Get the index with the max validation accuracy by experiment_type value
     max_val = data.loc[data.groupby(['model_name'], sort=False)['val_acc'].idxmax()].reset_index()
-    max_val.drop(max_val.columns.difference(['model_name', experiment_type, 'val_acc']), 1, inplace=True)
-    max_val.rename(columns={experiment_type: 'val_' + experiment_type}, inplace=True)
+    max_val.drop(max_val.columns.difference(['model_name', exp_param, 'val_acc']), 1, inplace=True)
+    max_val.rename(columns={exp_param: 'val_' + exp_param}, inplace=True)
 
     # Get the index with the max test/F1 accuracy by experiment_type value
     max_test = data.loc[data.groupby(['model_name'], sort=False)['test_acc'].idxmax()].reset_index()
-    max_test.drop(max_test.columns.difference(['model_name', experiment_type, 'test_acc', 'f1_micro', 'f1_weighted']), 1, inplace=True)
-    max_test.rename(columns={experiment_type: 'test_' + experiment_type}, inplace=True)
+    max_test.drop(max_test.columns.difference(['model_name', exp_param, 'test_acc', 'f1_micro']), 1, inplace=True)
+    max_test.rename(columns={exp_param: 'test_' + exp_param}, inplace=True)
 
     # Group the validation and test data
     max_data = pd.concat([max_val, max_test], axis=1, ignore_index=False, sort=False)

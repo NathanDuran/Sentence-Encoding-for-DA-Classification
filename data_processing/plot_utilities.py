@@ -37,7 +37,7 @@ colour_palettes = {'xkcd_red': xkcd_red, 'xkcd_green': xkcd_green, 'xkcd_blue': 
                    'triple_red': triple_red, 'triple_green': triple_green, 'triple_blue': triple_blue,
                    'triple_orange': triple_orange, 'triple_purple': triple_purple,
                    'triples_rgb': triples_rgb, 'triples': triples, 'five_colour': five_colour, 'rgb': rgb,
-                   'default': 'tab10'}
+                   'default': sns.color_palette('tab10')}
 
 
 def create_colour_map(boundaries=None, pallet='RdBu_r'):
@@ -108,6 +108,32 @@ def plot_scatter_chart(data, x='index', y='value', hue='group', size='metric',
     return g, g.get_figure()
 
 
+def plot_swarm_chart(data, x='index', y='value', hue='group', size=5,
+                     title='', y_label='', x_label='', colour='Paired'):
+
+    # If using xkcd colours set the pallet, else use seaborn
+    if colour in colour_palettes.keys():
+        # Create colour palette for each item in group
+        palette = dict(zip(data[hue].unique(), colour_palettes[colour]))
+    else:
+        palette = sns.color_palette(colour, len(data[hue].unique()))
+
+    # Create the violin plot
+    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
+    g = sns.swarmplot(data=data, x=x, y=y, hue=hue, size=size, dodge=True, palette=palette)
+    sns.despine(ax=g, left=True)
+
+    # Set axis labels
+    g.set_xlabel(x_label)
+    g.set_ylabel(y_label)
+
+    # Set main title
+    g.set_title(title, fontsize=14, fontweight='bold')
+
+    plt.tight_layout()
+    return g, g.get_figure()
+
+
 def plot_strip_chart(data, x='index', y='value', hue='group', title='', y_label='', x_label='', colour='Paired'):
     # If using xkcd colours set the pallet, else use seaborn
     if colour in colour_palettes.keys():
@@ -133,7 +159,7 @@ def plot_strip_chart(data, x='index', y='value', hue='group', title='', y_label=
 
 
 def plot_violin_chart(data, x='index', y='value', hue=None, title='', y_label='', x_label='',
-                      colour='Paired', legend=False, legend_loc='best', x_tick_rotation=0):
+                      colour='Paired', inner='box', legend=False, legend_loc='best', x_tick_rotation=0):
     # If using xkcd colours set the pallet, else use seaborn
     if colour in colour_palettes.keys():
         # Create colour palette for each item in group
@@ -146,7 +172,7 @@ def plot_violin_chart(data, x='index', y='value', hue=None, title='', y_label=''
 
     # Create the violin plot
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
-    g = sns.violinplot(data=data, x=x, y=y, hue=hue, scale='width', inner='point', cut=0, palette=palette)
+    g = sns.violinplot(data=data, x=x, y=y, hue=hue, scale='width', inner=inner, cut=0, palette=palette)
     sns.despine(ax=g, left=True)
 
     # Add legend
@@ -166,7 +192,7 @@ def plot_violin_chart(data, x='index', y='value', hue=None, title='', y_label=''
 
 
 def plot_bar_chart(data, x='index', y='value', hue='variable', title='', y_label='', x_label='',
-                   colour='Paired', legend_loc='best', num_legend_col=3, x_tick_rotation=0, show_bar_val=True):
+                   colour='Paired', dodge=False, legend_loc='best', num_legend_col=3, x_tick_rotation=0, show_bar_val=True):
     # If using xkcd colours set the pallet, else use seaborn
     if colour in colour_palettes.keys():
         # Create colour palette for each item in group
@@ -176,7 +202,7 @@ def plot_bar_chart(data, x='index', y='value', hue='variable', title='', y_label
 
     # Create the barchart
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
-    g = sns.barplot(data=data, x=x, y=y, hue=hue, palette=palette)
+    g = sns.barplot(data=data, x=x, y=y, hue=hue, palette=palette, dodge=dodge)
     sns.despine(ax=g, left=True)
 
     # Add legend
@@ -232,6 +258,60 @@ def plot_box_chart(data, x='index', y='value', hue=None, title='', y_label='', x
 
     plt.tight_layout()
     return g, g.get_figure()
+
+
+def plot_dist_chart(data, metric='value', hue=None, row=None, col='', title='', y_label='', x_label='',
+                    plt_hist=True, axis_titles=False, share_x=False, share_y=False, num_col=2,
+                    colour='Paired', all_legend=False, num_legend_col=1, legend_loc='best'):
+
+    # If using xkcd colours set the pallet, else use seaborn
+    if colour in colour_palettes.keys():
+        if hue:
+            palette = dict(zip(data[hue].unique(), colour_palettes[colour]))
+        else:
+            palette = dict(zip(data[metric].unique(), colour_palettes[colour]))
+    else:
+        palette = sns.color_palette(colour)
+
+    # Create FacetGrid catplot for each item in 'metric'
+    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
+
+    g = sns.FacetGrid(data, row=row, col=col, hue=hue, col_wrap=num_col, palette=palette,
+                      sharex=share_x, sharey=share_y, height=6, aspect=2)
+    g = (g.map(sns.distplot, metric, hist=plt_hist))
+    g = g.despine(left=True)
+
+    # Add legend
+    if all_legend:
+        for i, ax in enumerate(g.axes.flatten()):
+            ax.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+    elif num_col:
+        g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+    else:
+        g.axes[0, g.axes.shape[0] - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+
+    # Set axis labels
+    g.set_xlabels(x_label)
+    g.set_ylabels(y_label)
+
+    # Set individual plot titles and main title
+    if axis_titles and num_col:  # Sets plot titles to be y axis labels, else titles on top
+        for i, ax in enumerate(g.axes):
+            ax.set_ylabel(g.col_names[i], fontsize=14, fontweight='bold')
+        g.set_titles('')
+    elif axis_titles:
+        for i, ax in enumerate(g.axes[:, 0]):
+            ax.set_ylabel(g.row_names[i], fontsize=14, fontweight='bold')
+        g.set_titles('')
+        for i, ax in enumerate(g.axes[0, :]):
+            ax.set_title(g.col_names[i], fontsize=14, fontweight='bold')
+    else:
+        g.set_titles("{col_name}", fontsize=14, fontweight='bold')
+
+    g.fig.suptitle(title, fontsize=18, fontweight='bold', y=0.99)
+
+    plt.tight_layout()
+    return g, g.fig
 
 
 def plot_heatmap(data, title='', y_label='', x_label='', colour='RdBu_r', custom_boundaries=None, center_val=None,
@@ -304,41 +384,38 @@ def plot_lmplot_chart(data, x='index', y='value', hue='group', col=None, title='
     return g, g.fig
 
 
-def plot_catplot_chart(data, x='index', y='value', hue='group', col='metric', kind='bar',
-                       title='', y_label='', x_label='', share_x=False, share_y=False, num_col=2,
-                       colour='Paired', legend_loc='best', num_legend_col=3, **kwargs):
-    # If using xkcd colours set the pallet, else use seaborn
+def plot_relplot(data, x='index', y='value', hue='group', row=None, col='metric', kind='line', line_width=2,
+                 ci=None, err_style='band', title='', y_label='', x_label='', share_x=False, share_y=False, num_col=2,
+                 colour='Paired', legend_loc='best', num_legend_col=3, all_legend=False):
+
+    # If using my colours set the pallet, else use seaborn
     if colour in colour_palettes.keys():
         # Create colour palette for each item in group
         palette = dict(zip(data[hue].unique(), colour_palettes[colour]))
     else:
-        palette = sns.color_palette(colour)
+        palette = colour
 
-    # Create the barcharts
-    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
-    g = sns.catplot(data=data, x=x, y=y, hue=hue,
-                    col=col, col_wrap=num_col, sharex=share_x, sharey=share_y,
-                    kind=kind, palette=palette, height=6, aspect=2, legend=False)
+    # Create FacetGrid for each item in 'metric'
+    sns.set(rc={'figure.figsize': (11.7, 8.27), "lines.linewidth": line_width}, style='whitegrid')
+    g = sns.relplot(data=data, x=x, y=y, hue=hue, row=row, col=col, col_wrap=num_col, kind=kind, ci=ci,
+                    err_style=err_style, palette=palette, height=6, aspect=2, legend=False,
+                    facet_kws={'sharex': share_x, 'sharey': share_y})
     g.despine(left=True)
 
     # Add legend to the plot, either single one or to each plot
+    legend_labels = data[hue].unique()
     if len(g.axes) > 1:
-        if 'all_legend' in kwargs and kwargs['all_legend']:
-            for i in range(len(g.axes)):
-                g.axes[i].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+        if all_legend:
+            for i, ax in enumerate(g.axes.flatten()):
+                ax.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col, labels=legend_labels)
         else:
             # Add to top right plot
-            g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+            if num_col:
+                g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col, labels=legend_labels)
+            else:
+                g.axes[0, g.axes.shape[0] - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col, labels=legend_labels)
     else:
-        plt.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
-
-    # Annotate the bars if using bar chart
-    if kind == 'bar' and 'show_bar_val' in kwargs and kwargs['show_bar_val']:
-        for ax in g.axes:
-            for p in ax.patches:
-                ax.annotate('{0:.2f}'.format(p.get_height()), (p.get_x() + p.get_width() / 2.0, p.get_height()),
-                            ha='center', va='center', fontsize=11, color='black', rotation=0, xytext=(0, 10),
-                            textcoords='offset points')
+        plt.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col, labels=legend_labels)
 
     # Set axis labels
     g.set_xlabels(x_label)
@@ -353,10 +430,10 @@ def plot_catplot_chart(data, x='index', y='value', hue='group', col='metric', ki
     return g, g.fig
 
 
-def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='bar', show_bar_value=False,
-                   title='', y_label='', x_label='', share_x=False, share_y=False, num_col=2,
+def plot_facetgrid(data, x='index', y='value', hue='group', row=None, col='metric', kind='bar',
+                   title='', y_label='', x_label='', axis_titles=False, share_x=False, share_y=False, num_col=2,
                    colour='Paired', legend_loc='best', num_legend_col=3, all_legend=False, height=6, aspect=2,
-                   x_tick_rotation=0, y_tick_rotation=0, **kwargs):
+                   show_bar_value=False, bar_value_rotation=0, x_tick_rotation=0, y_tick_rotation=0, **kwargs):
 
     # Facet grid plot functions
     def _scatter(*args, **kwargs):
@@ -369,7 +446,7 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
         current_data = kwargs.pop("data")
         sns.violinplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
 
-    def _barplot(*args, **kwargs):
+    def _bar(*args, **kwargs):
         ax = plt.gca()
         current_data = kwargs.pop("data")
         sns.barplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
@@ -383,7 +460,7 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
     # Get the desired plot function for facetgrid
     plot_types = {'scatter': _scatter,
                   'violin': _violin,
-                  'bar': _barplot,
+                  'bar': _bar,
                   'heatmap': _heatmap}
 
     plot_function = plot_types[kind]
@@ -401,9 +478,9 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
     else:
         palette = sns.color_palette(colour)
 
-    # Create FacetGrid catplot for each item in 'metric'
+    # Create FacetGrid for each item in 'metric'
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
-    g = sns.FacetGrid(data=data, col=col, col_wrap=num_col, sharex=share_x, sharey=share_y, height=height, aspect=aspect)
+    g = sns.FacetGrid(data=data, row=row, col=col, col_wrap=num_col, sharex=share_x, sharey=share_y, height=height, aspect=aspect)
     g.map_dataframe(plot_function, x, y, hue, **kwargs)
     g.despine(left=True)
 
@@ -411,22 +488,25 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
     if kind != 'heatmap':
         if len(g.axes) > 1:
             if all_legend:
-                for i in range(len(g.axes)):
-                    g.axes[i].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+                for i, ax in enumerate(g.axes.flatten()):
+                    ax.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
             else:
                 # Add to top right plot
-                g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+                if num_col:
+                    g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+                else:
+                    g.axes[0, g.axes.shape[0] - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
         else:
             plt.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
 
     # Annotate the bars if using bar chart
     if kind == 'bar' and show_bar_value:
-        for i in range(len(g.axes)):
-            for p in g.axes[i].patches:
-                g.axes[i].annotate('{0:.2f}'.format(p.get_height()), (p.get_x() + p.get_width() / 2.0, p.get_height()),
-                                   ha='center', va='center', fontsize=11, color='black', rotation=90, xytext=(0, 20),
-                                   textcoords='offset points')
-
+        for i, ax in enumerate(g.axes.flatten()):
+            for p in ax.patches:
+                y_txt_offset = 20 if bar_value_rotation == 90 else 10
+                ax.annotate('{0:.2f}'.format(p.get_height()), (p.get_x() + p.get_width() / 2.0, p.get_height()),
+                            ha='center', va='center', fontsize=11, color='black', rotation=bar_value_rotation,
+                            xytext=(0, y_txt_offset), textcoords='offset points')
     # Set axis labels
     for ax in g.axes.flatten():
         # If sharing axis labels just get the first, else get each axis labels (because matplotlib/seaborn is why...)
@@ -438,15 +518,30 @@ def plot_facetgrid(data, x='index', y='value', hue='group', col='metric', kind='
             xtick_labels = g.axes.flatten()[0].get_xticklabels()
         else:
             xtick_labels = ax.get_xticklabels()
-        ax.set_xticklabels(xtick_labels, rotation=x_tick_rotation)
+
+        horiz_alignment = 'right' if x_tick_rotation != 0 else 'center'
+        ax.set_xticklabels(xtick_labels, rotation=x_tick_rotation, ha=horiz_alignment)
         ax.set_yticklabels(ytick_labels, rotation=y_tick_rotation)
 
+    # Set axis labels
     g.set_xlabels(x_label)
     g.set_ylabels(y_label)
 
     # Set individual plot titles and main title
-    g.set_titles("{col_name}", fontsize=14, fontweight='bold')
-    g.fig.suptitle(title, fontsize=16, fontweight='bold', y=0.99)
+    if axis_titles and num_col:  # Sets plot titles to be y axis labels, else titles on top
+        for i, ax in enumerate(g.axes):
+            ax.set_ylabel(g.col_names[i], fontsize=14, fontweight='bold')
+        g.set_titles('')
+    elif axis_titles:
+        for i, ax in enumerate(g.axes[:, 0]):
+            ax.set_ylabel(g.row_names[i], fontsize=14, fontweight='bold')
+        g.set_titles('')
+        for i, ax in enumerate(g.axes[0, :]):
+            ax.set_title(g.col_names[i], fontsize=14, fontweight='bold')
+    else:
+        g.set_titles("{col_name}", fontsize=14, fontweight='bold')
+
+    g.fig.suptitle(title, fontsize=18, fontweight='bold', y=0.99)
 
     plt.tight_layout()
     return g, g.fig
@@ -488,7 +583,7 @@ def plot_table(data, title=''):
         else:
             cell.set_facecolor(row_colors[k[0] % len(row_colors)])
 
-    plt.title(title, fontdict={'fontsize': font_size * 1.5})
+    plt.title(title, fontdict={'fontsize': font_size * 2})
 
     plt.tight_layout()
     return fig
