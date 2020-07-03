@@ -22,7 +22,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.enable_eager_execution()
 
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
-for model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'gru']:
+for model_name in ['cnn', 'text_cnn', 'dcnn']:
+# for model_name in ['rcnn', 'lstm', 'gru']:
+    #for embedd_dim in [100, 150, 200, 250, 300]:
     for embedd_dim in [100, 150, 200, 250, 300]:
         for i in range(1, 11):
             experiment_params = {'task_name': 'swda',
