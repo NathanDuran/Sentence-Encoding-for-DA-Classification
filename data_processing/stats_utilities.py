@@ -168,14 +168,14 @@ def anova_test(data, exp_param, metric):
         anova_table = sm.stats.anova_lm(anova, typ=2)
         # Add effect size to table
         anova_table = _anova_table(anova_table)
+        #print(anova_table)
 
         # Add this models results to the dict
-        results_dict[model] = anova_table.loc['C(vocab_size)'].to_dict()
+        results_dict[model] = anova_table.loc['C(' + exp_param + ')'].to_dict()
 
     # Create dataframe
     anova_frame = pd.DataFrame.from_dict(results_dict, orient='columns').T
-    # Round to 6 decimal places
-    anova_frame = anova_frame.round(6)
+
     return anova_frame
 
 
