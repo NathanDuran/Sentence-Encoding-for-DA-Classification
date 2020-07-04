@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 
@@ -11,6 +12,9 @@ def load_dataframe(path, multi_index=False, num_header_rows=1):
 
 
 def save_dataframe(path, data, index_label='index'):
+    # If the path doesn't exist make it first
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
     data.to_csv(path, index_label=index_label)
 
 
@@ -80,27 +84,27 @@ def sort_dataframe_by_list_and_param(data, sort_column, sort_order, param):
     return data
 
 
-def get_means(data, experiment_type):
-    """Creates dataframe of the means of each experiment value for an experiment_type."""
-    # Create empty dataframe
-    mean_data = pd.DataFrame(columns=data.columns)
-
-    # Get the list of models and ranges of experiment values
-    model_names = data['model_name'].unique()
-    experiment_values = data[experiment_type].unique()
-    for model in model_names:
-        for exp_value in experiment_values:
-            # Select only the data we want
-            model_data = data.loc[(data['model_name'] == model) & (data[experiment_type] == exp_value)]
-            # Get the first lines metadata as series
-            meta = model_data.loc[:, 'model_name': 'embedding_source'].iloc[0]
-            # Get the mean of the metrics
-            mean = model_data.loc[:, 'train_loss':].mean()
-            # Create a dataframe and append to overall results
-            model_data = pd.concat([meta, mean], axis=0)
-            mean_data = mean_data.append(model_data, ignore_index=True)
-
-    return mean_data
+# def get_means(data, experiment_type):
+#     """Creates dataframe of the means of each experiment value for an experiment_type."""
+#     # Create empty dataframe
+#     mean_data = pd.DataFrame(columns=data.columns)
+#
+#     # Get the list of models and ranges of experiment values
+#     model_names = data['model_name'].unique()
+#     experiment_values = data[experiment_type].unique()
+#     for model in model_names:
+#         for exp_value in experiment_values:
+#             # Select only the data we want
+#             model_data = data.loc[(data['model_name'] == model) & (data[experiment_type] == exp_value)]
+#             # Get the first lines metadata as series
+#             meta = model_data.loc[:, 'model_name': 'embedding_source'].iloc[0]
+#             # Get the mean of the metrics
+#             mean = model_data.loc[:, 'train_loss':].mean()
+#             # Create a dataframe and append to overall results
+#             model_data = pd.concat([meta, mean], axis=0)
+#             mean_data = mean_data.append(model_data, ignore_index=True)
+#
+#     return mean_data
 
 
 def get_max(data, exp_param):
