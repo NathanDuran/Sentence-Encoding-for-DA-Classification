@@ -1,91 +1,127 @@
 import pandas as pd
-from scipy.stats import ttest_ind, f_oneway
+from scipy.stats import shapiro, bartlett, levene, ttest_ind
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import MultiComparison
 
 
-def pairwise_t_test(data, experiment_type, metric):
-    """Pairwise t-test for each consecutive experiment value.
+def shapiro_wilk_test(data, exp_param, metric):
+    """Scipy Shapiro-Wilk test for normality.
+    The Shapiro-Wilk test tests the null hypothesis that the data was drawn from a normal distribution.
 
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
-        experiment_type (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
 
     Returns:
-        t_test_frame (Dataframe): Columns are experiment_type value pairs, rows are model_name and data is the p-value.
+        shapiro_frame (Dataframe): Columns are model_name, exp_param, t-statistic and p-value.
 
-                  500 & 1000  1000 & 1500  1500 & 2000  2000 & 2500  2500 & 3000  3000 & 3500
-        cnn         0.000483     0.040621     0.546059     0.274387     0.418656     0.647783
-        text cnn    0.000330     0.545221     0.625784     0.203548     0.243866     0.035153
-        dcnn        0.000693     0.094072     0.951321     0.810791     0.812316     0.225113
+            model_name vocab_size    t-stat   p-value
+        0          cnn        500  0.933878  0.487099
+        1          cnn       1000  0.934968  0.498493
+        2          cnn       1500  0.904710  0.246593
     """
+    # Create results frame
+    shapiro_frame = pd.DataFrame(columns=['model_name', 'vocab_size', 't-stat', 'p-value'])
+
     # Get the list of models and ranges of experiment
     model_names = data['model_name'].unique()
-    experiment_values = data[experiment_type].unique()
-    results_dict = dict()
     for model in model_names:
-        model_dict = dict()
-        for i in range(len(experiment_values) - 1):
-            # Select the data to compare
-            data_a = data.loc[(data['model_name'] == model) & (data[experiment_type] == experiment_values[i])]
-            data_b = data.loc[(data['model_name'] == model) & (data[experiment_type] == experiment_values[i + 1])]
 
-            # T-test
-            t_and_p = ttest_ind(data_a[metric], data_b[metric])
-            # Add the p value to this pair in the dict
-            model_dict[str(experiment_values[i]) + " & " + str(experiment_values[i + 1])] = t_and_p[1]
+        # Create a list of all experiment values for this model
+        model_data = data.loc[(data['model_name'] == model)]
+        for exp_param_value in model_data[exp_param].unique():
 
-        # Add this models results to the dict
-        results_dict[model] = model_dict
+            # Select the metric column
+            metric_data = data.loc[(data['model_name'] == model) & (data[exp_param] == exp_param_value)][metric]
+
+            # Run Shapiro-wilks
+            t, p = shapiro(metric_data)
+
+            # Append to result frame
+            shapiro_frame = shapiro_frame.append({'model_name': model, 'vocab_size': exp_param_value,
+                                                  't-stat': t, 'p-value': p}, ignore_index=True)
+
+    return shapiro_frame
+
+
+def levene_test(data, exp_param, metric):
+    """Scipy Levene test for equal variance (Homoscedasticity).
+    The Levene test tests the null hypothesis that all input samples are from populations with equal variances.
+    Levene’s test is an alternative to Bartlett’s test bartlett in the case where there are significant deviations
+    from normality.
+
+    Args:
+        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+
+    Returns:
+        levene_frame (Dataframe): Columns are model_name, t-statistic and p-value.
+
+          model_name     t-stat   p-value
+        0        cnn  22.431538  0.096978
+        1   text cnn  13.273237  0.581202
+        2       dcnn  13.045170  0.598809
+    """
+    # Create results frame
+    levene_frame = pd.DataFrame(columns=['model_name', 't-stat', 'p-value'])
+
+    # Get the list of models and ranges of experiment
+    model_names = data['model_name'].unique()
+    for model in model_names:
+
+        # Create a list of all experiment values for this model
+        model_data = data.loc[(data['model_name'] == model)]
+        metric_data_list = []
+        for exp_param_value in model_data[exp_param].unique():
+
+            # Select the metric column
+            metric_data_list.append(data.loc[(data['model_name'] == model) & (data[exp_param] == exp_param_value)][metric])
+
+        # Run Levene's
+        t, p = levene(*metric_data_list)
+
+        # Append to result frame
+        levene_frame = levene_frame.append({'model_name': model, 't-stat': t, 'p-value': p}, ignore_index=True)
+
+    return levene_frame
+
+
+def t_test(data, exp_param, metric):
+    """Scipy T-test for two experiment groups.
+
+    Args:
+        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+
+    Returns:
+        t_test_frame (Dataframe): Columns are t-statistic and p-value.
+
+                 t-statistic   p-value
+        0          2.598956  0.011838
+    """
+    # Get the list of models and ranges of experiment
+    group_names = data[exp_param].unique()
+    if len(group_names) != 2:
+        raise ValueError("Too many groups in groups column! Found " + str(len(group_names)) + " but should == 2.")
+
+    # Select the data to compare
+    data_a = data.loc[(data[exp_param] == group_names[0])]
+    data_b = data.loc[(data[exp_param] == group_names[1])]
+
+    # T-test
+    t_and_p = ttest_ind(data_a[metric], data_b[metric])
 
     # Create dataframe
-    t_test_frame = pd.DataFrame.from_dict(results_dict, orient='index').reindex(results_dict.keys())
+    t_test_frame = pd.DataFrame({'t-statistic': [t_and_p[0]], 'p-value': [t_and_p[1]]})
 
     return t_test_frame
 
 
-def f_oneway_test(data, experiment_type, metric):
-    """ANOVA test with scipy.stats.
-
-    Args:
-        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
-        experiment_type (string): Indicates which columns values to group data for comparison i.e. vocab_size.
-        metric (string): Indicates which column name has the result values i.e. test_acc.
-
-    Returns:
-        f_one_way_frame (Dataframe): Columns are f-statistic and p-value value pairs and rows are model_name.
-
-                   statistic pvalue
-        cnn        5.055341  0.000000
-        text cnn   4.298028  0.000001
-        dcnn       3.555700  0.000032
-    """
-    # Get the list of models and ranges of experiment
-    model_names = data['model_name'].unique()
-    experiment_values = data[experiment_type].unique()
-    results_dict = dict()
-    for model in model_names:
-        # Create a list of all experiment values for this model and metric
-        model_values_list = [data.loc[(data['model_name'] == model) & (data[experiment_type] == val)][metric].tolist()
-                             for val in experiment_values]
-
-        # Unpack list and generate stats
-        model_result = f_oneway(*model_values_list)
-
-        # Add this models results to the dict
-        results_dict[model] = model_result
-
-    # Create dataframe
-    f_one_way_frame = pd.DataFrame.from_dict(results_dict, orient='index')
-    f_one_way_frame = f_one_way_frame.reset_index().rename(columns={'index': 'model_name'})
-    # Round to 6 decimal places
-    f_one_way_frame = f_one_way_frame.round(6)
-    return f_one_way_frame
-
-
-def anova_test(data, experiment_type, metric):
+def anova_test(data, exp_param, metric):
     """ANOVA test with statsmodels.
 
     Eta-squared and omega-squared share the same suggested ranges for effect size classification:
@@ -96,7 +132,7 @@ def anova_test(data, experiment_type, metric):
 
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
-        experiment_type (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
 
     Returns:
@@ -125,7 +161,7 @@ def anova_test(data, experiment_type, metric):
         model_values_list = data.loc[(data['model_name'] == model)]
 
         # Regression (ordinary least squares) for this metric and experiment type
-        anova = ols(metric + '~ C(' + experiment_type + ')', data=model_values_list).fit()
+        anova = ols(metric + '~ C(' + exp_param + ')', data=model_values_list).fit()
         # print(anova.summary())
 
         # Calculate the stats table
@@ -143,10 +179,10 @@ def anova_test(data, experiment_type, metric):
     return anova_frame
 
 
-def tukey_hsd(data, experiment_type, metric):
+def tukey_hsd(data, exp_param, metric):
     """ANOVA and Tukey HSD post-hoc comparison from statsmodels.
 
-    The Tukey HSD post-hoc comparison test controls for type I error and maintains the familywise error rate at 0.05.
+    The Tukey HSD post-hoc comparison test controls for type I error and maintains the family-wise error rate at 0.05.
     The group1 and group2 columns are the groups being compared,
     meandiff column is the difference in means of the two groups being calculated as group2 – group1,
     lower/upper columns are the lower/upper boundaries of the 95% confidence interval,
@@ -154,7 +190,7 @@ def tukey_hsd(data, experiment_type, metric):
 
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
-        experiment_type (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
 
     Returns:
@@ -165,15 +201,15 @@ def tukey_hsd(data, experiment_type, metric):
         1          cnn     500    1500    0.0041   0.0083  0.0006  0.0077    True
         2          cnn     500    2000    0.0051   0.0010  0.0016  0.0087    True
     """
+    tukey_frame = pd.DataFrame()
     # Get the list of models and ranges of experiment
     model_names = data['model_name'].unique()
-    tukey_frame = pd.DataFrame()
     for model in model_names:
         # Create a list of all experiment values for this model
         model_data = data.loc[(data['model_name'] == model)]
 
         # Compare the results (metric) for the range of values for this experiment_type
-        multi_comparison = MultiComparison(model_data[metric], model_data[experiment_type])
+        multi_comparison = MultiComparison(model_data[metric], model_data[exp_param])
         # Create the tukey results table
         tukey_results = multi_comparison.tukeyhsd()
 
