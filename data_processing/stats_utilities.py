@@ -103,20 +103,27 @@ def t_test(data, exp_param, metric):
                  t-statistic   p-value
         0          2.598956  0.011838
     """
-    # Get the list of models and ranges of experiment
-    group_names = data[exp_param].unique()
-    if len(group_names) != 2:
-        raise ValueError("Too many groups in groups column! Found " + str(len(group_names)) + " but should == 2.")
+    # Ensure only two groups are being tested
+    if len(data[exp_param].unique()) != 2:
+        raise ValueError("Too many groups in groups column! Found " + str(len(data[exp_param].unique())) + " but should == 2.")
 
-    # Select the data to compare
-    data_a = data.loc[(data[exp_param] == group_names[0])]
-    data_b = data.loc[(data[exp_param] == group_names[1])]
+    # Create results frame
+    t_test_frame = pd.DataFrame(columns=['model_name', 't-stat', 'p-value'])
 
-    # T-test
-    t_and_p = ttest_ind(data_a[metric], data_b[metric])
+    # Get the list of models and experiment params
+    model_names = data['model_name'].unique()
+    groups = data[exp_param].unique()
+    for model in model_names:
 
-    # Create dataframe
-    t_test_frame = pd.DataFrame({'t-statistic': [t_and_p[0]], 'p-value': [t_and_p[1]]})
+        # Select the data to compare
+        data_a = data.loc[(data['model_name'] == model) & (data[exp_param] == groups[0])][metric]
+        data_b = data.loc[(data['model_name'] == model) & (data[exp_param] == groups[1])][metric]
+
+        # T-test
+        t, p = ttest_ind(data_a, data_b)
+
+        # Append to result frame
+        t_test_frame = t_test_frame.append({'model_name': model, 't-stat': t, 'p-value': p}, ignore_index=True)
 
     return t_test_frame
 
