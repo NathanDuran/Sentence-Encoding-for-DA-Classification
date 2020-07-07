@@ -23,9 +23,9 @@ tf.enable_eager_execution()
 
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 
-for i in range(1, 6):
+for i in range(4, 6):
     experiment_params = {'task_name': 'kvret',
-                         'experiment_name': 'lstm_' + str(i),
+                         'experiment_name': 'lstm_ap_' + str(i),
                          'model_name': 'lstm',
                          'training': True,
                          'testing': True,
@@ -128,7 +128,7 @@ for i in range(1, 6):
 
     # Initialize the dataset processor
     data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length,
-                                            vocab_size=vocab_size, to_tokens=to_tokens,  use_punct=use_punct, label_index=3)
+                                            vocab_size=vocab_size, to_tokens=to_tokens,  use_punct=use_punct, label_index=2)
 
     # If dataset folder is empty get the metadata and datasets to .npz files
     if not os.listdir(dataset_dir):
