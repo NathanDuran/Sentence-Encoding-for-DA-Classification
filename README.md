@@ -3,9 +3,10 @@
 # TODO
 - test crf models?
 - CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
-https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers/ChainCRF.py
 
 - Make bi-directional a parameter?
+
+Upgrade to tf2
 
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
@@ -15,10 +16,13 @@ https://github.com/UKPLab/elmo-bilstm-cnn-crf/blob/master/neuralnets/keraslayers
 - BERT Large
 - Albert 
 - Distillbert
+- GPT2!!!
+
 - https://github.com/AlexYangLi/TextClassification
 
 ## Misc
 - Document the models in readme
+- Document layers in readme
 
 Language models need to be strings to_tokens=false
 - elmo: (or tokenised strings - but those suck)

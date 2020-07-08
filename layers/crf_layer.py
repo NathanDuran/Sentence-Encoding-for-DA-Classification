@@ -296,14 +296,12 @@ class CRF(Layer):
             'sparse_target': self.sparse_target,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
             'chain_initializer': initializers.serialize(self.chain_initializer),
-            'boundary_initializer': initializers.serialize(
-                self.boundary_initializer),
+            'boundary_initializer': initializers.serialize(self.boundary_initializer),
             'bias_initializer': initializers.serialize(self.bias_initializer),
             'activation': activations.serialize(self.activation),
             'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
             'chain_regularizer': regularizers.serialize(self.chain_regularizer),
-            'boundary_regularizer': regularizers.serialize(
-                self.boundary_regularizer),
+            'boundary_regularizer': regularizers.serialize(self.boundary_regularizer),
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'chain_constraint': constraints.serialize(self.chain_constraint),

@@ -402,6 +402,7 @@ class DataProcessor:
         # Reshape labels for crf layer
         if use_crf:
             labels = [l.reshape((l.shape[0], l.shape[1], 1)) for l in labels]
+            labels = np.asarray(labels)
 
         return text, labels
 
