@@ -6,7 +6,9 @@
 
 - Make bi-directional a parameter?
 
-Upgrade to tf2
+- RUN ConveRT Optimisation
+
+- Upgrade to tf2?
 
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM

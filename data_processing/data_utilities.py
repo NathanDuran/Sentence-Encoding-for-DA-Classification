@@ -31,6 +31,9 @@ def sort_dataframe_by_list(data, sort_column, sort_order):
     # Drop rank column
     data.drop('rank', 1, inplace=True)
 
+    # Reset index
+    data.reset_index(drop=True, inplace=True)
+
     return data
 
 
@@ -53,22 +56,23 @@ def sort_dataframe_by_list_and_param(data, sort_column, sort_order, param):
     return data
 
 
-def get_max(data, exp_param):
+def get_max(data, exp_params):
     """Creates dataframe of the max validation/test/F1 and corresponding experiment value for an experiment_type."""
     # Get the index with the max validation accuracy by experiment_type value
     max_val = data.loc[data.groupby(['model_name'], sort=False)['val_acc'].idxmax()].reset_index()
-    max_val.drop(max_val.columns.difference(['model_name', exp_param, 'val_acc']), 1, inplace=True)
-    max_val.rename(columns={exp_param: 'val_' + exp_param}, inplace=True)
+    max_val.drop(max_val.columns.difference(['model_name',  'val_acc'] + exp_params), 1, inplace=True)
 
     # Get the index with the max test/F1 accuracy by experiment_type value
     max_test = data.loc[data.groupby(['model_name'], sort=False)['test_acc'].idxmax()].reset_index()
-    max_test.drop(max_test.columns.difference(['model_name', exp_param, 'test_acc', 'f1_micro']), 1, inplace=True)
-    max_test.rename(columns={exp_param: 'test_' + exp_param}, inplace=True)
+    max_test.drop(max_test.columns.difference(['model_name', 'test_acc', 'f1_micro'] + exp_params), 1, inplace=True)
+    max_test.drop('model_name', axis=1, inplace=True)
 
     # Group the validation and test data
     max_data = pd.concat([max_val, max_test], axis=1, ignore_index=False, sort=False)
+
     # Remove duplicate columns i.e. model_name
-    max_data = max_data.loc[:, ~max_data.columns.duplicated()]
+    # max_data = max_data.loc[:, ~max_data.columns.duplicated()]
+
     # Round data to 6 decimals
     max_data = max_data.round(6)
 

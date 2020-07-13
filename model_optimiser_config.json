@@ -530,7 +530,7 @@
   },
   "convert": {"algorithm": "bayes",
     "spec": {
-      "maxCombo": 100,
+      "maxCombo": 50,
       "objective": "minimize",
       "metric": "validate_loss",
       "seed": 42,

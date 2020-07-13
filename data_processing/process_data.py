@@ -30,7 +30,30 @@ for exp_param in ['vocab_size', 'max_seq_length', 'use_punct']:
     save_dataframe(os.path.join(task_name, exp_param, exp_param + '_mean_data.csv'), data_means)
 
 
-# TODO Process input sequence grid search/optimisation
+# Process input sequence search data
+exp_param = 'input_seq'
+# Load experiment data
+data = load_dataframe(os.path.join(data_dir, task_name + '_' + exp_param + '.csv'))
+# Remove the numbered experiment names and replace '_' char
+data = data.drop('experiment_name', axis='columns')
+data.model_name = data.model_name.str.replace("_", " ")
+
+# Sort by model name
+sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'gru']
+data = sort_dataframe_by_list(data, 'model_name', sort_order)
+
+# Save dataframe with all the data in
+save_dataframe(os.path.join(task_name, exp_param, exp_param + '_data.csv'), data)
+
+# Group by model name and get means
+data_means = data.groupby(['model_name', 'vocab_size', 'max_seq_length', 'use_punct'], sort=True).mean()
+data_means.reset_index(inplace=True)
+data_means.model_name = data_means.model_name.str.replace("_", " ")
+
+# Save dataframe with mean data in
+save_dataframe(os.path.join(task_name, exp_param, exp_param + '_mean_data.csv'), data_means)
+
+# TODO Embeddings
 
 # Process language model data
 exp_param = 'embedding_type'
