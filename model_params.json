@@ -254,6 +254,12 @@
     "dropout_rate": 0.05,
     "dense_units": 256
   },
+    "convert": {
+    "learning_rate": 0.001,
+    "optimiser": "adam",
+    "dropout_rate": 0.02,
+    "dense_units": 256
+  },
     "use": {
     "learning_rate": 0.001,
     "optimiser": "adam",

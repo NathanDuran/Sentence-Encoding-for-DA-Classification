@@ -116,7 +116,6 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
 
     # Build tensorflow datasets from .npz files
     train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
-    # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
     val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))

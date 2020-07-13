@@ -38,6 +38,7 @@ def get_model(model_name):
               'deep_bi_gru_attn': DeepBiGRUAttn(),
               'elmo': ELMo(),
               'bert': BERT(),
+              'convert': ConveRT(),
               'use': UniversalSentenceEncoder(),
               'nnlm': NeuralNetworkLanguageModel(),
               'mlstm_char_lm': MLSTMCharLM()}
@@ -1693,6 +1694,48 @@ class BERT(Model):
 
         # Create keras model
         model = tf.keras.models.Model(inputs=bert_inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
+class ConveRT(Model):
+    """ Uses ConveRT Tensorflow Hub module as embedding layer from: https://github.com/PolyAI-LDN/polyai-models
+
+    Henderson, M., Casanueva, I., Mrkšić, N., Su, P.-H., Tsung-Hsien and Vulić, I. (2019)
+    ConveRT: Efficient and Accurate Conversational Representations from Transformers. arXiv [online].
+    Available from: http://arxiv.org/abs/1911.03688 [Accessed 13 November 2019].
+
+    Module url: "http://models.poly-ai.com/convert/v1/model.tar.gz"
+
+    Note: Requires tensorflow-text to be installed (TODO currently unavailable on windows).
+    """
+
+    def __init__(self, name='ConveRT'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
+
+        inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
+        embedding = ConveRTLayer(name='convert')(inputs)
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs, name=self.name)
 
         # Create optimiser
         optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)

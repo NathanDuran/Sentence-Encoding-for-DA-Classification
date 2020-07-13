@@ -36,6 +36,7 @@ Language models need to be strings to_tokens=false
 - bert
 - use
 - mlstm_char_lm
+- ConveRT
 
 ## To try
 - Visualising attention layers

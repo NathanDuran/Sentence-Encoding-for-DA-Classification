@@ -16,8 +16,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 experiment_params = {'task_name': 'swda',
-                     'experiment_name': 'mlstm_char_lm_opt',
-                     'model_name': 'mlstm_char_lm',
+                     'experiment_name': 'convert_opt',
+                     'model_name': 'convert',
                      'project_name': 'model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
@@ -27,9 +27,9 @@ experiment_params = {'task_name': 'swda',
                      'vocab_size': 10000,
                      'max_seq_length': 128,
                      'to_tokens': False,
-                     'embedding_dim': 4096,
-                     'embedding_type': 'mlstm_char_lm',
-                     'embedding_source': 'mlstm_char_lm'}
+                     'embedding_dim': 512,
+                     'embedding_type': 'convert',
+                     'embedding_source': 'convert'}
 
 # Task and experiment name
 task_name = experiment_params['task_name']
@@ -112,7 +112,6 @@ for experiment in model_optimiser.get_experiments(project_name=experiment_params
 
     # Build tensorflow datasets from .npz files
     train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
-    # train_text, train_labels = data_set.build_dataset_from_numpy('dev', batch_size, is_training=True)
     val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))
