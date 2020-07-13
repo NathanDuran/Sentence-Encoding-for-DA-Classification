@@ -23,17 +23,17 @@ tf.enable_eager_execution()
 
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 
-for i in range(4, 6):
+for i in range(1, 2):
     experiment_params = {'task_name': 'kvret',
-                         'experiment_name': 'lstm_ap_' + str(i),
-                         'model_name': 'lstm',
+                         'experiment_name': 'lstm_crf_ap_' + str(i),
+                         'model_name': 'lstm_crf',
                          'training': True,
                          'testing': True,
                          'save_model': True,
                          'load_model': True,
                          'init_ckpt_file': None,
                          'batch_size': 32,
-                         'num_epochs': 30,
+                         'num_epochs': 10,
                          'evaluate_steps': 50,
                          'early_stopping': True,
                          'patience': 3,
@@ -142,9 +142,10 @@ for i in range(4, 6):
     embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
     # Build datasets from .npz files
-    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
-    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
-    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=False)
+    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=True)
+    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=True)
+    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=True)
+
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))
     val_steps = int(len(list(val_text)))

@@ -683,14 +683,19 @@ def from_one_hot(one_hot, labels):
 
 
 def join_punctuation(tokens, characters='.,;?!'):
-    tokens = iter(tokens)
-    current = next(tokens)
+    # characters = set(characters)
 
-    for char in tokens:
-        if char in string.punctuation:
-            current += char
-        else:
-            yield current
-            current = char
+    try:
+        tokens = iter(tokens)
+        current = next(tokens)
 
-    yield current
+        for char in tokens:
+            if char in string.punctuation:
+                current += char
+            else:
+                yield current
+                current = char
+
+        yield current
+    except StopIteration:
+        return
