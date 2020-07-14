@@ -64,7 +64,7 @@ data = data.drop('experiment_name', axis='columns')
 data.model_name = data.model_name.str.replace("_", " ")
 
 # Sort by model name and experiment type
-sort_order = ['elmo', 'bert', 'use', 'nnlm', 'mlstm_char_lm']
+sort_order = ['elmo', 'bert', 'use', 'nnlm', 'mlstm_char_lm'] # TODO change this order ['bert', 'bert_large', 'elmo', 'convert', 'use', 'mlstm_char_lm', 'nnlm']
 data = sort_dataframe_by_list_and_param(data, 'model_name', sort_order, exp_param)
 
 # Save dataframe with all the data in

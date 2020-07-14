@@ -441,10 +441,22 @@ def plot_facetgrid(data, x='index', y='value', hue='group', row=None, col='metri
         current_data = kwargs.pop("data")
         sns.scatterplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
 
+    def _swarm(*args, **kwargs):
+        ax = plt.gca()
+        current_data = kwargs.pop("data")
+        sns.swarmplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
+
     def _violin(*args, **kwargs):
         ax = plt.gca()
         current_data = kwargs.pop("data")
         sns.violinplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, **kwargs)
+
+    def _swarm_violin(*args, **kwargs):
+        ax = plt.gca()
+        current_data = kwargs.pop("data")
+        sns.violinplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=palette, ax=ax, inner=None, **kwargs)
+        plt.setp(ax.collections, alpha=1.0)
+        sns.swarmplot(data=current_data, x=args[0], y=args[1], hue=args[2], palette=sns.color_palette(['#FFFFFF']), ax=ax, edgecolor='gray', **kwargs)
 
     def _bar(*args, **kwargs):
         ax = plt.gca()
@@ -459,7 +471,9 @@ def plot_facetgrid(data, x='index', y='value', hue='group', row=None, col='metri
 
     # Get the desired plot function for facetgrid
     plot_types = {'scatter': _scatter,
+                  'swarm': _swarm,
                   'violin': _violin,
+                  'swarm_violin': _swarm_violin,
                   'bar': _bar,
                   'heatmap': _heatmap}
 
@@ -486,18 +500,28 @@ def plot_facetgrid(data, x='index', y='value', hue='group', row=None, col='metri
 
     # Add legend to the plot, either a single one or to each plot (if not creating heatmaps)
     if kind != 'heatmap':
+        handles, labels = [], []
+        # Remove any excess labels from legend (i.e because of overlapping plots)
+        for i, ax in enumerate(g.axes.flatten()):
+            # Get the handles and labels
+            handles, labels = ax.get_legend_handles_labels()
+            # If they are longer than the number of hue categories
+            if len(handles) > len(data[hue].unique()):
+                # Slice them and set to legend
+                handles = handles[:len(data[hue].unique())]
+                labels = labels[:len(data[hue].unique())]
         if len(g.axes) > 1:
             if all_legend:
                 for i, ax in enumerate(g.axes.flatten()):
-                    ax.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+                    ax.legend(handles, labels, rameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
             else:
                 # Add to top right plot
                 if num_col:
-                    g.axes[num_col - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+                    g.axes[num_col - 1].legend(handles, labels, frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
                 else:
-                    g.axes[0, g.axes.shape[0] - 1].legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+                    g.axes[0, g.axes.shape[0] - 1].legend(handles, labels, frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
         else:
-            plt.legend(frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+            plt.legend(handles, labels, frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
 
     # Annotate the bars if using bar chart
     if kind == 'bar' and show_bar_value:
