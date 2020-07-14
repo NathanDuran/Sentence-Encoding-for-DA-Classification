@@ -5,7 +5,7 @@ from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import MultiComparison
 
 
-def shapiro_wilk_test(data, exp_param, metric):
+def shapiro_wilk_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     """Scipy Shapiro-Wilk test for normality.
     The Shapiro-Wilk test tests the null hypothesis that the data was drawn from a normal distribution.
 
@@ -13,6 +13,8 @@ def shapiro_wilk_test(data, exp_param, metric):
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
 
     Returns:
         shapiro_frame (Dataframe): Columns are model_name, exp_param, t-statistic and p-value.
@@ -23,7 +25,7 @@ def shapiro_wilk_test(data, exp_param, metric):
         2          cnn       1500  0.904710  0.246593
     """
     # Create results frame
-    shapiro_frame = pd.DataFrame(columns=['model_name', 'vocab_size', 't-stat', 'p-value'])
+    shapiro_frame = pd.DataFrame(columns=['model_name', exp_param, 't-stat', 'p-value'])
 
     # Get the list of models and ranges of experiment
     model_names = data['model_name'].unique()
@@ -40,13 +42,19 @@ def shapiro_wilk_test(data, exp_param, metric):
             t, p = shapiro(metric_data)
 
             # Append to result frame
-            shapiro_frame = shapiro_frame.append({'model_name': model, 'vocab_size': exp_param_value,
+            shapiro_frame = shapiro_frame.append({'model_name': model, exp_param: exp_param_value,
                                                   't-stat': t, 'p-value': p}, ignore_index=True)
+    if show_result:
+        if all(p_value > sig_level for p_value in shapiro_frame['p-value']):
+            print("All models " + exp_param + " are normally distributed.")
+        else:
+            print("The following " + exp_param + " are not normally distributed.")
+            print(shapiro_frame.loc[shapiro_frame['p-value'] <= sig_level])
 
     return shapiro_frame
 
 
-def levene_test(data, exp_param, metric):
+def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     """Scipy Levene test for equal variance (Homoscedasticity).
     The Levene test tests the null hypothesis that all input samples are from populations with equal variances.
     Levene’s test is an alternative to Bartlett’s test bartlett in the case where there are significant deviations
@@ -56,6 +64,8 @@ def levene_test(data, exp_param, metric):
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
 
     Returns:
         levene_frame (Dataframe): Columns are model_name, t-statistic and p-value.
@@ -86,16 +96,25 @@ def levene_test(data, exp_param, metric):
         # Append to result frame
         levene_frame = levene_frame.append({'model_name': model, 't-stat': t, 'p-value': p}, ignore_index=True)
 
+    if show_result:
+        if all(p_value > sig_level for p_value in levene_frame['p-value']):
+            print("All models " + exp_param + " have equal variance.")
+        else:
+            print("The following models " + exp_param + " do not have equal variance.")
+            print(levene_frame.loc[levene_frame['p-value'] <= sig_level])
+
     return levene_frame
 
 
-def t_test(data, exp_param, metric):
+def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     """Scipy T-test for two experiment groups.
 
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
 
     Returns:
         t_test_frame (Dataframe): Columns are t-statistic and p-value.
@@ -125,10 +144,17 @@ def t_test(data, exp_param, metric):
         # Append to result frame
         t_test_frame = t_test_frame.append({'model_name': model, 't-stat': t, 'p-value': p}, ignore_index=True)
 
+    if show_result:
+        if all(p_value <= sig_level for p_value in t_test_frame['p-value']):
+            print("All models have significant p-values when comparing " + exp_param + " groups.")
+        else:
+            print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
+            print(t_test_frame.loc[t_test_frame['p-value'] > sig_level])
+
     return t_test_frame
 
 
-def anova_test(data, exp_param, metric):
+def anova_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     """ANOVA test with statsmodels.
 
     Eta-squared and omega-squared share the same suggested ranges for effect size classification:
@@ -141,6 +167,8 @@ def anova_test(data, exp_param, metric):
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
 
     Returns:
         anova_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
@@ -183,10 +211,17 @@ def anova_test(data, exp_param, metric):
     # Create dataframe
     anova_frame = pd.DataFrame.from_dict(results_dict, orient='columns').T
 
+    if show_result:
+        if all(p_value <= sig_level for p_value in anova_frame['PR(>F)']):
+            print("All models have significant p-values when comparing " + exp_param + " groups.")
+        else:
+            print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
+            print(anova_frame.loc[anova_frame['PR(>F)'] > sig_level])
+
     return anova_frame
 
 
-def tukey_hsd(data, exp_param, metric):
+def tukey_hsd(data, exp_param, metric, sig_level=0.5, show_result=True):
     """ANOVA and Tukey HSD post-hoc comparison from statsmodels.
 
     The Tukey HSD post-hoc comparison test controls for type I error and maintains the family-wise error rate at 0.05.
@@ -199,6 +234,8 @@ def tukey_hsd(data, exp_param, metric):
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
 
     Returns:
         tukey_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
@@ -228,5 +265,12 @@ def tukey_hsd(data, exp_param, metric):
         tukey_frame = pd.concat([tukey_frame, model_frame], axis=0, ignore_index=True)
 
     tukey_frame.rename(columns={'p-adj': 'p-value'}, inplace=True)
+
+    if show_result:
+        if all(p_value <= sig_level for p_value in tukey_frame['p-value']):
+            print("All models have significant p-values when comparing " + exp_param + " groups.")
+        else:
+            print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
+            print(tukey_frame.loc[tukey_frame['p-value'] > sig_level])
 
     return tukey_frame

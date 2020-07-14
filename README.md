@@ -6,8 +6,6 @@
 
 - Make bi-directional a parameter?
 
-- RUN ConveRT Optimisation
-
 - Upgrade to tf2?
 
 ## Models to Add
