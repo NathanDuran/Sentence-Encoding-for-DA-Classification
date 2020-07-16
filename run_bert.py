@@ -23,7 +23,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 sess = tf.Session()
 
 experiment_type = 'language_models'  # TODO !Change experiment_type name?!
-for i in range(8, 11):
+for i in range(1, 11):
 
     # Run Tensorflow session
     sess = tf.Session()
@@ -44,7 +44,7 @@ for i in range(8, 11):
                          'vocab_size': 10000,
                          'max_seq_length': 128,
                          'to_tokens': False,
-                         'use_punct': False,
+                         'use_punct': True,
                          'embedding_dim': 768,
                          'embedding_type': 'bert',
                          'embedding_source': 'bert'}
