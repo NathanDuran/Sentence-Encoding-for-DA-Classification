@@ -6,6 +6,7 @@
 
 - Make bi-directional a parameter?
 
+- Update bert to handle base and large
 - Upgrade to tf2
 
 ## Models to Add

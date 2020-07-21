@@ -108,7 +108,7 @@ for i in range(1, 11):
     print("Using parameters...")
     print("Batch size: " + str(batch_size))
     print("Epochs: " + str(num_epochs))
-    print("Evaluate every steps: " + str(evaluate_steps))
+    print("Evaluate steps: " + str(evaluate_steps))
     print("Early Stopping: " + str(early_stopping))
     print("Patience: " + str(patience))
     print("Optimiser: " + optimiser_type)
