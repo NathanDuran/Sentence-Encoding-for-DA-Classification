@@ -22,12 +22,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.enable_eager_execution()
 
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
-#for model_name in ['cnn', 'text_cnn', 'dcnn']:
-for model_name in ['rcnn', 'lstm', 'gru']:
+for model_name in ['cnn', 'text_cnn', 'dcnn']:
+# for model_name in ['rcnn', 'lstm', 'gru']:
     for embedd_dim in [100, 150, 200, 250, 300]:
         for i in range(1, 11):
             experiment_params = {'task_name': 'swda',
-                                 'experiment_name': model_name + '_word2vec_' + str(embedd_dim) + '_' + str(i),
+                                 'experiment_name': model_name + '_fasttext_' + str(embedd_dim) + '_' + str(i),
                                  'model_name': model_name,
                                  'training': True,
                                  'testing': True,
@@ -45,8 +45,8 @@ for model_name in ['rcnn', 'lstm', 'gru']:
                                  'use_punct': True,
                                  'train_embeddings': True,
                                  'embedding_dim': embedd_dim,
-                                 'embedding_type': 'word2vec',
-                                 'embedding_source': 'GoogleNews-vectors-negative300'}
+                                 'embedding_type': 'fasttext',
+                                 'embedding_source': 'crawl-300d-2M'}
 
             # Load model params if file exists otherwise defaults will be used
             model_param_file = 'model_params.json'
@@ -246,7 +246,7 @@ for model_name in ['rcnn', 'lstm', 'gru']:
                                 history['val_accuracy'].append(val_accuracy.result().numpy())
 
                                 # Save checkpoint if checkpointer metric improves
-                                checkpointer.save_best(val_loss.result(), global_step)
+                                checkpointer.save_best(val_loss.result().numpy(), global_step)
 
                     # Check to stop training early
                     if early_stopping and earlystopper.check_early_stop(val_loss.result().numpy()):

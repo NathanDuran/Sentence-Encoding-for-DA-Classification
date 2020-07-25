@@ -1,6 +1,11 @@
 import tensorflow as tf
 import tensorflow_hub as hub
-import tensorflow_text
+try:
+    import tensorflow_text
+except ImportError:
+    import platform
+    import warnings
+    warnings.warn("ConveRT Layer needs to import tensorflow_text but does not exist for " + platform.system())
 
 
 class ConveRTLayer(tf.keras.layers.Layer):

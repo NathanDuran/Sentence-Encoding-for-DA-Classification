@@ -4,10 +4,9 @@
 - test crf models?
 - CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
 
-- Make bi-directional a parameter?
 
 - Update bert to handle base and large
-- Upgrade to tf2
+- Upgrade to tf2 - https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/guide/migrate.ipynb
 
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
@@ -37,7 +36,7 @@ Language models need to be strings to_tokens=false
 - bert
 - use
 - mlstm_char_lm
-- ConveRT
+- ConveRT (requires linux (tensorflow_text))
 
 ## To try
 - Visualising attention layers

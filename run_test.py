@@ -26,7 +26,7 @@ experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 for i in range(1, 2):
     experiment_params = {'task_name': 'kvret',
                          'experiment_name': 'lstm_crf_ap_' + str(i),
-                         'model_name': 'lstm_crf',
+                         'model_name': 'lstm',
                          'training': True,
                          'testing': True,
                          'save_model': True,
@@ -66,7 +66,7 @@ for i in range(1, 2):
 
     # Set up comet experiment
     # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
+    experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)
@@ -142,9 +142,9 @@ for i in range(1, 2):
     embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
 
     # Build datasets from .npz files
-    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=True)
-    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=True)
-    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=True)
+    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
+    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
+    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=False)
 
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))
@@ -246,7 +246,7 @@ for i in range(1, 2):
                         history['val_accuracy'].append(val_accuracy.result().numpy())
 
                         # Save checkpoint if checkpointer metric improves
-                        checkpointer.save_best(val_loss.result(), global_step)
+                        checkpointer.save_best(val_loss.result().numpy(), global_step)
 
             # Check to stop training early
             if early_stopping and earlystopper.check_early_stop(val_loss.result().numpy()):
