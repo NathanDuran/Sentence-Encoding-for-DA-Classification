@@ -84,14 +84,9 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
             embeddings_dir = 'embeddings'
 
             # Create appropriate directories if they don't exist
-            if not os.path.exists(task_name):
-                os.mkdir(task_name)
-            if not os.path.exists(dataset_dir):
-                os.makedirs(dataset_dir)
-            if not os.path.exists(output_dir):
-                os.mkdir(output_dir)
-            if not os.path.exists(checkpoint_dir):
-                os.mkdir(checkpoint_dir)
+            for directory in [task_name, dataset_dir, output_dir, checkpoint_dir]:
+                if not os.path.exists(directory):
+                    os.mkdir(directory)
 
             print("------------------------------------")
             print("Running experiment...")

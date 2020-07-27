@@ -37,7 +37,10 @@ def get_model(model_name):
               'deep_bi_gru': DeepBiGRU(),
               'deep_bi_gru_attn': DeepBiGRUAttn(),
               'elmo': ELMo(),
-              'bert': BERT(),
+              'albert_base': ALBERT(),
+              'albert_large': ALBERT(),
+              'bert_base': BERT(),
+              'bert_large': BERT(),
               'convert': ConveRT(),
               'use': UniversalSentenceEncoder(),
               'nnlm': NeuralNetworkLanguageModel(),
@@ -1654,6 +1657,59 @@ class ELMo(Model):
         return model
 
 
+class ALBERT(Model):
+    """ Uses an ALBERT from Tensorflow Hub as embedding layer from:
+    https://tfhub.dev/google/albert_base/3
+
+    Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush Sharma, Radu Soricut.
+    ALBERT: A Lite BERT for Self-supervised Learning of Language Representations. arXiv preprint arXiv:1909.11942, 2019.
+
+    Module urls:
+    albert_base - "https://tfhub.dev/google/albert_base/3"
+    albert_large - "https://tfhub.dev/google/albert_large/3"
+    albert_xlarge - "https://tfhub.dev/google/albert_xlarge/3"
+    albert_xxlarge - "https://tfhub.dev/google/albert_xxlarge/3"
+    """
+
+    def __init__(self, name='ALBERT'):
+        super().__init__(name)
+        self.name = name
+
+    def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
+        # Unpack key word arguments
+        albert_model = kwargs['albert_model'] if 'albert_model' in kwargs.keys() else 'base'
+        learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.0015  # BERT default 0.00002
+        optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adagrad'  # BERT default adam
+        output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'sequence'
+        dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
+        dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
+        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
+
+        in_id = tf.keras.layers.Input(shape=input_shape, name="input_ids", dtype='int32')
+        in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks", dtype='int32')
+        in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids", dtype='int32')
+
+        albert_inputs = dict(input_ids=in_id, input_mask=in_mask, segment_ids=in_segment)
+        x = AlbertLayer(output_mode=output_mode, albert_model=albert_model, name='albert_' + albert_model)(albert_inputs)
+
+        if output_mode == 'sequence':
+            x = tf.keras.layers.GlobalAveragePooling1D()(x)
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
+
+        # Create keras model
+        model = tf.keras.models.Model(inputs=albert_inputs, outputs=outputs, name=self.name)
+
+        # Create optimiser
+        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+
+        # Compile the model
+        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+        return model
+
+
 class BERT(Model):
     """ Uses an BERT from Tensorflow Hub as embedding layer from:
     https://github.com/strongio/keras-bert/blob/master/keras-bert.py
@@ -1662,7 +1718,9 @@ class BERT(Model):
     BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.
     arXiv preprint arXiv:1810.04805, 2018.
 
-    Module url: "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
+    Module urls:
+    bert_base - "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
+    bert_large - "https://tfhub.dev/google/bert_uncased_L-24_H-1024_A-16/1"
     """
 
     def __init__(self, name='BERT'):
@@ -1671,9 +1729,10 @@ class BERT(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        bert_model = kwargs['bert_model'] if 'bert_model' in kwargs.keys() else 'base'
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.0015  # BERT default 0.00002
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adagrad'  # BERT default adam
-        num_fine_tune_layers = kwargs['num_fine_tune_layers'] if 'num_fine_tune_layers' in kwargs.keys() else 3
+        num_fine_tune_layers = kwargs['num_fine_tune_layers'] if 'num_fine_tune_layers' in kwargs.keys() else 12
         output_mode = kwargs['output_mode'] if 'output_mode' in kwargs.keys() else 'sequence'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.05
@@ -1683,7 +1742,8 @@ class BERT(Model):
         in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks")
         in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids")
         bert_inputs = [in_id, in_mask, in_segment]
-        x = BertLayer(num_fine_tune_layers=num_fine_tune_layers, output_mode=output_mode, name='bert')(bert_inputs)
+        x = BertLayer(num_fine_tune_layers=num_fine_tune_layers, output_mode=output_mode,
+                      bert_model=bert_model, name='bert_' + bert_model)(bert_inputs)
 
         if output_mode == 'sequence':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)

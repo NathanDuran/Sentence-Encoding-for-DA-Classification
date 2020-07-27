@@ -1,4 +1,6 @@
 import os
+# Suppress TensorFlow debugging
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import datetime
 import time
 import json
@@ -13,8 +15,6 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from tokenization import FullTokenizer
 
-# Suppress TensorFlow debugging
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -30,7 +30,7 @@ for i in range(1, 11):
 
     experiment_params = {'task_name': 'swda',
                          'experiment_name': 'bert' + '_' + str(i),
-                         'model_name': 'bert',
+                         'model_name': 'albert_base',
                          'training': True,
                          'testing': True,
                          'save_model': True,
@@ -68,8 +68,8 @@ for i in range(1, 11):
     init_ckpt_file = experiment_params['init_ckpt_file']
 
     # Set up comet experiment
-    experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    # experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+    # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
+    experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)
@@ -85,15 +85,9 @@ for i in range(1, 11):
     embeddings_dir = 'embeddings'
 
     # Create appropriate directories if they don't exist
-    if not os.path.exists(task_name):
-        os.mkdir(task_name)
-    if not os.path.exists(dataset_dir):
-        os.makedirs(dataset_dir)
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-    if not os.path.exists(checkpoint_dir):
-        os.mkdir(checkpoint_dir)
-
+    for directory in [task_name, dataset_dir, output_dir, checkpoint_dir]:
+        if not os.path.exists(directory):
+            os.mkdir(directory)
     print("------------------------------------")
     print("Running experiment...")
     print(task_name + ": " + experiment_name)
@@ -183,7 +177,7 @@ for i in range(1, 11):
     model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
     tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=True, show_shapes=True)
     experiment.log_image(model_image_file)
-    experiment.set_model_graph(model.to_json())
+    # experiment.set_model_graph(model.to_json())
 
     # Initialise variables
     sess.run(tf.local_variables_initializer())

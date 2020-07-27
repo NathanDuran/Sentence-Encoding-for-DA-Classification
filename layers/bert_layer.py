@@ -5,27 +5,36 @@ import tensorflow_hub as hub
 class BertLayer(tf.keras.layers.Layer):
     """ Wraps the BERT module from Tensorflow Hub in a Keras Layer."""
 
-    def __init__(self, num_fine_tune_layers=12, output_mode="sequence",
-                 bert_url="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1", **kwargs):
+    def __init__(self, num_fine_tune_layers=12, output_mode="sequence", bert_model='base', **kwargs):
         """Constructor for BERT Layer.
 
         Args:
             num_fine_tune_layers (int): Int between 1 and 12, determines how many bert layers are fine tuned
             output_mode (string):
-                    pool = Pooled output of the entire sequence with shape [batch_size, hidden_size]
+                    pooled = Pooled output of the entire sequence with shape [batch_size, hidden_size]
                     sequence = Output every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
                     mean_sequence = Averaged sequence output with shape [batch_size, hidden_size]
-            bert_url (string): URL to the BERT module
+            bert_model (string): Determines the URL for the BERT module (base or large). Default is base.
         """
-
-        self.num_fine_tune_layers = num_fine_tune_layers
+        self.bert = None
         self.trainable = True
-        self.hidden_size = 768
+        self.num_fine_tune_layers = num_fine_tune_layers
         self.output_mode = output_mode.lower()
-        self.bert_url = bert_url
+        self.hidden_size = 768
+        self.bert_model = bert_model.lower()
+        self.model_url = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
 
         if self.output_mode not in ["pooled", "sequence", "mean_sequence"]:
             raise NameError("BERT output_mode must be either pool, sequence or mean_sequence but is " + self.output_mode)
+
+        if self.bert_model == 'base':
+            self.hidden_size = 768
+            self.model_url = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
+        elif self.bert_model == 'large':
+            self.hidden_size = 1024
+            self.model_url = "https://tfhub.dev/google/bert_uncased_L-24_H-1024_A-16/1"
+        else:
+            raise NameError("Unable to determine BERT model type. Should be 'base' or 'large', but was " + self.bert_model)
 
         super(BertLayer, self).__init__(**kwargs)
 

@@ -1,4 +1,5 @@
 from .elmo_layer import ElmoLayer
+from .albert_layer import AlbertLayer
 from .bert_layer import BertLayer
 from .convert_layer import ConveRTLayer
 from .universal_sentence_encoder_layer import UniversalSentenceEncoderLayer

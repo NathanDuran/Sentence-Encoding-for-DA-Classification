@@ -246,10 +246,36 @@
     "dropout_rate": 0.01,
     "dense_units": 256
   },
-    "bert": {
+  "albert_base": {
+    "albert_model": "base",
+    "learning_rate": 0.0015,
+    "optimiser": "adagrad",
+    "output_mode": "sequence",
+    "dropout_rate": 0.05,
+    "dense_units": 256
+  },
+  "albert_large": {
+    "albert_model": "large",
+    "learning_rate": 0.0015,
+    "optimiser": "adagrad",
+    "output_mode": "sequence",
+    "dropout_rate": 0.05,
+    "dense_units": 256
+  },
+    "bert_base": {
+    "bert_model": "base",
     "learning_rate": 0.0015,
     "optimiser": "adagrad",
     "num_fine_tune_layers": 12,
+    "output_mode": "sequence",
+    "dropout_rate": 0.05,
+    "dense_units": 256
+  },
+  "bert_large": {
+    "bert_model": "large",
+    "learning_rate": 0.0015,
+    "optimiser": "adagrad",
+    "num_fine_tune_layers": 16,
     "output_mode": "sequence",
     "dropout_rate": 0.05,
     "dense_units": 256
