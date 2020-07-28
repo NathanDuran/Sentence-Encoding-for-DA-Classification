@@ -154,7 +154,7 @@ def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     return t_test_frame
 
 
-def anova_test(data, exp_param, metric, sig_level=0.05, show_result=True):
+def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     """ANOVA test with statsmodels.
 
     Eta-squared and omega-squared share the same suggested ranges for effect size classification:
@@ -216,6 +216,76 @@ def anova_test(data, exp_param, metric, sig_level=0.05, show_result=True):
             print("All models have significant p-values when comparing " + exp_param + " groups.")
         else:
             print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
+            print(anova_frame.loc[anova_frame['PR(>F)'] > sig_level])
+
+    return anova_frame
+
+
+def two_way_anova_test(data, exp_param1, exp_param2, metric, sig_level=0.05, show_result=True):
+    """ANOVA test with statsmodels.
+
+    Eta-squared and omega-squared share the same suggested ranges for effect size classification:
+    Low (0.01 – 0.059)
+    Medium (0.06 – 0.139)
+    Large (0.14+)
+    Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.
+
+    Args:
+        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        exp_param1 (string): Indicates first columns values to group data for comparison i.e. embedding_dim.
+        exp_param2 (string): Indicates second columns values to group data for comparison i.e. embedding_type.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
+
+    Returns:
+        anova_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
+    model_name                          exp_params    sum_sq   df   mean_sq         F    PR(>F)    eta_sq  omega_sq
+            gru                    C(embedding_dim)  0.000023  4.0  0.000006  0.640506  0.634978  0.024733 -0.013749
+            gru                   C(embedding_type)  0.000026  1.0  0.000026  2.944534  0.089609  0.028426  0.018592
+            gru  C(embedding_dim):C(embedding_type)  0.000071  4.0  0.000018  2.020298  0.098257  0.078013  0.039022
+    """
+
+    def _anova_table(aov_data):
+        """Calculates the effect size statisctics."""
+        aov_data['mean_sq'] = aov_data[:]['sum_sq'] / aov_data[:]['df']
+        aov_data['eta_sq'] = aov_data[:-1]['sum_sq'] / sum(aov_data['sum_sq'])
+        aov_data['omega_sq'] = (aov_data[:-1]['sum_sq'] - (aov_data[:-1]['df'] * aov_data['mean_sq'][-1])) / (sum(aov_data['sum_sq']) + aov_data['mean_sq'][-1])
+        cols = ['sum_sq', 'df', 'mean_sq', 'F', 'PR(>F)', 'eta_sq', 'omega_sq']
+        aov_data = aov_data[cols]
+        return aov_data
+
+    # Get the list of models and ranges of experiment
+    model_names = data['model_name'].unique()
+    anova_frame = pd.DataFrame()
+    for model in model_names:
+        # Create a list of all experiment values for this model
+        model_values_list = data.loc[(data['model_name'] == model)]
+
+        # Regression (ordinary least squares) for this metric and experiment type
+        formula = metric + '~ C(' + exp_param1 + ') + C(' + exp_param2 + ') + C(' + exp_param1 + '):C(' + exp_param2 + ')'
+        anova = ols(formula, data=model_values_list).fit()
+        # print(anova.summary())
+
+        # Calculate the stats table
+        anova_table = sm.stats.anova_lm(anova, typ=2)
+        # Add effect size to table
+        anova_table = _anova_table(anova_table)
+
+        # Add model name column and append to results frame
+        anova_table.index = anova_table.index.set_names(['exp_params'])
+        anova_table.reset_index(inplace=True)
+        anova_table.insert(0, 'model_name', model)
+        anova_table = anova_table[:-1]  # Drop the residuals row
+        # print(anova_table)
+
+        anova_frame = pd.concat([anova_frame, anova_table], axis=0, ignore_index=True)
+
+    if show_result:
+        if all(p_value <= sig_level for p_value in anova_frame['PR(>F)']):
+            print("All models have significant p-values when comparing " + exp_param1 + " and " + exp_param2 + " groups.")
+        else:
+            print("The following models do not have significant p-values when comparing " + exp_param1 + " and " + exp_param2 + " groups.")
             print(anova_frame.loc[anova_frame['PR(>F)'] > sig_level])
 
     return anova_frame
