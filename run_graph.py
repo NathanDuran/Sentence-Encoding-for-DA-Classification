@@ -1,4 +1,6 @@
 import os
+# Suppress TensorFlow debugging
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import datetime
 import time
 import json
@@ -10,9 +12,7 @@ import check_pointer
 import early_stopper
 import numpy as np
 import tensorflow as tf
-
-# Suppress TensorFlow debugging
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -63,8 +63,8 @@ for i in range(1, 11):
     init_ckpt_file = experiment_params['init_ckpt_file']
 
     # Set up comet experiment
-    experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    # experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+    # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
+    experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)

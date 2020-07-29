@@ -14,7 +14,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
 from tokenization import FullTokenizer
-
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -29,8 +29,8 @@ for i in range(1, 11):
     sess = tf.Session()
 
     experiment_params = {'task_name': 'swda',
-                         'experiment_name': 'bert' + '_' + str(i),
-                         'model_name': 'albert_base',
+                         'experiment_name': 'bert_large' + '_' + str(i),
+                         'model_name': 'bert_large',
                          'training': True,
                          'testing': True,
                          'save_model': True,
@@ -45,7 +45,7 @@ for i in range(1, 11):
                          'max_seq_length': 128,
                          'to_tokens': False,
                          'use_punct': True,
-                         'embedding_dim': 768,
+                         'embedding_dim': 1024,
                          'embedding_type': 'bert',
                          'embedding_source': 'bert'}
 

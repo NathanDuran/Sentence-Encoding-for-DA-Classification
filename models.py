@@ -1658,7 +1658,7 @@ class ELMo(Model):
 
 
 class ALBERT(Model):
-    """ Uses an ALBERT from Tensorflow Hub as embedding layer from:
+    """Uses an ALBERT from Tensorflow Hub as embedding layer from:
     https://tfhub.dev/google/albert_base/3
 
     Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush Sharma, Radu Soricut.
@@ -1851,13 +1851,12 @@ class NeuralNetworkLanguageModel(Model):
     Yoshua Bengio, Rejean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
     Journal of Machine Learning Research, 3:1137-1155, 2003.
 
-    Module url: "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
+    Module url: "https://tfhub.dev/google/nnlm-en-dim128/1"
     """
 
     def __init__(self, name='NeuralNetworkLanguageModel'):
         super().__init__(name)
         self.name = name
-        self.module_url = "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128/1"
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
@@ -1867,13 +1866,15 @@ class NeuralNetworkLanguageModel(Model):
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.02
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
+        inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
+        embedding = NeuralNetworkLanguageModelLayer(name='neural_network_language_model')(inputs)
+
+        x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
+        outputs = tf.keras.layers.Dense(output_shape, activation='sigmoid', name='output_layer')(x)
+
         # Create keras model
-        model = tf.keras.Sequential([
-            hub.KerasLayer(self.module_url, input_shape=[], dtype=tf.string, trainable=True, name='nnlm'),
-            tf.keras.layers.Dense(dense_units, activation=dense_activation),
-            tf.keras.layers.Dropout(dropout_rate),
-            tf.keras.layers.Dense(output_shape, activation='softmax', name='output_layer')
-        ])
+        model = tf.keras.models.Model(inputs=[inputs], outputs=outputs, name=self.name)
 
         # Create optimiser
         optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)

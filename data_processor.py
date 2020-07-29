@@ -11,9 +11,6 @@ import tensorflow as tf
 import gluonnlp as nlp
 from spacy.lang.en import English
 
-# Suppress TensorFlow debugging
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Initialise Spacy tokeniser
 tokenizer = English().Defaults.create_tokenizer(English())

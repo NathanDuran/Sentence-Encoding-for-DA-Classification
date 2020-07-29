@@ -23,7 +23,7 @@ class ElmoLayer(tf.keras.layers.Layer):
         self.input_mode = input_mode
         self.output_mode = output_mode
         self.dimensions = 1024
-        self.elmo_url = 'https://tfhub.dev/google/elmo/2'
+        self.elmo_url = 'https://tfhub.dev/google/elmo/3'
         self.elmo = None
 
         # Check input and output mode is valid
@@ -57,9 +57,6 @@ class ElmoLayer(tf.keras.layers.Layer):
             }
         result = self.elmo(inputs=inputs, as_dict=True, signature=self.input_mode)[self.output_mode]
         return result
-
-    # def compute_mask(self, inputs, mask=None):
-    #     return tf.keras.backend.not_equal(inputs, '<pad>')
 
     def compute_output_shape(self, input_shape):
         if self.output_mode == "default":
