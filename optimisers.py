@@ -35,11 +35,11 @@ def get_optimiser(optimiser_type='sgd', lr=0.01, **kwargs):
             clip_args['clipvalue'] = kwargs['clipvalue']
 
         # Build the optimiser with the specified params
-        optimiser = globals()[optimiser_type.lower()](lr, clip_args, **kwargs)
+        return globals()[optimiser_type.lower()](lr, clip_args, **kwargs)
+
     else:
         raise Exception("The given optimiser type: '" + optimiser_type + "' is not valid!\n" +
                         "Please select one from: " + str(list(optimisers.keys())) + " or create one.")
-    return optimiser
 
 
 def adadelta(lr, clip_args, **kwargs):

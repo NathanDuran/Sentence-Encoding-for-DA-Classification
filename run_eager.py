@@ -1,4 +1,6 @@
 import os
+# Suppress TensorFlow debugging
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import datetime
 import time
 import json
@@ -11,9 +13,7 @@ import check_pointer
 import early_stopper
 import numpy as np
 import tensorflow as tf
-
-# Suppress TensorFlow debugging
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -52,14 +52,14 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
             model_param_file = 'model_params.json'
             with open(model_param_file) as json_file:
                 params_dict = json.load(json_file)
+                model_params = dict()
                 if experiment_params['model_name'] in params_dict.keys():
                     model_params = params_dict[experiment_params['model_name']]
-                else:
-                    model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
 
             # Task and experiment name
             task_name = experiment_params['task_name']
             experiment_name = experiment_params['experiment_name']
+            model_name = experiment_params['model_name']
             training = experiment_params['training']
             testing = experiment_params['testing']
             save_model = experiment_params['save_model']
@@ -134,8 +134,7 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
             vocabulary, labels = data_set.load_metadata()
 
             # Generate the embedding matrix
-            embedding = embedding_processor.get_embedding_processor(embedding_type)
-            embedding_matrix = embedding.get_embedding_matrix(embeddings_dir, embedding_source, embedding_dim, vocabulary)
+            embeddings = embedding_processor.get_embedding(embeddings_dir, embedding_type, embedding_source, embedding_dim, vocabulary)
 
             # Build datasets from .npz files
             train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
@@ -165,8 +164,7 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
             print("Creating model...")
 
             # Build model with supplied parameters
-            model_class = models.get_model(experiment_params['model_name'])
-            model = model_class.build_model((max_seq_length,), len(labels), embedding_matrix, train_embeddings, **model_params)
+            model = models.get_model(model_name, (max_seq_length,), len(labels), model_params, embeddings, train_embeddings)
             print("Built model using parameters:")
             for key, value in model_params.items():
                 print("{}: {}".format(key, value))
@@ -176,7 +174,6 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
             model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
             tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=False, show_shapes=True)
             experiment.log_image(model_image_file)
-            experiment.set_model_graph(model.to_json())
 
             # Load initialisation weights if set
             if load_model and init_ckpt_file and os.path.exists(os.path.join(checkpoint_dir, init_ckpt_file)):

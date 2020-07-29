@@ -1,14 +1,18 @@
 import tensorflow as tf
-import tensorflow_hub as hub
 import optimisers
 from layers import *
 
 
-def get_model(model_name):
-    """Utility function for returning a Model.
+def get_model(model_name, input_shape, output_shape, model_params, embeddings=None, train_embeddings=True):
+    """Utility function for returning a Keras model.
 
     Args:
-        model_name (str): The name of the Model
+        model_name (str): The name of the model
+        input_shape (tuple): The input shape excluding batch size, i.e (sequence_length, )
+        output_shape (int): The output shape, i.e. number of classes to predict
+        model_params (dict): Optional dictionary of model parameters to use for specific implementations
+        embeddings (nb.array): A matrix of vocabulary_size rows and embedding_dim columns
+        train_embeddings (bool): Whether to keep embeddings fixed during training
 
     Returns:
         model (tf.keras.Model): Keras model instance
@@ -46,11 +50,12 @@ def get_model(model_name):
               'nnlm': NeuralNetworkLanguageModel(),
               'mlstm_char_lm': MLSTMCharLM()}
 
-    if model_name.lower() not in models.keys():
+    if model_name.lower() in models.keys():
+        model_class = models[model_name.lower()]
+        return model_class.build_model(input_shape, output_shape, embeddings, train_embeddings, **model_params)
+    else:
         raise Exception("The given model type: '" + model_name + "' is not valid!\n" +
                         "Please select one from: " + str(list(models.keys())) + " or create one.")
-    else:
-        return models[model_name]
 
 
 class Model(object):

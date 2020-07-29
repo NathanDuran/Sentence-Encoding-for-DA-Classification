@@ -19,9 +19,6 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-# Run Tensorflow session
-sess = tf.Session()
-
 experiment_type = 'language_models'  # TODO !Change experiment_type name?!
 for i in range(1, 11):
 
@@ -53,14 +50,14 @@ for i in range(1, 11):
     model_param_file = 'model_params.json'
     with open(model_param_file) as json_file:
         params_dict = json.load(json_file)
+        model_params = dict()
         if experiment_params['model_name'] in params_dict.keys():
             model_params = params_dict[experiment_params['model_name']]
-        else:
-            model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
 
     # Task and experiment name
     task_name = experiment_params['task_name']
     experiment_name = experiment_params['experiment_name']
+    model_name = experiment_params['model_name']
     training = experiment_params['training']
     testing = experiment_params['testing']
     save_model = experiment_params['save_model']
@@ -88,6 +85,7 @@ for i in range(1, 11):
     for directory in [task_name, dataset_dir, output_dir, checkpoint_dir]:
         if not os.path.exists(directory):
             os.mkdir(directory)
+
     print("------------------------------------")
     print("Running experiment...")
     print(task_name + ": " + experiment_name)
@@ -166,8 +164,7 @@ for i in range(1, 11):
     print("Creating model...")
 
     # Build model with supplied parameters
-    model_class = models.get_model(experiment_params['model_name'])
-    model = model_class.build_model((max_seq_length,), len(labels), [], **model_params)
+    model = models.get_model(model_name, (max_seq_length,), len(labels), model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
@@ -175,9 +172,8 @@ for i in range(1, 11):
     # Display a model summary and create/save a model graph definition and image
     model.summary()
     model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
-    tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=True, show_shapes=True)
+    tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=False, show_shapes=True)
     experiment.log_image(model_image_file)
-    # experiment.set_model_graph(model.to_json())
 
     # Initialise variables
     sess.run(tf.local_variables_initializer())
@@ -334,6 +330,10 @@ for i in range(1, 11):
 
             end_time = time.time()
             print("Testing took " + str(('%.3f' % (end_time - start_time))) + " seconds for " + str(test_steps) + " steps")
+
+    # Close the current session
+    sess.close()
+    tf.keras.backend.clear_session()
 
     # TODO remove when all experiments complete
     if training and testing:

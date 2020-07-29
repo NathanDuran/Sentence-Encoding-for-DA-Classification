@@ -48,14 +48,14 @@ for i in range(1, 11):
     model_param_file = 'model_params.json'
     with open(model_param_file) as json_file:
         params_dict = json.load(json_file)
+        model_params = dict()
         if experiment_params['model_name'] in params_dict.keys():
             model_params = params_dict[experiment_params['model_name']]
-        else:
-            model_params = {'optimiser': 'adam', 'learning_rate': 0.001}
 
     # Task and experiment name
     task_name = experiment_params['task_name']
     experiment_name = experiment_params['experiment_name']
+    model_name = experiment_params['model_name']
     training = experiment_params['training']
     testing = experiment_params['testing']
     save_model = experiment_params['save_model']
@@ -156,8 +156,7 @@ for i in range(1, 11):
     print("Creating model...")
 
     # Build model with supplied parameters
-    model_class = models.get_model(experiment_params['model_name'])
-    model = model_class.build_model((1,), len(labels), [], **model_params)
+    model = models.get_model(model_name, (1,), len(labels), model_params)
     print("Built model using parameters:")
     for key, value in model_params.items():
         print("{}: {}".format(key, value))
@@ -167,7 +166,6 @@ for i in range(1, 11):
     model_image_file = os.path.join(output_dir, experiment_name + '_model.png')
     tf.keras.utils.plot_model(model, to_file=model_image_file, show_layer_names=False, show_shapes=True)
     experiment.log_image(model_image_file)
-    experiment.set_model_graph(model.to_json())
 
     # Initialise variables
     sess.run(tf.local_variables_initializer())
