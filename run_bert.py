@@ -15,6 +15,8 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from tokenization import FullTokenizer
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
 
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -23,7 +25,7 @@ experiment_type = 'language_models'  # TODO !Change experiment_type name?!
 for i in range(1, 11):
 
     # Run Tensorflow session
-    sess = tf.Session()
+    sess = tf.Session(config=config)
 
     experiment_params = {'task_name': 'swda',
                          'experiment_name': 'bert_large' + '_' + str(i),

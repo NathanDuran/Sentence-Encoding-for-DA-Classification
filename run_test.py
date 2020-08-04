@@ -20,6 +20,9 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.InteractiveSession(config=config)
 
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 
@@ -33,7 +36,7 @@ for i in range(1, 2):
                          'load_model': True,
                          'init_ckpt_file': None,
                          'batch_size': 32,
-                         'num_epochs': 10,
+                         'num_epochs': 5,
                          'evaluate_steps': 50,
                          'early_stopping': True,
                          'patience': 3,
@@ -105,7 +108,7 @@ for i in range(1, 2):
     print("Using parameters...")
     print("Batch size: " + str(batch_size))
     print("Epochs: " + str(num_epochs))
-    print("Evaluate every steps: " + str(evaluate_steps))
+    print("Evaluate steps: " + str(evaluate_steps))
     print("Early Stopping: " + str(early_stopping))
     print("Patience: " + str(patience))
     print("Optimiser: " + optimiser_type)
@@ -123,7 +126,7 @@ for i in range(1, 2):
 
     # Initialize the dataset processor
     data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length,
-                                            vocab_size=vocab_size, to_tokens=to_tokens,  use_punct=use_punct, label_index=2)
+                                            vocab_size=vocab_size, to_tokens=to_tokens, use_punct=use_punct, label_index=2)
 
     # If dataset folder is empty get the metadata and datasets to .npz files
     if not os.listdir(dataset_dir):

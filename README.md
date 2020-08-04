@@ -10,7 +10,11 @@
 - Get all running from one script 
 - use hugging face transformers tokeniser (+models?)
 
-- Update dataprocessor to do BERT(transformer tokenisation internally), so can run bert from run_graph.py
+- Change bert and albert (and elmo/nnlm/use) configs to take url rather than type (so dont have to keep urls in layer)?
+
+- Update dataprocessor to do BERT(transformer) tokenisation internally, so can run bert from run_graph.py
+- Update checkpointer to only keep 1 best. + add metric name and val
+
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
 - ELMo + LSTM/Bi-LSTM + Attn

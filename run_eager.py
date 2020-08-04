@@ -20,6 +20,9 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.InteractiveSession(config=config)
 
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 for model_name in ['cnn', 'text_cnn', 'dcnn']:
@@ -27,7 +30,7 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
     for embedd_dim in [100, 150, 200, 250, 300]:
         for i in range(1, 11):
             experiment_params = {'task_name': 'swda',
-                                 'experiment_name': model_name + '_fasttext_' + str(embedd_dim) + '_' + str(i),
+                                 'experiment_name': model_name + '_numberbatch_' + str(embedd_dim) + '_' + str(i),
                                  'model_name': model_name,
                                  'training': True,
                                  'testing': True,
@@ -45,8 +48,8 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
                                  'use_punct': True,
                                  'train_embeddings': True,
                                  'embedding_dim': embedd_dim,
-                                 'embedding_type': 'fasttext',
-                                 'embedding_source': 'crawl-300d-2M'}
+                                 'embedding_type': 'numberbatch',
+                                 'embedding_source': 'numberbatch-en'}
 
             # Load model params if file exists otherwise defaults will be used
             model_param_file = 'model_params.json'

@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-
 import warnings
 import tensorflow as tf
 from tensorflow.keras import backend as K
