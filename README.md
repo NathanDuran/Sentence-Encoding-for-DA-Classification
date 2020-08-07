@@ -5,6 +5,7 @@
 - CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
 
 - Test BERT large and Albert
+- REDO TEXTCNN Vocab size = 5k!!!!!!!!!!
 
 - Upgrade to tf2 - https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/guide/migrate.ipynb
 - Get all running from one script 

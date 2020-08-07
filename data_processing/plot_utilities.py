@@ -83,6 +83,58 @@ def plot_line_chart(data, x='index', y='value', hue='group', style=None, size=No
     return g, g.get_figure()
 
 
+def plot_line_bar_chart(data, bar_data, x='index', y='value', hue='variable', title='', y_label='', x_label='', colour='Paired',
+                        style=None, size=None, bar_x='index', bar_y='value', bar_y_label='', bar_width=100,
+                        bar_axis_step=None, bar_axis_range=None, bar_alpha=0.5, bar_color='tab:blue',
+                        legend_loc='best', num_legend_col=3):
+    # If using xkcd colours set the pallet, else use seaborn
+    if colour in colour_palettes.keys():
+        # Create colour palette for each item in group
+        palette = dict(zip(data[hue].unique(), colour_palettes[colour]))
+    else:
+        palette = sns.color_palette(colour, n_colors=len(data[hue].unique()))
+
+    # Create the barchart
+    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
+    g = sns.lineplot(data=data, x=x, y=y, hue=hue, style=style, size=size,
+                     err_style='band', ci=24, sort=False, palette=palette)
+    sns.despine(ax=g, left=True)
+
+    # Add barchart
+    g2 = g.twinx()
+    g2.bar(x=bar_data[bar_x], height=bar_data[bar_y], width=bar_width, alpha=bar_alpha, color=bar_color)
+
+    # Add legend
+    handles, labels = g.get_legend_handles_labels()
+    g.legend(handles[1:], labels[1:], frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+
+    # Set line axis labels
+    g.yaxis.set_label_position("right")
+    g.yaxis.tick_right()
+    g.set_xlabel(x_label)
+    g.set_ylabel(y_label)
+
+    # Set bar axis labels
+    g2.grid(False)
+    g2.yaxis.set_label_position("left")
+    g2.yaxis.tick_left()
+    g2.set_ylabel(bar_y_label)
+    if bar_axis_range:
+        g2.set_ylim(bar_axis_range)
+    if bar_axis_step:
+        start, end = g2.get_ylim()
+        g2.yaxis.set_ticks(np.arange(start, end, bar_axis_step))
+
+    # Set shared x axis labels
+    plt.xticks(data[x].unique())
+
+    # Set main title
+    g.set_title(title, fontsize=14, fontweight='bold')
+
+    plt.tight_layout()
+    return g.get_figure()
+
+
 def plot_scatter_chart(data, x='index', y='value', hue='group', size='metric',
                        title='', y_label='', x_label='', colour='Paired'):
     # If using xkcd colours set the pallet, else use seaborn

@@ -20,7 +20,7 @@ class Checkpointer:
             minimise (bool): Whether the supplied metric values should be minimised (loss) or maximised (accuracy)
 
          Attributes:
-             best (dict): Dictionary mapping training steps (keys) and the metric value (values)
+            best (dict): Dictionary mapping training steps (keys) and the metric value (values)
         """
 
         self.checkpoint_dir = checkpoint_dir
