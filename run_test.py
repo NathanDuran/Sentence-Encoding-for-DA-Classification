@@ -27,8 +27,8 @@ tf.InteractiveSession(config=config)
 experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 
 for i in range(1, 2):
-    experiment_params = {'task_name': 'kvret',
-                         'experiment_name': 'lstm_crf_ap_' + str(i),
+    experiment_params = {'task_name': 'maptask',
+                         'experiment_name': 'lstm_maptask_test_' + str(i),
                          'model_name': 'lstm',
                          'training': True,
                          'testing': True,
@@ -36,7 +36,7 @@ for i in range(1, 2):
                          'load_model': True,
                          'init_ckpt_file': None,
                          'batch_size': 32,
-                         'num_epochs': 5,
+                         'num_epochs': 15,
                          'evaluate_steps': 50,
                          'early_stopping': True,
                          'patience': 3,
@@ -69,7 +69,7 @@ for i in range(1, 2):
 
     # Set up comet experiment
     # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+    experiment = Experiment(auto_output_logging='simple', disabled=False)  # TODO remove this when not testing
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)
