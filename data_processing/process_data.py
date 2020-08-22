@@ -87,10 +87,8 @@ data = load_dataframe(os.path.join(data_dir, task_name + '_language_models.csv')
 data = data.drop('experiment_name', axis='columns')
 data.model_name = data.model_name.str.replace("_", " ")
 
-# data.drop(data[data.model_name == 'bert'].index, inplace=True)  # TODO Drop the duplicate/un-needed i.e. extra berts
-
 # Sort by model name and experiment type
-sort_order = ['bert', 'bert base', 'bert large', 'gpt2', 'dialogpt', 'convert', 'elmo', 'use', 'mlstm char lm', 'nnlm'] # TODO change this to add new models
+sort_order = ['bert', 'roberta', 'gpt2', 'dialogpt', 'xlnet', 'convert', 'elmo', 'use', 'mlstm char lm', 'nnlm']
 data = sort_dataframe_by_list(data, 'model_name', sort_order)
 
 # Save dataframe with all the data in
