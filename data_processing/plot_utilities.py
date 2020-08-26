@@ -484,7 +484,7 @@ def plot_relplot(data, x='index', y='value', hue='group', row=None, col='metric'
 
 def plot_facetgrid(data, x='index', y='value', hue='group', row=None, col='metric', kind='bar',
                    title='', y_label='', x_label='', axis_titles=False, share_x=False, share_y=False, num_col=2,
-                   colour='Paired', legend_loc='best', num_legend_col=3, all_legend=False, height=6, aspect=2,
+                   colour='Paired', num_colour=None, legend_loc='best', num_legend_col=3, all_legend=False, height=6, aspect=2,
                    show_bar_value=False, bar_value_rotation=0, x_tick_rotation=0, y_tick_rotation=0, **kwargs):
 
     # Facet grid plot functions
@@ -542,7 +542,7 @@ def plot_facetgrid(data, x='index', y='value', hue='group', row=None, col='metri
         else:
             palette = dict(zip(data[x].unique(), colour_palettes[colour]))
     else:
-        palette = sns.color_palette(colour)
+        palette = sns.color_palette(colour, num_colour) if num_colour else sns.color_palette(colour)
 
     # Create FacetGrid for each item in 'metric'
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
