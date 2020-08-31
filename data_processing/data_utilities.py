@@ -60,15 +60,19 @@ def get_max(data, exp_params):
     """Creates dataframe of the max validation/test/F1 and corresponding experiment value for an experiment_type."""
     # Get the index with the max validation accuracy by experiment_type value
     max_val = data.loc[data.groupby(['model_name'], sort=False)['val_acc'].idxmax()].reset_index()
-    max_val.drop(max_val.columns.difference(['model_name',  'val_acc'] + exp_params), 1, inplace=True)
+    max_val.drop(max_val.columns.difference(['model_name',  'val_acc', 'val_acc_std'] + exp_params), 1, inplace=True)
 
     # Get the index with the max test/F1 accuracy by experiment_type value
     max_test = data.loc[data.groupby(['model_name'], sort=False)['test_acc'].idxmax()].reset_index()
-    max_test.drop(max_test.columns.difference(['model_name', 'test_acc', 'f1_micro'] + exp_params), 1, inplace=True)
+    max_test.drop(max_test.columns.difference(['model_name', 'test_acc', 'test_acc_std'] + exp_params), 1, inplace=True)
     max_test.drop('model_name', axis=1, inplace=True)
 
+    max_f1 = data.loc[data.groupby(['model_name'], sort=False)['test_acc'].idxmax()].reset_index()
+    max_f1.drop(max_f1.columns.difference(['model_name', 'f1_micro', 'f1_micro_std']), 1, inplace=True)
+    max_f1.drop('model_name', axis=1, inplace=True)
+
     # Group the validation and test data
-    max_data = pd.concat([max_val, max_test], axis=1, ignore_index=False, sort=False)
+    max_data = pd.concat([max_val, max_test, max_f1], axis=1, ignore_index=False, sort=False)
 
     # Remove duplicate columns i.e. model_name
     # max_data = max_data.loc[:, ~max_data.columns.duplicated()]
