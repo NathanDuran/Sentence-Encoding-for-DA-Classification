@@ -24,12 +24,12 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 session = tf.InteractiveSession(config=config)
 
-experiment_type = 'input_seq2'  # TODO !Change experiment_type name?!
-for model_name in ['cnn', 'text_cnn', 'dcnn']:
-# for model_name in ['rcnn', 'lstm', 'gru']:
+experiment_type = 'max_seq_length'  # TODO !Change experiment_type name?!
+for model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'gru', 'bi_gru']:
+# for model_name in ['lstm', 'bi_lstm', 'gru', 'bi_gru']:
     for i in range(1, 11):
-        experiment_params = {'task_name': 'swda',
-                             'experiment_name': model_name + '_seq=25_voc=2.5k' + str(i),
+        experiment_params = {'task_name': 'maptask',
+                             'experiment_name': model_name + '_5seqlength_' + str(i),
                              'model_name': model_name,
                              'training': True,
                              'testing': True,
@@ -41,8 +41,8 @@ for model_name in ['cnn', 'text_cnn', 'dcnn']:
                              'evaluate_steps': 500,
                              'early_stopping': False,
                              'patience': 3,
-                             'vocab_size': 2500,
-                             'max_seq_length': 25,
+                             'vocab_size': 1700,
+                             'max_seq_length': 5,
                              'to_tokens': True,
                              'to_lower': True,
                              'use_punct': True,

@@ -27,9 +27,9 @@ for i in range(1, 11):
     # Run Tensorflow session
     sess = tf.Session(config=config)
 
-    experiment_params = {'task_name': 'swda',
-                         'experiment_name': 'bert_large' + '_' + str(i),
-                         'model_name': 'bert_large',
+    experiment_params = {'task_name': 'maptask',
+                         'experiment_name': 'bert_' + str(i),
+                         'model_name': 'bert_base',
                          'training': True,
                          'testing': True,
                          'save_model': True,
@@ -40,11 +40,11 @@ for i in range(1, 11):
                          'evaluate_steps': 500,
                          'early_stopping': False,
                          'patience': 3,
-                         'vocab_size': 10000,
-                         'max_seq_length': 128,
+                         'vocab_size': 1700,
+                         'max_seq_length': 115,
                          'to_tokens': False,
                          'use_punct': True,
-                         'embedding_dim': 1024,
+                         'embedding_dim': 768,
                          'embedding_type': 'bert',
                          'embedding_source': 'bert'}
 
@@ -67,8 +67,8 @@ for i in range(1, 11):
     init_ckpt_file = experiment_params['init_ckpt_file']
 
     # Set up comet experiment
-    # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+    experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
+    # experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)

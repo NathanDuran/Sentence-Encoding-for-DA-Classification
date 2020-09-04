@@ -254,7 +254,7 @@
     "dropout_rate": 0.05,
     "dense_units": 256
   },
-  "albert_large": {
+    "albert_large": {
     "albert_model": "large",
     "learning_rate": 0.0015,
     "optimiser": "adagrad",
@@ -271,7 +271,7 @@
     "dropout_rate": 0.05,
     "dense_units": 256
   },
-  "bert_large": {
+    "bert_large": {
     "bert_model": "large",
     "learning_rate": 0.0015,
     "optimiser": "adagrad",

@@ -39,7 +39,7 @@ class BertLayer(tf.keras.layers.Layer):
         super(BertLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.bert = hub.Module(self.bert_url, trainable=self.trainable, name="{}_module".format(self.name))
+        self.bert = hub.Module(self.model_url, trainable=self.trainable, name="{}_module".format(self.name))
 
         # Remove unused layers
         trainable_vars = self.bert.variables
