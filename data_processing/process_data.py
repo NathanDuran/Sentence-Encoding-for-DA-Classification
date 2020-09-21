@@ -4,14 +4,18 @@ pd.set_option('display.max_columns', 50)
 pd.set_option('display.width', 500)
 
 # Set the task and experiment type
-task_name = 'swda'
+task_name = 'maptask'
 
 # Set data dir
 data_dir = os.path.join('..', task_name)
 
 
 """Process all input sequence data"""
-for exp_param in ['vocab_size', 'max_seq_length', 'use_punct', 'to_lower']:
+params = ['vocab_size', 'max_seq_length']
+if task_name == 'swda':
+    params += ['use_punct', 'to_lower']
+
+for exp_param in params:
 
     # Load experiment data
     data = load_dataframe(os.path.join(data_dir, task_name + '_' + exp_param + '.csv'))
@@ -34,8 +38,11 @@ for exp_param in ['vocab_size', 'max_seq_length', 'use_punct', 'to_lower']:
     data_means = data.groupby(['model_name', exp_param], sort=True).mean()
 
     # Add std columns
-    if exp_param == 'to_lower':
-        data.drop(columns=['vocab_size', 'max_seq_length', 'use_punct'], inplace=True)  # Need to drop columns to calc std
+    if task_name == 'maptask' or exp_param == 'to_lower':
+        cols = params.copy()
+        cols.append('use_punct')
+        cols.remove(exp_param)
+        data.drop(columns=cols, inplace=True)  # Need to drop columns to calc std
     data_std = data.groupby(['model_name', exp_param], sort=True).std()
     data_std = data_std.drop(data_std.columns.difference(data_std.columns[data_std.columns.get_loc('train_loss'):]), axis=1)
     data_std = data_std.add_suffix('_std')

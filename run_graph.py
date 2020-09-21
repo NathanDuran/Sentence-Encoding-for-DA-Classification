@@ -35,7 +35,7 @@ for i in range(1, 11):
                          'init_ckpt_file': None,
                          'batch_size': 32,
                          'num_epochs': 15,
-                         'evaluate_steps': 500,
+                         'evaluate_steps': 100,
                          'early_stopping': False,
                          'patience': 3,
                          'vocab_size': 1700,
@@ -65,8 +65,8 @@ for i in range(1, 11):
     init_ckpt_file = experiment_params['init_ckpt_file']
 
     # Set up comet experiment
-    # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+    experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
+    # experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)
