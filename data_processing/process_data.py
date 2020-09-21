@@ -19,12 +19,16 @@ for exp_param in params:
 
     # Load experiment data
     data = load_dataframe(os.path.join(data_dir, task_name + '_' + exp_param + '.csv'))
+
     # Remove the numbered experiment names and replace '_' char
     data = data.drop('experiment_name', axis='columns')
     data.model_name = data.model_name.str.replace("_", " ")
 
+    # Drop bi-directional models
+    data = data[~data['model_name'].isin(['bi lstm', 'bi gru'])]
+
     # Sort by model name and experiment type
-    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']
+    sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'gru']
     data = sort_dataframe_by_list_and_param(data, 'model_name', sort_order, exp_param)
 
     # Multiply accuracy columns by 100
@@ -59,12 +63,16 @@ for exp_param in params:
 exp_param = 'input_seq'
 # Load experiment data
 data = load_dataframe(os.path.join(data_dir, task_name + '_' + exp_param + '.csv'))
+
 # Remove the numbered experiment names and replace '_' char
 data = data.drop('experiment_name', axis='columns')
 data.model_name = data.model_name.str.replace("_", " ")
 
+# Drop bi-directional models
+data = data[~data['model_name'].isin(['bi lstm', 'bi gru'])]
+
 # Sort by model name
-sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'bi lstm', 'gru', 'bi gru']
+sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'gru']
 data = sort_dataframe_by_list(data, 'model_name', sort_order)
 
 # Multiply accuracy columns by 100
@@ -94,9 +102,13 @@ save_dataframe(os.path.join(task_name, exp_param, exp_param + '_mean_data.csv'),
 exp_param = 'embedding_type'
 # Load experiment data
 data = load_dataframe(os.path.join(data_dir, task_name + '_' + exp_param + '.csv'))
+
 # Remove the numbered experiment names and replace '_' char
 data = data.drop('experiment_name', axis='columns')
 data.model_name = data.model_name.str.replace("_", " ")
+
+# Drop bi-directional models
+data = data[~data['model_name'].isin(['bi lstm', 'bi gru'])]
 
 # Sort by model name
 sort_order = ['cnn', 'text cnn', 'dcnn', 'rcnn', 'lstm', 'gru']

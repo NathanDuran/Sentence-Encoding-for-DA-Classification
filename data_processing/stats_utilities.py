@@ -76,7 +76,7 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
         2       dcnn  13.045170  0.598809
     """
     # Create results frame
-    levene_frame = pd.DataFrame(columns=['model_name', 't-stat', 'p-value'])
+    levene_frame = pd.DataFrame(columns=['model_name', exp_param, 't-stat', 'p-value'])
 
     # Get the list of models and ranges of experiment
     model_names = data['model_name'].unique()
