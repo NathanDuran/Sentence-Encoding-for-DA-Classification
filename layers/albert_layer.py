@@ -5,37 +5,34 @@ import tensorflow_hub as hub
 class AlbertLayer(tf.keras.layers.Layer):
     """ Wraps the ALBERT module from Tensorflow Hub in a Keras Layer."""
 
-    def __init__(self, output_mode="sequence", albert_model='base', **kwargs):
+    def __init__(self, model_url, albert_model='base', output_mode="sequence", **kwargs):
         """Constructor for BERT Layer.
 
         Args:
+            model_url (string): Tensorflow Hub Model url. Default should be "https://tfhub.dev/google/albert_base/3"
+            albert_model (string): Determines the URL for the ALBERT module base, large etc. Default is base.
             output_mode (string):
                     pooled = Pooled output of the entire sequence with shape [batch_size, hidden_size]
                     sequence = Output every token in the input sequence with shape [batch_size, max_sequence_length, hidden_size]
-            albert_model (string): Determines the URL for the ALBERT module base, large etc. Default is base.
         """
         self.albert = None
         self.trainable = True
-        self.output_mode = output_mode
-        self.hidden_size = 768
+        self.albert_url = model_url
         self.albert_model = albert_model.lower()
-        self.albert_url = "https://tfhub.dev/google/albert_base/3"
+        self.hidden_size = 768
+        self.output_mode = output_mode
 
         if self.output_mode not in ["pooled", "sequence"]:
             raise NameError("ALBERT output_mode must be either pool or sequence but is " + self.output_mode)
 
         if self.albert_model == 'base':
             self.hidden_size = 768
-            self.albert_url = "https://tfhub.dev/google/albert_base/3"
         elif self.albert_model == 'large':
             self.hidden_size = 1024
-            self.albert_url = "https://tfhub.dev/google/albert_large/3"
         elif self.albert_model == 'xlarge':
             self.hidden_size = 2048
-            self.albert_url = "https://tfhub.dev/google/albert_xlarge/3"
         elif self.albert_model == 'xxlarge':
             self.hidden_size = 4096
-            self.albert_url = "https://tfhub.dev/google/albert_xxlarge/3"
         else:
             raise NameError("Unable to determine ALBERT model type."
                             "Should be one of 'base', 'large', 'xlarge' or 'xxlarge' but was " + self.albert_model)

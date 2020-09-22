@@ -5,24 +5,27 @@
 - CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
 
 - Test BERT large and Albert
-
-- Upgrade to tf2 - https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/guide/migrate.ipynb
-- Get all running from one script 
-- use hugging face transformers tokeniser (+models?)
-
-- Change bert and albert (and elmo/nnlm/use) configs to take url rather than type (so dont have to keep urls in layer)?
-
-- Update dataprocessor to do BERT(transformer) tokenisation internally, so can run bert from run_graph.py
+- Add Char embeddings?
+- Put embedding type in model params rather than experiment? (because different models are better with diff embeddings?)
 - Update checkpointer to only keep 1 best. + add metric name and val
+
+# Upgrade to tf2?
+- https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/guide/migrate.ipynb
+- Get all running from one script? OR just add run_transformers notebook
+- use hugging face transformers tokeniser (+models?)
+- Update dataprocessor to do BERT(transformer) tokenisation internally, so can run bert from run_transformer.py
 
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
 - ELMo + LSTM/Bi-LSTM + Attn
 - ELMo + Attn
 - BERT + LSTM
-- Distillbert
+
 - Roberta
-- GPT2!!!
+- GPT2
+- DialoGPT
+- XLNET
+
 - https://github.com/AlexYangLi/TextClassification
 
 ## Misc

@@ -5,10 +5,11 @@ import tensorflow_hub as hub
 class ElmoLayer(tf.keras.layers.Layer):
     """ Wraps the Elmo module from Tensorflow Hub in a Keras Layer."""
 
-    def __init__(self, input_mode='default', output_mode='default', **kwargs):
+    def __init__(self, model_url, input_mode='default', output_mode='default', **kwargs):
         """Constructor for ELMo Layer.
 
         Args:
+            model_url (string): Tensorflow Hub Model url. Default should be 'https://tfhub.dev/google/elmo/2'
             input_mode (string):
                     default = string sentence input with shape [batch_size]
                     tokens = string tokens input sequence with shape [batch_size, max_sequence_length]
@@ -23,7 +24,7 @@ class ElmoLayer(tf.keras.layers.Layer):
         self.input_mode = input_mode
         self.output_mode = output_mode
         self.dimensions = 1024
-        self.elmo_url = 'https://tfhub.dev/google/elmo/3'
+        self.model_url = model_url
         self.elmo = None
 
         # Check input and output mode is valid
@@ -37,7 +38,7 @@ class ElmoLayer(tf.keras.layers.Layer):
         super(ElmoLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        self.elmo = hub.Module(self.elmo_url, trainable=True, name="{}_module".format(self.name))
+        self.elmo = hub.Module(self.model_url, trainable=True, name="{}_module".format(self.name))
 
         if self.trainable:
             self._trainable_weights.extend(tf.trainable_variables(scope="^{}_module/.*".format(self.name)))

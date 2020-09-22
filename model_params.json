@@ -239,6 +239,7 @@
     "dense_units": 128
   },
     "elmo": {
+    "model_url": "https://tfhub.dev/google/elmo/2",
     "learning_rate": 0.04,
     "optimiser": "adagrad",
     "input_mode": "default",
@@ -246,7 +247,8 @@
     "dropout_rate": 0.01,
     "dense_units": 256
   },
-  "albert_base": {
+    "albert": {
+    "model_url": "https://tfhub.dev/google/albert_base/3",
     "albert_model": "base",
     "learning_rate": 0.0015,
     "optimiser": "adagrad",
@@ -254,28 +256,12 @@
     "dropout_rate": 0.05,
     "dense_units": 256
   },
-    "albert_large": {
-    "albert_model": "large",
-    "learning_rate": 0.0015,
-    "optimiser": "adagrad",
-    "output_mode": "sequence",
-    "dropout_rate": 0.05,
-    "dense_units": 256
-  },
-    "bert_base": {
+    "bert": {
+    "model_url": "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1",
     "bert_model": "base",
     "learning_rate": 0.0015,
     "optimiser": "adagrad",
     "num_fine_tune_layers": 12,
-    "output_mode": "sequence",
-    "dropout_rate": 0.05,
-    "dense_units": 256
-  },
-    "bert_large": {
-    "bert_model": "large",
-    "learning_rate": 0.0015,
-    "optimiser": "adagrad",
-    "num_fine_tune_layers": 16,
     "output_mode": "sequence",
     "dropout_rate": 0.05,
     "dense_units": 256
@@ -287,12 +273,14 @@
     "dense_units": 256
   },
     "use": {
+    "model_url": "https://tfhub.dev/google/universal-sentence-encoder-large/3",
     "learning_rate": 0.001,
     "optimiser": "adam",
     "dropout_rate": 0.02,
     "dense_units": 256
   },
     "nnlm": {
+    "model_url": "https://tfhub.dev/google/nnlm-en-dim128/1",
     "learning_rate": 0.0001,
     "optimiser": "adam",
     "dropout_rate": 0.02,

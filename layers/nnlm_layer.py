@@ -5,9 +5,9 @@ import tensorflow_hub as hub
 class NeuralNetworkLanguageModelLayer(tf.keras.layers.Layer):
     """ Wraps the Universal Sentence Encoder module from Tensorflow Hub in a Keras Layer."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, model_url, **kwargs):
         self.dimensions = 128
-        self.model_url = 'https://tfhub.dev/google/nnlm-en-dim128/1'
+        self.model_url = model_url
         self.encoder = None
         super(NeuralNetworkLanguageModelLayer, self).__init__(**kwargs)
 

@@ -1633,6 +1633,7 @@ class ELMo(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        model_url = kwargs['model_url'] if 'model_url' in kwargs.keys() else "https://tfhub.dev/google/elmo/2"
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         input_mode = kwargs['input_mode'] if 'input_mode' in kwargs.keys() else 'default'
@@ -1642,7 +1643,7 @@ class ELMo(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        x = ElmoLayer(input_mode=input_mode, output_mode=output_mode, name='elmo')(inputs)
+        x = ElmoLayer(model_url, input_mode=input_mode, output_mode=output_mode, name='elmo')(inputs)
 
         if output_mode != 'default':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
@@ -1682,6 +1683,7 @@ class ALBERT(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        model_url = kwargs['model_url'] if 'model_url' in kwargs.keys() else "https://tfhub.dev/google/albert_base/3"
         albert_model = kwargs['albert_model'] if 'albert_model' in kwargs.keys() else 'base'
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.0015  # BERT default 0.00002
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adagrad'  # BERT default adam
@@ -1695,7 +1697,7 @@ class ALBERT(Model):
         in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids", dtype='int32')
 
         albert_inputs = dict(input_ids=in_id, input_mask=in_mask, segment_ids=in_segment)
-        x = AlbertLayer(output_mode=output_mode, albert_model=albert_model, name='albert_' + albert_model)(albert_inputs)
+        x = AlbertLayer(model_url, albert_model=albert_model, output_mode=output_mode, name='albert_' + albert_model)(albert_inputs)
 
         if output_mode == 'sequence':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
@@ -1734,6 +1736,7 @@ class BERT(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        model_url = kwargs['model_url'] if 'model_url' in kwargs.keys() else "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
         bert_model = kwargs['bert_model'] if 'bert_model' in kwargs.keys() else 'base'
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.0015  # BERT default 0.00002
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adagrad'  # BERT default adam
@@ -1747,8 +1750,8 @@ class BERT(Model):
         in_mask = tf.keras.layers.Input(shape=input_shape, name="input_masks")
         in_segment = tf.keras.layers.Input(shape=input_shape, name="segment_ids")
         bert_inputs = [in_id, in_mask, in_segment]
-        x = BertLayer(num_fine_tune_layers=num_fine_tune_layers, output_mode=output_mode,
-                      bert_model=bert_model, name='bert_' + bert_model)(bert_inputs)
+        x = BertLayer(model_url, bert_model=bert_model, num_fine_tune_layers=num_fine_tune_layers,
+                      output_mode=output_mode,name='bert_' + bert_model)(bert_inputs)
 
         if output_mode == 'sequence':
             x = tf.keras.layers.GlobalAveragePooling1D()(x)
@@ -1826,6 +1829,7 @@ class UniversalSentenceEncoder(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        model_url = kwargs['model_url'] if 'model_url' in kwargs.keys() else "https://tfhub.dev/google/universal-sentence-encoder-large/3"
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
@@ -1833,7 +1837,7 @@ class UniversalSentenceEncoder(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = UniversalSentenceEncoderLayer(name='universal_sentence_encoder')(inputs)
+        embedding = UniversalSentenceEncoderLayer(model_url, name='universal_sentence_encoder')(inputs)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)
@@ -1865,6 +1869,7 @@ class NeuralNetworkLanguageModel(Model):
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         # Unpack key word arguments
+        model_url = kwargs['model_url'] if 'model_url' in kwargs.keys() else "https://tfhub.dev/google/nnlm-en-dim128/1"
         learning_rate = kwargs['learning_rate'] if 'learning_rate' in kwargs.keys() else 0.001
         optimiser = kwargs['optimiser'] if 'optimiser' in kwargs.keys() else 'adam'
         dense_activation = kwargs['dense_activation'] if 'dense_activation' in kwargs.keys() else 'relu'
@@ -1872,7 +1877,7 @@ class NeuralNetworkLanguageModel(Model):
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 256
 
         inputs = tf.keras.layers.Input(shape=input_shape, dtype="string")
-        embedding = NeuralNetworkLanguageModelLayer(name='neural_network_language_model')(inputs)
+        embedding = NeuralNetworkLanguageModelLayer(model_url, name='neural_network_language_model')(inputs)
 
         x = tf.keras.layers.Dense(dense_units, activation=dense_activation)(embedding)
         x = tf.keras.layers.Dropout(dropout_rate)(x)

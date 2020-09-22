@@ -29,7 +29,7 @@ for i in range(1, 11):
 
     experiment_params = {'task_name': 'maptask',
                          'experiment_name': 'bert_' + str(i),
-                         'model_name': 'bert_base',
+                         'model_name': 'bert',
                          'training': True,
                          'testing': True,
                          'save_model': True,
