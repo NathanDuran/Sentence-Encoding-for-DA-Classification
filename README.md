@@ -7,13 +7,13 @@
 - Test BERT large and Albert
 - Add Char embeddings?
 - Put embedding type in model params rather than experiment? (because different models are better with diff embeddings?)
-- Update checkpointer to only keep 1 best. + add metric name and val
+- Update checkpointer to only keep 1 best. + add metric name and value?
 
 # Upgrade to tf2?
 - https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/guide/migrate.ipynb
 - Get all running from one script? OR just add run_transformers notebook
 - use hugging face transformers tokeniser (+models?)
-- Update dataprocessor to do BERT(transformer) tokenisation internally, so can run bert from run_transformer.py
+- Update dataprocessor to do BERT(transformer) tokenisation internally, so can run bert/transformers from run_transformer.py
 
 ## Models to Add
 - ELMo + LSTM/Bi-LSTM
