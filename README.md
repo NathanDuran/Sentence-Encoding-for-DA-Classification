@@ -1,8 +1,8 @@
 # Supervised and Semi-supervised Sentence Encoding Methods for Dialogue Act Classification
 
 # TODO
-- test crf models?
-- CRF, More models and/or add use_crf to model_params (i.e. in model just swap classification layers)
+- Document but remove use_crf from the run script OR update CRF to work on tf 1.15/2.X
+
 
 - Test BERT large and Albert
 - Add Char embeddings?

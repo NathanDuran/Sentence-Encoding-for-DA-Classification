@@ -142,9 +142,9 @@ for model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'gru', 
         embeddings = embedding_processor.get_embedding(embeddings_dir, embedding_type, embedding_source, embedding_dim, vocabulary)
 
         # Build datasets from .npz files
-        train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=False)
-        val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=False)
-        test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=False)
+        train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=model_params['use_crf'])
+        val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=model_params['use_crf'])
+        test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=model_params['use_crf'])
         global_steps = int(len(list(train_text)) * num_epochs)
         train_steps = int(len(list(train_text)))
         val_steps = int(len(list(val_text)))
@@ -297,8 +297,12 @@ for model_name in ['cnn', 'text_cnn', 'dcnn', 'rcnn', 'lstm', 'bi_lstm', 'gru', 
 
                     # Append to lists for creating metrics
                     true_labels = np.append(true_labels, test_labels[test_step].flatten())
-                    predicted_labels = np.append(predicted_labels, np.argmax(batch_predictions, axis=1))
-                    predictions.append(batch_predictions)
+                    if model_params['use_crf']:  # TODO CRF outputs [batch_size, seq_len, num_labels], so just get max of first seq predictions
+                        predicted_labels = np.append(predicted_labels, np.argmax(batch_predictions[:, 0], axis=1))
+                        predictions.append(batch_predictions[:, 0])
+                    else:
+                        predicted_labels = np.append(predicted_labels, np.argmax(batch_predictions, axis=1))
+                        predictions.append(batch_predictions)
 
                 # Log final test result
                 experiment.log_metric('loss', test_loss.result().numpy(), step=test_steps)

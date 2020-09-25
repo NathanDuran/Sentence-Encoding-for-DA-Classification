@@ -27,6 +27,16 @@
     "dropout_rate": 0.1,
     "dense_units": 192
   },
+    "text_cnn_attn": {
+    "learning_rate": 0.02,
+    "optimiser": "adagrad",
+    "attention_type": "add",
+    "num_filters": 128,
+    "kernel_size": [1, 2, 3, 4, 5],
+    "pool_size": 8,
+    "dropout_rate": 0.1,
+    "dense_units": 192
+  },
     "dcnn": {
     "learning_rate": 0.02,
     "optimiser": "adagrad",
@@ -34,6 +44,15 @@
     "kernel_size": [7, 5],
     "dropout_rate": 0.1,
     "dense_units": 128
+  },
+    "dcnn_attn": {
+    "learning_rate": 0.02,
+    "optimiser": "adagrad",
+    "attention_type": "add",
+    "num_filters": 64,
+    "kernel_size": [7, 5],
+    "dropout_rate": 0.1,
+    "dense_units": 256
   },
     "rcnn": {
     "learning_rate": 0.001,
@@ -45,6 +64,18 @@
     "num_filters": 64,
     "dropout_rate": 0.02,
     "dense_units": 128
+  },
+    "rcnn_attn": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "attention_type": "add",
+    "use_gpu": true,
+    "lstm_units": 256,
+    "lstm_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "num_filters": 64,
+    "dropout_rate": 0.02,
+    "dense_units": 256
   },
     "lstm": {
     "learning_rate": 0.001,
@@ -63,8 +94,9 @@
     "use_gpu": true,
     "lstm_units": 256,
     "lstm_dropout": 0.2,
-    "recurrent_dropout": 0.1
-  },
+    "recurrent_dropout": 0.1,
+    "use_crf": true
+    },
     "lstm_attn": {
     "learning_rate": 0.001,
     "optimiser": "rmsprop",
@@ -156,6 +188,15 @@
     "pooling": "max",
     "dropout_rate": 0.02,
     "dense_units": 128
+  },
+    "gru_crf": {
+    "learning_rate": 0.001,
+    "optimiser": "rmsprop",
+    "use_gpu": true,
+    "gru_units": 256,
+    "gru_dropout": 0.2,
+    "recurrent_dropout": 0.1,
+    "use_crf": true
   },
     "gru_attn": {
     "learning_rate": 0.001,
