@@ -123,6 +123,7 @@ for i in range(1, 2):
     embedding_dim = experiment_params['embedding_dim']
     embedding_type = experiment_params['embedding_type']
     embedding_source = experiment_params['embedding_source']
+    use_crf = model_params['use_crf'] if 'use_crf' in model_params else False
 
     # Initialize the dataset processor
     data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length,
@@ -139,9 +140,9 @@ for i in range(1, 2):
     embeddings = embedding_processor.get_embedding(embeddings_dir, embedding_type, embedding_source, embedding_dim, vocabulary)
 
     # Build datasets from .npz files
-    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=model_params['use_crf'])
-    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=model_params['use_crf'])
-    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=model_params['use_crf'])
+    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=use_crf)
+    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=use_crf)
+    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=use_crf)
 
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))
@@ -295,7 +296,7 @@ for i in range(1, 2):
 
                 # Append to lists for creating metrics
                 true_labels = np.append(true_labels, test_labels[test_step].flatten())
-                if model_params['use_crf']:  # TODO CRF outputs [batch_size, seq_len, num_labels], so just get max of first seq predictions
+                if use_crf:  # TODO CRF outputs [batch_size, seq_len, num_labels], so just get max of first seq predictions
                     predicted_labels = np.append(predicted_labels, np.argmax(batch_predictions[:, 0], axis=1))
                     predictions.append(batch_predictions[:, 0])
                 else:

@@ -180,6 +180,11 @@ class CNNAttn(Model):
         dropout_rate = kwargs['dropout_rate'] if 'dropout_rate' in kwargs.keys() else 0.27
         dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 224
 
+        # If sequence length is too short need to reduce kernel/pool sizes
+        if kernel_size <= input_shape[0] * 2:
+            kernel_size = 2
+            pool_size = 2
+
         # Determine attention type
         if attention_type is 'dot':
             attention_layer = tf.keras.layers.Attention()
