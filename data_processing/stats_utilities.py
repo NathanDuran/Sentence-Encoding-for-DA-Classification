@@ -75,35 +75,49 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
         1   text cnn  13.273237  0.581202
         2       dcnn  13.045170  0.598809
     """
-    # Create results frame
-    levene_frame = pd.DataFrame(columns=['model_name', exp_param, 't-stat', 'p-value'])
+    if exp_param != 'model_name':
+        # Create results frame
+        levene_frame = pd.DataFrame(columns=['model_name', exp_param, 't-stat', 'p-value'])
 
-    # Get the list of models and ranges of experiment
-    model_names = data['model_name'].unique()
-    for model in model_names:
+        # Get the list of models and ranges of experiment
+        model_names = data['model_name'].unique()
+        for model in model_names:
 
-        # Create a list of all experiment values for this model
-        model_data = data.loc[(data['model_name'] == model)]
-        metric_data_list = []
-        for exp_param_value in model_data[exp_param].unique():
+            # Create a list of all experiment values for this model
+            model_data = data.loc[(data['model_name'] == model)]
+            metric_data_list = []
+            for exp_param_value in model_data[exp_param].unique():
 
+                # Select the metric column
+                metric_data_list.append(data.loc[(data['model_name'] == model) & (data[exp_param] == exp_param_value)][metric])
+
+            # Run Levene's
+            t, p = levene(*metric_data_list)
+
+            # Append to result frame
+            levene_frame = levene_frame.append({'model_name': model, 't-stat': t, 'p-value': p}, ignore_index=True)
+
+        if show_result:
+            if all(p_value > sig_level for p_value in levene_frame['p-value']):
+                print("All models " + exp_param + " have equal variance.")
+            else:
+                print("The following models " + exp_param + " do not have equal variance.")
+                print(levene_frame.loc[levene_frame['p-value'] <= sig_level])
+
+        return levene_frame
+    else:
+        levene_list = []
+        for model in data['model_name'].unique():
             # Select the metric column
-            metric_data_list.append(data.loc[(data['model_name'] == model) & (data[exp_param] == exp_param_value)][metric])
+            levene_list.append(data.loc[(data['model_name'] == model)][metric])
 
-        # Run Levene's
-        t, p = levene(*metric_data_list)
+        t, p_value = levene(*levene_list)
 
-        # Append to result frame
-        levene_frame = levene_frame.append({'model_name': model, 't-stat': t, 'p-value': p}, ignore_index=True)
-
-    if show_result:
-        if all(p_value > sig_level for p_value in levene_frame['p-value']):
-            print("All models " + exp_param + " have equal variance.")
-        else:
-            print("The following models " + exp_param + " do not have equal variance.")
-            print(levene_frame.loc[levene_frame['p-value'] <= sig_level])
-
-    return levene_frame
+        if show_result:
+            if p_value > sig_level:
+                print("All models have equal variance. P-value = " + str(round(p_value, 5)))
+            else:
+                print("Some models do not have equal variance. P-value = " + str(round(p_value, 5)))
 
 
 def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
@@ -188,15 +202,42 @@ def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True
         aov_data = aov_data[cols]
         return aov_data
 
-    # Get the list of models and ranges of experiment
-    model_names = data['model_name'].unique()
-    results_dict = dict()
-    for model in model_names:
-        # Create a list of all experiment values for this model
-        model_values_list = data.loc[(data['model_name'] == model)]
+    if exp_param != 'model_name':
+        # Get the list of models and ranges of experiment
+        model_names = data['model_name'].unique()
+        results_dict = dict()
+        for model in model_names:
+            # Create a list of all experiment values for this model
+            model_values_list = data.loc[(data['model_name'] == model)]
+
+            # Regression (ordinary least squares) for this metric and experiment type
+            anova = ols(metric + '~ C(' + exp_param + ')', data=model_values_list).fit()
+            # print(anova.summary())
+
+            # Calculate the stats table
+            anova_table = sm.stats.anova_lm(anova, typ=2)
+            # Add effect size to table
+            anova_table = _anova_table(anova_table)
+            #print(anova_table)
+
+            # Add this models results to the dict
+            results_dict[model] = anova_table.loc['C(' + exp_param + ')'].to_dict()
+
+        # Create dataframe
+        anova_frame = pd.DataFrame.from_dict(results_dict, orient='columns').T
+
+        if show_result:
+            if all(p_value <= sig_level for p_value in anova_frame['PR(>F)']):
+                print("All models have significant p-values when comparing " + exp_param + " groups.")
+            else:
+                print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
+                print(anova_frame.loc[anova_frame['PR(>F)'] > sig_level])
+
+        return anova_frame
+    else:
 
         # Regression (ordinary least squares) for this metric and experiment type
-        anova = ols(metric + '~ C(' + exp_param + ')', data=model_values_list).fit()
+        anova = ols(metric + '~ C(' + exp_param + ')', data=data).fit()
         # print(anova.summary())
 
         # Calculate the stats table
@@ -205,20 +246,15 @@ def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True
         anova_table = _anova_table(anova_table)
         #print(anova_table)
 
-        # Add this models results to the dict
-        results_dict[model] = anova_table.loc['C(' + exp_param + ')'].to_dict()
+        p_value = anova_table.iloc[0]['PR(>F)']
 
-    # Create dataframe
-    anova_frame = pd.DataFrame.from_dict(results_dict, orient='columns').T
+        if show_result:
+            if p_value <= sig_level:
+                print("The models have significant p-values when comparing groups. P-value = " + str(round(p_value, 5)))
+            else:
+                print("The models do not have significant p-values when comparing groups. P-value = " + str(round(p_value, 5)))
 
-    if show_result:
-        if all(p_value <= sig_level for p_value in anova_frame['PR(>F)']):
-            print("All models have significant p-values when comparing " + exp_param + " groups.")
-        else:
-            print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
-            print(anova_frame.loc[anova_frame['PR(>F)'] > sig_level])
-
-    return anova_frame
+        return anova_table
 
 
 def two_way_anova_test(data, exp_param1, exp_param2, metric, sig_level=0.05, show_result=True):
@@ -315,32 +351,43 @@ def tukey_hsd(data, exp_param, metric, sig_level=0.5, show_result=True):
         1          cnn     500    1500    0.0041   0.0083  0.0006  0.0077    True
         2          cnn     500    2000    0.0051   0.0010  0.0016  0.0087    True
     """
-    tukey_frame = pd.DataFrame()
-    # Get the list of models and ranges of experiment
-    model_names = data['model_name'].unique()
-    for model in model_names:
-        # Create a list of all experiment values for this model
-        model_data = data.loc[(data['model_name'] == model)]
 
+    if exp_param != 'model_name':
+        tukey_frame = pd.DataFrame()
+        # Get the list of models and ranges of experiment
+        model_names = data['model_name'].unique()
+        for model in model_names:
+            # Create a list of all experiment values for this model
+            model_data = data.loc[(data['model_name'] == model)]
+
+            # Compare the results (metric) for the range of values for this experiment_type
+            multi_comparison = MultiComparison(model_data[metric], model_data[exp_param])
+            # Create the tukey results table
+            tukey_results = multi_comparison.tukeyhsd()
+
+            # Convert the results to a dataframe
+            model_frame = pd.DataFrame(data=tukey_results._results_table.data[1:], columns=tukey_results._results_table.data[0])
+            model_frame.insert(0, column='model_name', value=model)
+
+            # Add to results frame
+            tukey_frame = pd.concat([tukey_frame, model_frame], axis=0, ignore_index=True)
+
+        tukey_frame.rename(columns={'p-adj': 'p-value'}, inplace=True)
+
+        if show_result:
+            if all(p_value <= sig_level for p_value in tukey_frame['p-value']):
+                print("All models have significant p-values when comparing " + exp_param + " groups.")
+            else:
+                print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
+                print(tukey_frame.loc[tukey_frame['p-value'] > sig_level])
+
+        return tukey_frame
+
+    else:
         # Compare the results (metric) for the range of values for this experiment_type
-        multi_comparison = MultiComparison(model_data[metric], model_data[exp_param])
+        multi_comparison = MultiComparison(data[metric], data[exp_param])
         # Create the tukey results table
         tukey_results = multi_comparison.tukeyhsd()
 
-        # Convert the results to a dataframe
-        model_frame = pd.DataFrame(data=tukey_results._results_table.data[1:], columns=tukey_results._results_table.data[0])
-        model_frame.insert(0, column='model_name', value=model)
-
-        # Add to results frame
-        tukey_frame = pd.concat([tukey_frame, model_frame], axis=0, ignore_index=True)
-
-    tukey_frame.rename(columns={'p-adj': 'p-value'}, inplace=True)
-
-    if show_result:
-        if all(p_value <= sig_level for p_value in tukey_frame['p-value']):
-            print("All models have significant p-values when comparing " + exp_param + " groups.")
-        else:
-            print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
-            print(tukey_frame.loc[tukey_frame['p-value'] > sig_level])
-
-    return tukey_frame
+        if show_result:
+            print(tukey_results)
