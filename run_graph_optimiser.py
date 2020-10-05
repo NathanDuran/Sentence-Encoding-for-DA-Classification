@@ -18,7 +18,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'convert_opt',
                      'model_name': 'convert',
-                     'project_name': 'model-optimisation',
+                     'project_name': 'sentence-encoding-for-da-model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
                      'evaluate_steps': 500,

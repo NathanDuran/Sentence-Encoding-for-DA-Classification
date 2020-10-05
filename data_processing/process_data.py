@@ -54,6 +54,7 @@ for exp_param in params:
 
     data_means.reset_index(inplace=True)
     data_means.model_name = data_means.model_name.str.replace("_", " ")
+    data_means = sort_dataframe_by_list(data_means, 'model_name', sort_order)
 
     # Save dataframe with mean data in
     save_dataframe(os.path.join(task_name, exp_param, exp_param + '_mean_data.csv'), data_means)
@@ -93,6 +94,7 @@ data_means = data_means.merge(data_std, left_on=['model_name', 'vocab_size', 'ma
 
 data_means.reset_index(inplace=True)
 data_means.model_name = data_means.model_name.str.replace("_", " ")
+data_means = sort_dataframe_by_list(data_means, 'model_name', sort_order)
 
 # Save dataframe with mean data in
 save_dataframe(os.path.join(task_name, exp_param, exp_param + '_mean_data.csv'), data_means)
@@ -132,6 +134,7 @@ data_means = data_means.merge(data_std, left_on=['model_name', exp_param, 'embed
 
 data_means.reset_index(inplace=True)
 data_means.model_name = data_means.model_name.str.replace("_", " ")
+data_means = sort_dataframe_by_list(data_means, 'model_name', sort_order)
 
 # Save dataframe with mean data in
 save_dataframe(os.path.join(task_name, exp_param, exp_param + '_mean_data.csv'), data_means)
@@ -168,6 +171,7 @@ data_means = data_means.merge(data_std, left_on=['model_name'], right_index=True
 
 data_means.reset_index(inplace=True)
 data_means.model_name = data_means.model_name.str.replace("_", " ")
+data_means = sort_dataframe_by_list(data_means, 'model_name', sort_order)
 
 # Save dataframe with mean data in
 save_dataframe(os.path.join(task_name, exp_param, exp_param + '_mean_data.csv'), data_means)

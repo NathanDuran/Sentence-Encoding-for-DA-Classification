@@ -23,7 +23,7 @@ sess = tf.Session()
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'bert_layer_opt',
                      'model_name': 'bert',
-                     'project_name': 'model-optimisation',
+                     'project_name': 'sentence-encoding-for-da-model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
                      'evaluate_steps': 500,

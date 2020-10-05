@@ -21,7 +21,7 @@ tf.enable_eager_execution()
 experiment_params = {'task_name': 'swda',
                      'experiment_name': 'nnlm_opt',
                      'model_name': 'nnlm',
-                     'project_name': 'model-optimisation',
+                     'project_name': 'sentence-encoding-for-da-model-optimisation',
                      'batch_size': 32,
                      'num_epochs': 5,
                      'evaluate_steps': 500,

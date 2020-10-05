@@ -29,7 +29,7 @@ experiment_type = 'embedding_type'  # TODO !Change experiment_type name?!
 for i in range(1, 2):
     experiment_params = {'task_name': 'maptask',
                          'experiment_name': 'test_' + str(i),
-                         'model_name': 'gru_crf',
+                         'model_name': 'bi_lstm',
                          'training': True,
                          'testing': True,
                          'save_model': True,
