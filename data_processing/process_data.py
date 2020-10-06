@@ -4,7 +4,7 @@ pd.set_option('display.max_columns', 50)
 pd.set_option('display.width', 500)
 
 # Set the task and experiment type
-task_name = 'maptask'
+task_name = 'swda'
 
 # Set data dir
 data_dir = os.path.join('..', task_name)
