@@ -105,8 +105,9 @@ def plot_line_bar_chart(data, bar_data, x='index', y='value', hue='variable', ti
     g2.bar(x=bar_data[bar_x], height=bar_data[bar_y], width=bar_width, alpha=bar_alpha, color=bar_color)
 
     # Add legend
+    g.get_legend().remove()  # Remove the legend from the first plot
     handles, labels = g.get_legend_handles_labels()
-    g.legend(handles[1:], labels[1:], frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
+    g2.legend(handles[1:], labels[1:], frameon=True, shadow=True, loc=legend_loc, ncol=num_legend_col)
 
     # Set line axis labels
     g.yaxis.set_label_position("right")
