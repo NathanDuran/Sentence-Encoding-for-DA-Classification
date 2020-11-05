@@ -367,20 +367,23 @@ def plot_dist_chart(data, metric='value', hue=None, row=None, col='', title='', 
     return g, g.fig
 
 
-def plot_heatmap(data, title='', y_label='', x_label='', colour='RdBu_r', custom_boundaries=None, center_val=None,
-                 show_cbar=True, annotate=True, num_format='.3f', linewidth=0.5, linecolour=None, x_tick_rotation=0):
+def plot_heatmap(data, title='', y_label='', x_label='', colour='RdBu_r', num_colour=None, custom_boundaries=None,
+                 center_val=None, show_cbar=True, annotate=True, num_format='.3f', annot_font_size=8,
+                 linewidth=0.5, linecolour=None, x_tick_rotation=0, y_tick_rotation=0, square=True):
+
     # Check if creating a custom colour map, else use seaborn
     if custom_boundaries:
         # Create custom colour palette for each item in group
         palette = create_colour_map(boundaries=custom_boundaries, pallet=colour)
     else:
-        palette = sns.color_palette(colour)
+        palette = sns.color_palette(colour, num_colour) if num_colour else sns.color_palette(colour)
 
     sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
     g = sns.heatmap(data, annot=annotate, fmt=num_format, linewidths=linewidth, linecolor=linecolour,
-                    cmap=palette, center=center_val, cbar=show_cbar)
+                    square=square, cmap=palette, center=center_val, cbar=show_cbar, annot_kws={"fontsize":annot_font_size})
     # Set axis labels
-    g.set_xticklabels(g.get_xticklabels(), rotation=x_tick_rotation)
+    g.set_xticklabels(g.get_xticklabels(), size=annot_font_size, rotation=x_tick_rotation)
+    g.set_yticklabels(g.get_yticklabels(), size=annot_font_size, rotation=y_tick_rotation)
     g.set_xlabel(x_label)
     g.set_ylabel(y_label)
 
