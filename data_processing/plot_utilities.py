@@ -86,7 +86,7 @@ def plot_line_chart(data, x='index', y='value', hue='group', style=None, size=No
 def plot_line_bar_chart(data, bar_data, x='index', y='value', hue='variable', title='', y_label='', x_label='', colour='Paired',
                         style=None, size=None, bar_x='index', bar_y='value', bar_y_label='', bar_width=100,
                         bar_axis_step=None, bar_axis_range=None, bar_alpha=0.5, bar_color='tab:blue',
-                        legend_loc='best', num_legend_col=3):
+                        legend_loc='best', num_legend_col=3, axislabel_fontsize=12, ticklabel_fontsize=12, xtick_rotation=0):
     # If using xkcd colours set the pallet, else use seaborn
     if colour in colour_palettes.keys():
         # Create colour palette for each item in group
@@ -95,7 +95,7 @@ def plot_line_bar_chart(data, bar_data, x='index', y='value', hue='variable', ti
         palette = sns.color_palette(colour, n_colors=len(data[hue].unique()))
 
     # Create the barchart
-    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid')
+    sns.set(rc={'figure.figsize': (11.7, 8.27)}, style='whitegrid', font_scale=1.5)
     g = sns.lineplot(data=data, x=x, y=y, hue=hue, style=style, size=size,
                      err_style='band', ci=24, sort=False, palette=palette)
     sns.despine(ax=g, left=True)
@@ -112,14 +112,21 @@ def plot_line_bar_chart(data, bar_data, x='index', y='value', hue='variable', ti
     # Set line axis labels
     g.yaxis.set_label_position("right")
     g.yaxis.tick_right()
-    g.set_xlabel(x_label)
-    g.set_ylabel(y_label)
+    # g.set_xlabel(x_label, fontsize=axislabel_fontsize, fontweight='bold')
+    # g.set_ylabel(y_label, fontsize=axislabel_fontsize, fontweight='bold')
+    g.set_xlabel(x_label, fontweight='bold')
+    g.set_ylabel(y_label, fontweight='bold')
+    # g.tick_params(labelsize=ticklabel_fontsize)
+    for tick in g.get_xticklabels():
+        tick.set_rotation(xtick_rotation)
 
     # Set bar axis labels
     g2.grid(False)
     g2.yaxis.set_label_position("left")
     g2.yaxis.tick_left()
-    g2.set_ylabel(bar_y_label)
+    # g2.set_ylabel(bar_y_label, fontsize=axislabel_fontsize, fontweight='bold')
+    g2.set_ylabel(bar_y_label, fontweight='bold')
+    # g2.tick_params(labelsize=ticklabel_fontsize)
     if bar_axis_range:
         g2.set_ylim(bar_axis_range)
     if bar_axis_step:
@@ -130,7 +137,7 @@ def plot_line_bar_chart(data, bar_data, x='index', y='value', hue='variable', ti
     plt.xticks(data[x].unique())
 
     # Set main title
-    g.set_title(title, fontsize=14, fontweight='bold')
+    g.set_title(title, fontsize=24, fontweight='bold')
 
     plt.tight_layout()
     return g.get_figure()
@@ -382,8 +389,9 @@ def plot_heatmap(data, title='', y_label='', x_label='', colour='RdBu_r', num_co
     g = sns.heatmap(data, annot=annotate, fmt=num_format, linewidths=linewidth, linecolor=linecolour,
                     square=square, cmap=palette, center=center_val, cbar=show_cbar, annot_kws={"fontsize":annot_font_size})
     # Set axis labels
+    vert_alignment = 'center' if y_tick_rotation != 0 else 'right'
     g.set_xticklabels(g.get_xticklabels(), size=annot_font_size, rotation=x_tick_rotation)
-    g.set_yticklabels(g.get_yticklabels(), size=annot_font_size, rotation=y_tick_rotation)
+    g.set_yticklabels(g.get_yticklabels(), size=annot_font_size, rotation=y_tick_rotation, va=vert_alignment)
     g.set_xlabel(x_label)
     g.set_ylabel(y_label)
 
@@ -488,8 +496,9 @@ def plot_relplot(data, x='index', y='value', hue='group', row=None, col='metric'
 
 def plot_facetgrid(data, x='index', y='value', hue='group', row=None, col='metric', kind='bar',
                    title='', y_label='', x_label='', axis_titles=False, share_x=False, share_y=False, num_col=2,
-                   colour='Paired', num_colour=None, legend_loc='best', num_legend_col=3, all_legend=False, height=6, aspect=2,
-                   show_bar_value=False, bar_value_rotation=0, x_tick_rotation=0, y_tick_rotation=0, **kwargs):
+                   colour='Paired', num_colour=None, legend_loc='best', num_legend_col=3, all_legend=False,
+                   height=6, aspect=2, show_bar_value=False, bar_value_rotation=0,
+                   x_tick_rotation=0, y_tick_rotation=0, **kwargs):
 
     # Facet grid plot functions
     def _scatter(*args, **kwargs):
