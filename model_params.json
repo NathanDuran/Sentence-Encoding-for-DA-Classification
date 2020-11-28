@@ -291,7 +291,7 @@
     "albert": {
     "model_url": "https://tfhub.dev/google/albert_base/3",
     "albert_model": "base",
-    "learning_rate": 0.0015,
+    "learning_rate": 0.015,
     "optimiser": "adagrad",
     "output_mode": "sequence",
     "dropout_rate": 0.05,

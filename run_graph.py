@@ -19,7 +19,7 @@ config.gpu_options.allow_growth = True
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-experiment_type = 'language_models'  # TODO !Change experiment_type name?!
+experiment_type = 'language_models'
 for i in range(1, 11):
 
     # Run Tensorflow session
@@ -65,8 +65,8 @@ for i in range(1, 11):
     init_ckpt_file = experiment_params['init_ckpt_file']
 
     # Set up comet experiment
-    experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    # experiment = Experiment(auto_output_logging='simple', disabled=True)  # TODO remove this when not testing
+    # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
+    experiment = Experiment(auto_output_logging='simple', disabled=True)
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)
@@ -329,7 +329,7 @@ for i in range(1, 11):
     sess.close()
     tf.keras.backend.clear_session()
 
-    # TODO remove when all experiments complete
+    # Log results to csv
     if training and testing:
         experiment_file = os.path.join(task_name, task_name + "_" + experiment_type + ".csv")
         save_experiment(experiment_file, experiment_params,
