@@ -21,13 +21,13 @@ config.gpu_options.allow_growth = True
 # Disable GPU
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-experiment_type = 'language_models'
 for i in range(1, 11):
 
     # Run Tensorflow session
     sess = tf.Session(config=config)
 
     experiment_params = {'task_name': 'maptask',
+                         'experiment_type': 'language_models',
                          'experiment_name': 'bert_' + str(i),
                          'model_name': 'bert',
                          'training': True,

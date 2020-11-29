@@ -24,10 +24,10 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 session = tf.InteractiveSession(config=config)
 
-experiment_type = 'vocab_size'  # Set experiment_type
 
 for i in range(1, 11):
     experiment_params = {'task_name': 'swda',
+                         'experiment_type': 'vocab_size',
                          'experiment_name': 'text_cnn_' + str(i),
                          'model_name': 'text_cnn',
                          'training': True,
