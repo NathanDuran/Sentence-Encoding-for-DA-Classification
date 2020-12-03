@@ -84,7 +84,9 @@ All of the optimisation results can be viewed in the [comet project](https://www
 
 All models are implemented using TensorFlow, and Keras. For each of the 6 Transformer based models we additionally use the [Huggingface Transformers](https://huggingface.co/transformers/) library. For the language models, any tokenisation was performed as appropriate for that model. For example, most Transformer based language models utilise WordPiece or SentencePiece tokenisation, and BERT requires sequences to have a special [CLS] token prepended. Again, tokenisation was performed using the HuggingFace Transformers library, to maintain consistency with the vocabulary and any special tokens associated with the particular model.
 
-All of the model implementations are in models.py. Each model has default parameters, however, they can also be specified (or changed) in model_params.json. These include the learining rate, optimiser, dropout, number of hidden units, etc.
+All of the model implementations are in [models.py](models.py) and implement the same abstract class. Valid model names are listed in the get_model() function at the top of [models.py](models.py). Some of the models require, or in the case of the language models have been wrapped in, custom Keras layers. These are all defined in the layers directory.
+
+Each model has default parameters defined, however, they can also be specified (or changed) in [model_params.json](model_params.json). These include the learining rate, optimiser, dropout, number of hidden units, etc.
 
 ### Example Model Params:
 
@@ -100,49 +102,11 @@ All of the model implementations are in models.py. Each model has default parame
 }
 ```
 
-Some of the models require, or in the case of the language models have been wrapped in, custom Keras layers. These are all defined in the layers directory.
-
-## Supervised Models
-
-The following can be run using the run_eager.py.
-
-Note: Each of these can be appended with '_attn', to run their attentional variants.
-
-- cnn
-- text_cnn
-- dcnn
-- rcnn
-- lstm
-- deep_lstm
-- bi_lstm
-- gru
-- deep_gru
-- bi_gru
-
-## Language models
-
-The following can be run using the run_graph.py.
-
-Note: These models need input to be strings, so to_tokens=false in the experiment_params and input_shape=(1,).
-
-- elmo (can also use tokenised strings)
-- albert
-- bert (input_shape can be max_seq_length)
-- use
-- nnlm
-- mlstm_char_lm
-- convert (requires tensorflow_text which only works on linux)
-
-The following can be run using the [transformers.ipynb](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing)
-
-Note: The init_ckpt_file in experiment_params must be a valid [pre-trained model](https://huggingface.co/transformers/pretrained_models.html).
-
-- roberta
-- gpt2
-- dialogpt
-- xlnet
+A more detailed description of each model is given in the [models readme.](models_readme.md)
 
 # Datasets <a name="datasets-link">
+
+Datasets are acquired and processed via the data_processor.py script.
 
 # Embeddings <a name="embeddings-link">
 
@@ -158,19 +122,3 @@ All of the results can be viewed in the [comet project](https://www.comet.ml/nat
 # TODO
 - Document but remove use_crf from the run script OR update CRF to work on tf 1.15/2.X
 add run_transformers notebook
-
-#### graph models
-Language models need to be strings to_tokens=false and input_shape=(1,)
-- elmo (or tokenised strings - but those suck)
-- albert
-- bert (input_shape can be max_seq_length)
-- use
-- nnlm
-- mlstm_char_lm
-- ConveRT (requires linux (tensorflow_text))
-
-## TF2/huggingface models
- Roberta
-- GPT2
-- DialoGPT
-- XLNET
