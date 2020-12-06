@@ -102,11 +102,24 @@ Each model has default parameters defined, however, they can also be specified (
 }
 ```
 
-A more detailed description of each model is given in the [models readme.](MODELS_README.md)
-
 # Datasets <a name="datasets-link">
 
-Datasets are acquired and processed via the data_processor.py script.
+Datasets are acquired and processed via the [data_processor.py](data_processor.py) script. First a DataProcessor must be instantiated with the task_name, and various other options for data preprocessing. The entire dataset can then be downloaded and processed with ```get_dataset()``` function, which saves a local copy in .npz format. The train, test and val sets can then be built using one of the 'build dataset' functions.
+
+Note: All of these steps are already implemented in each of the run scripts, you simply need to specify the task_name and preprocessing parameters in the experiment_params.
+
+Currently the data processor supports 4 different corpora:
+- [The Switchboard Dialogue Act Corpus (SwDA)](https://github.com/NathanDuran/Switchboard-Corpus)
+- [Maptask](https://github.com/NathanDuran/Maptask-Corpus)
+- [MRDA](https://github.com/NathanDuran/MRDA-Corpus)
+- [Oasis](https://github.com/NathanDuran/BT-Oasis-Corpus)
+
+|     Corpus     |     Num Classes    |     Vocabulary Size    |     Max Utterance Length (mean)    |     Total Utterances    |     Training Utterances    |     Validation Utterances    |     Test Utterances    |
+|----------------|--------------------|------------------------|------------------------------------|-------------------------|----------------------------|------------------------------|------------------------|
+|     SwDA       |     41             |     22301              |     133 (9.6)                      |     199740              |     192390                 |     3272                     |     4078               |
+|     Maptask    |     12             |     1797               |     115 (6.2)                      |     26743               |     21052                  |     2929                     |     2762               |
+| MRDA           | 5/12/52            | 10866                  | 85 (8)                             | 108202                  | 75067                      | 16433                        | 16702                  |
+| Oasis          | 42                 | 2230                   | 449 (9.7)                          | 15067                   | 12076                      | 1502                         | 1489                   |
 
 # Embeddings <a name="embeddings-link">
 
@@ -119,6 +132,4 @@ All of the results can be viewed in the [comet project](https://www.comet.ml/nat
 # Citation
 ---------------
 
-# TODO
-- Document but remove use_crf from the run script OR update CRF to work on tf 1.15/2.X
 
