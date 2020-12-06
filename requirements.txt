@@ -1,12 +1,12 @@
 jupyter==1.0.0
 Comet-ml==3.1.14
-graphviz==0.11.1
+graphviz
 pydot==1.4.1
 numpy==1.19.0
 pandas==1.0.5
 spacy==2.1.7
 gluonnlp==0.7.1
-mxnet==1.5.0
+mxnet
 tensorflow-gpu==1.15.0
 tensorflow_hub==0.5.0
 scikit-learn==0.20.3
