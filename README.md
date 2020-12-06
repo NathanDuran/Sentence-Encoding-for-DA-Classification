@@ -1,4 +1,5 @@
 # Sentence Encoding Methods for Dialogue Act Classification
+[![Documentation Status](https://readthedocs.org/projects/sentence-encoding-for-da-classification/badge/?version=latest)](https://sentence-encoding-for-da-classification.readthedocs.io/en/latest/?badge=latest)
 
 # Overview
 This repository contains all code, data and results/analysis for the paper Sentence Encoding for Dialogue Act Classification (TODO: ADD LINK TO PAPER).
@@ -10,8 +11,7 @@ We investigated the process of generating single-sentence representations for th
 2. [Models](#models-link)
 3. [Datasets](#datasets-link)
 4. [Embeddings](#embeddings-link)
-5. [Other Scripts](#scripts-link)
-6. [Results](#results-link)
+5. [Results](#results-link)
 
 # Usage <a name="usage-link">
 
@@ -37,9 +37,9 @@ All of the run experiment scripts are configured to record results with [Comet.m
 
 There are 3 run scripts included and you must run the correct script for a given model. For a full list see the [models readme.](MODELS_README.md)
 
-- All of the supervised models are implemented in eager mode, so can be run with **run_eager.py**
-- Because TF 1.x Hub modules, and several of the other language model implementations, require graph mode, they must be run using **run_graph.py**
-- BERT and ALBERT can be run using **run_bert.py** or the [transformers.ipynb](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing)
+- All of the supervised models are implemented in eager mode, so can be run with [run_eager.py](run_eager.py)
+- Because TF 1.x Hub modules, and several of the other language model implementations, require graph mode, they must be run using [run_graph.py](run_graph.py)
+- BERT and ALBERT can be run using [run_bert.py](run_bert.py) or the [transformers.ipynb](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing)
 - For RoBERTa, GPT2, DialoGPT and XLNET, it is suggested that you use the [transformers.ipynb](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing)
 
 To run an experiment with specific parameters there is a python dictionary declared at the beginning of each file. The 'experiment_params' contains all of the parameters neccessary for specifying the model, text pre-processing, embeddings, number of training epochs, batch size, etc.
@@ -110,7 +110,7 @@ Datasets are acquired and processed via the data_processor.py script.
 
 # Embeddings <a name="embeddings-link">
 
-# Other Scripts <a name="scripts-link">
+
 
 # Results <a name="results-link">
 
@@ -121,4 +121,4 @@ All of the results can be viewed in the [comet project](https://www.comet.ml/nat
 
 # TODO
 - Document but remove use_crf from the run script OR update CRF to work on tf 1.15/2.X
-add run_transformers notebook
+

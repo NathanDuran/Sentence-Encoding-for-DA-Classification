@@ -142,9 +142,9 @@ for i in range(1, 11):
     embeddings = embedding_processor.get_embedding(embeddings_dir, embedding_type, embedding_source, embedding_dim, vocabulary)
 
     # Build datasets from .npz files
-    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True, use_crf=use_crf)
-    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False, use_crf=use_crf)
-    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False, use_crf=use_crf)
+    train_text, train_labels = data_set.build_dataset_from_numpy('train', batch_size, is_training=True)
+    val_text, val_labels = data_set.build_dataset_from_numpy('val', batch_size, is_training=False)
+    test_text, test_labels = data_set.build_dataset_from_numpy('test', batch_size, is_training=False)
     global_steps = int(len(list(train_text)) * num_epochs)
     train_steps = int(len(list(train_text)))
     val_steps = int(len(list(val_text)))
