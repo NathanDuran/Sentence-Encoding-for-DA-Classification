@@ -109,6 +109,7 @@ class Model(object):
         Returns:
             model (tf.keras.Model): Keras model instance
         """
+
         raise NotImplementedError()
 
 
@@ -2331,7 +2332,7 @@ class MLSTMCharLM(Model):
 
     Implements the model as described in (if return_type='mean' and max_seq_length=64):
     Bothe, C. et al. (2018) 'A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks',
-     in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).
+    in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).
 
     Note: batch_size and max_seq_length must be manually set for the MLSTMCharLMLayer, see mlstm_char_lm_layer.py.
     Default embedding dimension is 4,096.

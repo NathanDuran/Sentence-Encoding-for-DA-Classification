@@ -24,6 +24,7 @@ def shapiro_wilk_test(data, exp_param, metric, sig_level=0.05, show_result=True)
         1          cnn       1000  0.934968  0.498493
         2          cnn       1500  0.904710  0.246593
     """
+
     # Create results frame
     shapiro_frame = pd.DataFrame(columns=['model_name', exp_param, 't-stat', 'p-value'])
 
@@ -75,6 +76,7 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
         1   text cnn  13.273237  0.581202
         2       dcnn  13.045170  0.598809
     """
+
     if exp_param != 'model_name':
         # Create results frame
         levene_frame = pd.DataFrame(columns=['model_name', exp_param, 't-stat', 'p-value'])
@@ -136,6 +138,7 @@ def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
                  t-statistic   p-value
         0          2.598956  0.011838
     """
+
     # Ensure only two groups are being tested
     if len(data[exp_param].unique()) != 2:
         raise ValueError("Too many groups in groups column! Found " + str(len(data[exp_param].unique())) + " but should == 2.")
