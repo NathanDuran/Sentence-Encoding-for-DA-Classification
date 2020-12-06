@@ -74,31 +74,31 @@ class Model(object):
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):
         """Defines the model architecture using the Keras functional API.
 
-        Example of 2 layer feed forward network with embeddings:
+            Example of 2 layer feed forward network with embeddings:
 
-        # Unpack key word arguments
-        dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 100
+            # Unpack key word arguments
+            dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 100
 
-        # Define model
-        inputs = tf.keras.Input(shape=input_shape, name='input_layer')
-        x = tf.keras.layers_t.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
-                                      output_dim=embedding_matrix.shape[1],  # Embedding dim
-                                      embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
-                                      input_length=input_shape[0],  # Max seq length
-                                      trainable=train_embeddings,
-                                      name='embedding_layer')(inputs)
-        x = tf.keras.layers_t.GlobalMaxPooling1D(name='global_pool')(x)
-        x = tf.keras.layers_t.Dense(dense_units, activation='relu', name='dense_1')(x)
-        outputs = tf.keras.layers_t.Dense(output_shape, activation='softmax', name='output_layer')(x)
+            # Define model
+            inputs = tf.keras.Input(shape=input_shape, name='input_layer')
+            x = tf.keras.layers_t.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size
+                                          output_dim=embedding_matrix.shape[1],  # Embedding dim
+                                          embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+                                          input_length=input_shape[0],  # Max seq length
+                                          trainable=train_embeddings,
+                                          name='embedding_layer')(inputs)
+            x = tf.keras.layers_t.GlobalMaxPooling1D(name='global_pool')(x)
+            x = tf.keras.layers_t.Dense(dense_units, activation='relu', name='dense_1')(x)
+            outputs = tf.keras.layers_t.Dense(output_shape, activation='softmax', name='output_layer')(x)
 
-        # Create keras model
-        model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
+            # Create keras model
+            model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)
 
-        # Create optimiser
-        optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
+            # Create optimiser
+            optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, **kwargs)
 
-        # Compile the model
-        model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
+            # Compile the model
+            model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])
 
         Args:
             input_shape (tuple): The input shape excluding batch size, i.e (sequence_length, )

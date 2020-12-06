@@ -977,7 +977,8 @@ Default embedding dimension is 4,096.</p>
 <dt id="models.Model.build_model">
 <code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Model.build_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the model architecture using the Keras functional API.</p>
-<p>Example of 2 layer feed forward network with embeddings:</p>
+<blockquote>
+<div><p>Example of 2 layer feed forward network with embeddings:</p>
 <p># Unpack key word arguments
 dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 100</p>
 <p># Define model
@@ -999,6 +1000,7 @@ model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)</p>
 optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs)</p>
 <p># Compile the model
 model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
