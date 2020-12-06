@@ -38,6 +38,8 @@ autosummary_generate = True
 
 master_doc = 'index'
 
+autodoc_mock_imports = ["graphviz"]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
