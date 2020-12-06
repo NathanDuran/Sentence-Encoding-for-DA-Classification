@@ -39,7 +39,7 @@ autosummary_generate = True
 master_doc = 'index'
 
 if os.environ.get('READTHEDOCS'):
-    autodoc_mock_imports = ['jupyter', 'graphviz', 'sklearn', 'mxnet', 'comet_ml', 'spacy', 'gluonnlp', 'tensorflow', 'tensorflow_hub', 'seaborn', 'numpy', 'pandas', 'matplotlib']
+    autodoc_mock_imports = ['jupyter', 'graphviz', 'sklearn', 'mxnet', 'comet_ml', 'spacy', 'gluonnlp', 'tensorflow', 'tensorflow_hub', 'seaborn', 'numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
