@@ -38,7 +38,8 @@ autosummary_generate = True
 
 master_doc = 'index'
 
-autodoc_mock_imports = ['jupyter', 'graphviz', 'mxnet']
+if os.environ.get('READTHEDOCS'):
+    autodoc_mock_imports = ['jupyter', 'graphviz', 'mxnet', 'gluonnlp', 'tensorflow-gpu']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
