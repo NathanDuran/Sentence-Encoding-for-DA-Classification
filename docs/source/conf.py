@@ -12,7 +12,6 @@
 #
 import os
 import sys
-import shutil
 sys.path.insert(0, os.path.abspath('../..'))
 
 
@@ -38,6 +37,7 @@ autodoc_default_flags = ['members']
 autodoc_default_options = {'autosummary': True}
 autosummary_generate = True
 
+master_doc = 'index'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -52,7 +52,7 @@ language = 'Python'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['**/maptask']
+exclude_patterns = []
 
 
 # -- Options for HTML output -------------------------------------------------
