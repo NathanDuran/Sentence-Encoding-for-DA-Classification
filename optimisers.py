@@ -76,8 +76,8 @@ def adagrad(lr, clip_args, **kwargs):
 def adam(lr, clip_args, **kwargs):
     """Adam optimization is a stochastic gradient descent method that is based on adaptive estimation of first-order
      and second-order moments. According to the paper Adam: A Method for Stochastic Optimization.Kingma et al., 2014,
-     the method is "computationally efficient, has little memory requirement,invariant to diagonal rescaling of
-      gradients, and is well suited for problems that are large in terms of data/parameters".
+     the method is 'computationally efficient, has little memory requirement,invariant to diagonal rescaling of
+      gradients, and is well suited for problems that are large in terms of data/parameters'.
     """
     beta_1 = kwargs['beta_1'] if 'beta_1' in kwargs.keys() else 0.9
     beta_2 = kwargs['beta_2'] if 'beta_2' in kwargs.keys() else 0.999

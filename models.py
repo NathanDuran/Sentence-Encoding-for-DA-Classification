@@ -68,6 +68,7 @@ class Model(object):
 
         Implementation specific default parameters can be declared here.
         """
+
         self.name = name
 
     def build_model(self, input_shape, output_shape, embedding_matrix, train_embeddings=True, **kwargs):

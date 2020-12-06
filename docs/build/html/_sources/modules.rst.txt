@@ -13,10 +13,4 @@ Sentence-Encoding-for-DA-Classification
    metrics
    models
    optimisers
-   run_bert
-   run_bert_optimiser
-   run_eager
-   run_eager_optimiser
-   run_graph
-   run_graph_optimiser
-   tokenization
+
