@@ -1,3 +1,4 @@
+import os
 import warnings
 from sklearn.metrics import precision_recall_fscore_support, classification_report, confusion_matrix
 import numpy as np
@@ -156,10 +157,8 @@ def save_results(file_name, test_loss, test_accuracy, metrics):
             file.write(key + ': ' + str(value) + '\n')
 
 
-# TODO remove when all experiments complete?
 def save_experiment(file_name, params, train_loss, train_acc, val_loss, val_acc, test_loss, test_acc, metrics):
-    import os
-
+    """Saves/appends all experiment parameters and results to .csv file."""
     if not os.path.exists(file_name):
         with open(file_name, 'w+') as file:
             file.write("'experiment_name','model_name',"

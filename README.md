@@ -35,11 +35,11 @@ All of the run experiment scripts are configured to record results with [Comet.m
 
 ## Run Classifier
 
-There are 3 run scripts included and you must run the correct script for a given model. For a full list see the [models list](#models-link).
+There are 3 run scripts included and you must run the correct script for a given model. For a full list see the [models readme.](MODELS_README.md)
 
-- All of the supervised models are implemented in eager mode, so can be run with run_eager.py
-- Because TF 1.x Hub modules, and several of the other language model implementations, require graph mode, they must be run using run_graph.py
-- BERT and ALBERT can be run using run_bert.py or the [transformers.ipynb](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing)
+- All of the supervised models are implemented in eager mode, so can be run with **run_eager.py**
+- Because TF 1.x Hub modules, and several of the other language model implementations, require graph mode, they must be run using **run_graph.py**
+- BERT and ALBERT can be run using **run_bert.py** or the [transformers.ipynb](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing)
 - For RoBERTa, GPT2, DialoGPT and XLNET, it is suggested that you use the [transformers.ipynb](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FbdNP58IsBgBv_dq2Q8dSPckOCT5vLzo?usp=sharing)
 
 To run an experiment with specific parameters there is a python dictionary declared at the beginning of each file. The 'experiment_params' contains all of the parameters neccessary for specifying the model, text pre-processing, embeddings, number of training epochs, batch size, etc.
@@ -102,7 +102,7 @@ Each model has default parameters defined, however, they can also be specified (
 }
 ```
 
-A more detailed description of each model is given in the [models readme.](models_readme.md)
+A more detailed description of each model is given in the [models readme.](MODELS_README.md)
 
 # Datasets <a name="datasets-link">
 

@@ -1,0 +1,637 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Data/Results Processingg &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Early Stopper" href="early_stopper.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data/Results Processingg</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_processing.data_utilities">Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_processing.plot_utilities">Plot Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_processing.stats_utilities">Stats Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Data/Results Processingg</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/data_processing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-results-processingg">
+<h1>Data/Results Processingg<a class="headerlink" href="#data-results-processingg" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-data_processing.data_utilities">
+<span id="data-utilities"></span><h2>Data Utilities<a class="headerlink" href="#module-data_processing.data_utilities" title="Permalink to this headline">¶</a></h2>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.data_utilities.get_max" title="data_processing.data_utilities.get_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max</span></code></a>(data, exp_params)</p></td>
+<td><p>Creates dataframe of the max validation/test/F1 and corresponding experiment value for an experiment_type.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.data_utilities.load_dataframe" title="data_processing.data_utilities.load_dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_dataframe</span></code></a>(path[, multi_index, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.data_utilities.save_dataframe" title="data_processing.data_utilities.save_dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_dataframe</span></code></a>(path, data[, index_label])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.data_utilities.sort_dataframe_by_list" title="data_processing.data_utilities.sort_dataframe_by_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_dataframe_by_list</span></code></a>(data, sort_column, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.data_utilities.sort_dataframe_by_list_and_param" title="data_processing.data_utilities.sort_dataframe_by_list_and_param"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_dataframe_by_list_and_param</span></code></a>(data, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="data_processing.data_utilities.get_max">
+<code class="sig-prename descclassname">data_processing.data_utilities.</code><code class="sig-name descname">get_max</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exp_params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.data_utilities.get_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates dataframe of the max validation/test/F1 and corresponding experiment value for an experiment_type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.data_utilities.load_dataframe">
+<code class="sig-prename descclassname">data_processing.data_utilities.</code><code class="sig-name descname">load_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">multi_index</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">num_header_rows</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.data_utilities.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.data_utilities.save_dataframe">
+<code class="sig-prename descclassname">data_processing.data_utilities.</code><code class="sig-name descname">save_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">index_label</span><span class="o">=</span><span class="default_value">'index'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.data_utilities.save_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.data_utilities.sort_dataframe_by_list">
+<code class="sig-prename descclassname">data_processing.data_utilities.</code><code class="sig-name descname">sort_dataframe_by_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">sort_column</span></em>, <em class="sig-param"><span class="n">sort_order</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.data_utilities.sort_dataframe_by_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.data_utilities.sort_dataframe_by_list_and_param">
+<code class="sig-prename descclassname">data_processing.data_utilities.</code><code class="sig-name descname">sort_dataframe_by_list_and_param</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">sort_column</span></em>, <em class="sig-param"><span class="n">sort_order</span></em>, <em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.data_utilities.sort_dataframe_by_list_and_param" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-data_processing.plot_utilities">
+<span id="plot-utilities"></span><h2>Plot Utilities<a class="headerlink" href="#module-data_processing.plot_utilities" title="Permalink to this headline">¶</a></h2>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.create_colour_map" title="data_processing.plot_utilities.create_colour_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_colour_map</span></code></a>([boundaries, pallet])</p></td>
+<td><p>Creates a custom colour map around the specified boundary values.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_bar_chart" title="data_processing.plot_utilities.plot_bar_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_bar_chart</span></code></a>(data[, x, y, hue, title, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_box_chart" title="data_processing.plot_utilities.plot_box_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_box_chart</span></code></a>(data[, x, y, hue, title, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_dist_chart" title="data_processing.plot_utilities.plot_dist_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_dist_chart</span></code></a>(data[, metric, hue, row, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_facetgrid" title="data_processing.plot_utilities.plot_facetgrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_facetgrid</span></code></a>(data[, x, y, hue, row, col, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_heatmap" title="data_processing.plot_utilities.plot_heatmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_heatmap</span></code></a>(data[, title, y_label, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_line_bar_chart" title="data_processing.plot_utilities.plot_line_bar_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_line_bar_chart</span></code></a>(data, bar_data[, x, y, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_line_chart" title="data_processing.plot_utilities.plot_line_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_line_chart</span></code></a>(data[, x, y, hue, style, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_lmplot_chart" title="data_processing.plot_utilities.plot_lmplot_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_lmplot_chart</span></code></a>(data[, x, y, hue, col, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_relplot" title="data_processing.plot_utilities.plot_relplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_relplot</span></code></a>(data[, x, y, hue, row, col, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_scatter_chart" title="data_processing.plot_utilities.plot_scatter_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_scatter_chart</span></code></a>(data[, x, y, hue, size, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_strip_chart" title="data_processing.plot_utilities.plot_strip_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_strip_chart</span></code></a>(data[, x, y, hue, title, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_swarm_chart" title="data_processing.plot_utilities.plot_swarm_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_swarm_chart</span></code></a>(data[, x, y, hue, size, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_table" title="data_processing.plot_utilities.plot_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_table</span></code></a>(data[, title])</p></td>
+<td><p>Generates a table from a Dataframe.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.plot_utilities.plot_violin_chart" title="data_processing.plot_utilities.plot_violin_chart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_violin_chart</span></code></a>(data[, x, y, hue, title, ...])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="data_processing.plot_utilities.create_colour_map">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">create_colour_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">boundaries</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pallet</span><span class="o">=</span><span class="default_value">'RdBu_r'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.create_colour_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a custom colour map around the specified boundary values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_bar_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_bar_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'variable'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em>, <em class="sig-param"><span class="n">dodge</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">legend_loc</span><span class="o">=</span><span class="default_value">'best'</span></em>, <em class="sig-param"><span class="n">num_legend_col</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">x_tick_rotation</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">show_bar_val</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_bar_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_box_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_box_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em>, <em class="sig-param"><span class="n">legend</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">legend_loc</span><span class="o">=</span><span class="default_value">'best'</span></em>, <em class="sig-param"><span class="n">x_tick_rotation</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_box_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_dist_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_dist_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">row</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">col</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">plt_hist</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">axis_titles</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">share_x</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">share_y</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">num_col</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em>, <em class="sig-param"><span class="n">all_legend</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">num_legend_col</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">legend_loc</span><span class="o">=</span><span class="default_value">'best'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_dist_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_facetgrid">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_facetgrid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'group'</span></em>, <em class="sig-param"><span class="n">row</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">col</span><span class="o">=</span><span class="default_value">'metric'</span></em>, <em class="sig-param"><span class="n">kind</span><span class="o">=</span><span class="default_value">'bar'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">axis_titles</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">share_x</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">share_y</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">num_col</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em>, <em class="sig-param"><span class="n">num_colour</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">legend_loc</span><span class="o">=</span><span class="default_value">'best'</span></em>, <em class="sig-param"><span class="n">num_legend_col</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">all_legend</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">height</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">aspect</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">show_bar_value</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bar_value_rotation</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">x_tick_rotation</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">y_tick_rotation</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_facetgrid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_heatmap">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_heatmap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'RdBu_r'</span></em>, <em class="sig-param"><span class="n">num_colour</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">custom_boundaries</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">center_val</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show_cbar</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">annotate</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">num_format</span><span class="o">=</span><span class="default_value">'.3f'</span></em>, <em class="sig-param"><span class="n">annot_font_size</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">linewidth</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">linecolour</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">x_tick_rotation</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">y_tick_rotation</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">square</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_heatmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_line_bar_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_line_bar_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">bar_data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'variable'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em>, <em class="sig-param"><span class="n">style</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bar_x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">bar_y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">bar_y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">bar_width</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">bar_axis_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bar_axis_range</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bar_alpha</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">bar_color</span><span class="o">=</span><span class="default_value">'tab:blue'</span></em>, <em class="sig-param"><span class="n">legend_loc</span><span class="o">=</span><span class="default_value">'best'</span></em>, <em class="sig-param"><span class="n">num_legend_col</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">axislabel_fontsize</span><span class="o">=</span><span class="default_value">12</span></em>, <em class="sig-param"><span class="n">ticklabel_fontsize</span><span class="o">=</span><span class="default_value">12</span></em>, <em class="sig-param"><span class="n">xtick_rotation</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_line_bar_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_line_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_line_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'group'</span></em>, <em class="sig-param"><span class="n">style</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_line_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_lmplot_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_lmplot_chart</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">x='index'</em>, <em class="sig-param">y='value'</em>, <em class="sig-param">hue='group'</em>, <em class="sig-param">col=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">y_label=''</em>, <em class="sig-param">x_label=''</em>, <em class="sig-param">xtick_labels=None</em>, <em class="sig-param">share_x=False</em>, <em class="sig-param">share_y=False</em>, <em class="sig-param">num_col=None</em>, <em class="sig-param">colour='Paired'</em>, <em class="sig-param">legend_loc='best'</em>, <em class="sig-param">num_legend_col=3</em>, <em class="sig-param">scatter=True</em>, <em class="sig-param">sizes=(10</em>, <em class="sig-param">10)</em>, <em class="sig-param">order=2</em>, <em class="sig-param">ci=16</em>, <em class="sig-param">x_estimator=&lt;function mean&gt;</em>, <em class="sig-param">x_ci=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_lmplot_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_relplot">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_relplot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'group'</span></em>, <em class="sig-param"><span class="n">row</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">col</span><span class="o">=</span><span class="default_value">'metric'</span></em>, <em class="sig-param"><span class="n">kind</span><span class="o">=</span><span class="default_value">'line'</span></em>, <em class="sig-param"><span class="n">line_width</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">ci</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">err_style</span><span class="o">=</span><span class="default_value">'band'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">share_x</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">share_y</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">num_col</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em>, <em class="sig-param"><span class="n">legend_loc</span><span class="o">=</span><span class="default_value">'best'</span></em>, <em class="sig-param"><span class="n">num_legend_col</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">all_legend</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_relplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_scatter_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_scatter_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'group'</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">'metric'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_scatter_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_strip_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_strip_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'group'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_strip_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_swarm_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_swarm_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">'group'</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_swarm_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_table">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a table from a Dataframe.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.plot_utilities.plot_violin_chart">
+<code class="sig-prename descclassname">data_processing.plot_utilities.</code><code class="sig-name descname">plot_violin_chart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">'index'</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">'value'</span></em>, <em class="sig-param"><span class="n">hue</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">y_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">x_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">colour</span><span class="o">=</span><span class="default_value">'Paired'</span></em>, <em class="sig-param"><span class="n">inner</span><span class="o">=</span><span class="default_value">'box'</span></em>, <em class="sig-param"><span class="n">legend</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">legend_loc</span><span class="o">=</span><span class="default_value">'best'</span></em>, <em class="sig-param"><span class="n">x_tick_rotation</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.plot_utilities.plot_violin_chart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-data_processing.stats_utilities">
+<span id="stats-utilities"></span><h2>Stats Utilities<a class="headerlink" href="#module-data_processing.stats_utilities" title="Permalink to this headline">¶</a></h2>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.stats_utilities.levene_test" title="data_processing.stats_utilities.levene_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">levene_test</span></code></a>(data, exp_param, metric[, ...])</p></td>
+<td><p>Scipy Levene test for equal variance (Homoscedasticity).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.stats_utilities.one_way_anova_test" title="data_processing.stats_utilities.one_way_anova_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">one_way_anova_test</span></code></a>(data, exp_param, metric)</p></td>
+<td><p>ANOVA test with statsmodels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.stats_utilities.shapiro_wilk_test" title="data_processing.stats_utilities.shapiro_wilk_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shapiro_wilk_test</span></code></a>(data, exp_param, metric[, ...])</p></td>
+<td><p>Scipy Shapiro-Wilk test for normality.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.stats_utilities.t_test" title="data_processing.stats_utilities.t_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t_test</span></code></a>(data, exp_param, metric[, sig_level, ...])</p></td>
+<td><p>Scipy T-test for two experiment groups.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processing.stats_utilities.tukey_hsd" title="data_processing.stats_utilities.tukey_hsd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tukey_hsd</span></code></a>(data, exp_param, metric[, ...])</p></td>
+<td><p>ANOVA and Tukey HSD post-hoc comparison from statsmodels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processing.stats_utilities.two_way_anova_test" title="data_processing.stats_utilities.two_way_anova_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">two_way_anova_test</span></code></a>(data, exp_param1, ...[, ...])</p></td>
+<td><p>ANOVA test with statsmodels.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="data_processing.stats_utilities.levene_test">
+<code class="sig-prename descclassname">data_processing.stats_utilities.</code><code class="sig-name descname">levene_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exp_param</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">sig_level</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">show_result</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.stats_utilities.levene_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scipy Levene test for equal variance (Homoscedasticity).
+The Levene test tests the null hypothesis that all input samples are from populations with equal variances.
+Levene’s test is an alternative to Bartlett’s test bartlett in the case where there are significant deviations
+from normality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dataframe</em>) -- Dataframe grouped by model_name and experiment_type values.</p></li>
+<li><p><strong>exp_param</strong> (<em>string</em>) -- Indicates which columns values to group data for comparison i.e. vocab_size.</p></li>
+<li><p><strong>metric</strong> (<em>string</em>) -- Indicates which column name has the result values i.e. test_acc.</p></li>
+<li><p><strong>sig_level</strong> (<em>float</em>) -- The test significance level. Default=0.05.</p></li>
+<li><p><strong>show_result</strong> (<em>bool</em>) -- Whether to print the results of the test. Default=True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Columns are model_name, t-statistic and p-value.</p>
+<blockquote>
+<div><p>model_name     t-stat   p-value</p>
+</div></blockquote>
+<p>0        cnn  22.431538  0.096978
+1   text cnn  13.273237  0.581202
+2       dcnn  13.045170  0.598809</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>levene_frame (Dataframe)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.stats_utilities.one_way_anova_test">
+<code class="sig-prename descclassname">data_processing.stats_utilities.</code><code class="sig-name descname">one_way_anova_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exp_param</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">sig_level</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">show_result</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.stats_utilities.one_way_anova_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>ANOVA test with statsmodels.</p>
+<p>Eta-squared and omega-squared share the same suggested ranges for effect size classification:
+Low (0.01 – 0.059)
+Medium (0.06 – 0.139)
+Large (0.14+)
+Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dataframe</em>) -- Dataframe grouped by model_name and experiment_type values.</p></li>
+<li><p><strong>exp_param</strong> (<em>string</em>) -- Indicates which columns values to group data for comparison i.e. vocab_size.</p></li>
+<li><p><strong>metric</strong> (<em>string</em>) -- Indicates which column name has the result values i.e. test_acc.</p></li>
+<li><p><strong>sig_level</strong> (<em>float</em>) -- The test significance level. Default=0.05.</p></li>
+<li><p><strong>show_result</strong> (<em>bool</em>) -- Whether to print the results of the test. Default=True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Contains f-statistic, p-value and eta/omega effect sizes.</p>
+<blockquote>
+<div><p>F    PR(&gt;F)    df    eta_sq   mean_sq  omega_sq    sum_sq</p>
+</div></blockquote>
+<p>cnn       5.055341  0.000000  15.0  0.344949  0.000139  0.275461  0.002084
+text cnn  4.298028  0.000001  15.0  0.309255  0.000080  0.236169  0.001198
+dcnn      3.555700  0.000032  15.0  0.270278  0.000102  0.193286  0.001528</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>anova_frame (Dataframe)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.stats_utilities.shapiro_wilk_test">
+<code class="sig-prename descclassname">data_processing.stats_utilities.</code><code class="sig-name descname">shapiro_wilk_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exp_param</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">sig_level</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">show_result</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.stats_utilities.shapiro_wilk_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scipy Shapiro-Wilk test for normality.
+The Shapiro-Wilk test tests the null hypothesis that the data was drawn from a normal distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dataframe</em>) -- Dataframe grouped by model_name and experiment_type values.</p></li>
+<li><p><strong>exp_param</strong> (<em>string</em>) -- Indicates which columns values to group data for comparison i.e. vocab_size.</p></li>
+<li><p><strong>metric</strong> (<em>string</em>) -- Indicates which column name has the result values i.e. test_acc.</p></li>
+<li><p><strong>sig_level</strong> (<em>float</em>) -- The test significance level. Default=0.05.</p></li>
+<li><p><strong>show_result</strong> (<em>bool</em>) -- Whether to print the results of the test. Default=True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Columns are model_name, exp_param, t-statistic and p-value.</p>
+<blockquote>
+<div><p>model_name vocab_size    t-stat   p-value</p>
+</div></blockquote>
+<p>0          cnn        500  0.933878  0.487099
+1          cnn       1000  0.934968  0.498493
+2          cnn       1500  0.904710  0.246593</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>shapiro_frame (Dataframe)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.stats_utilities.t_test">
+<code class="sig-prename descclassname">data_processing.stats_utilities.</code><code class="sig-name descname">t_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exp_param</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">sig_level</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">show_result</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.stats_utilities.t_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scipy T-test for two experiment groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dataframe</em>) -- Dataframe grouped by model_name and experiment_type values.</p></li>
+<li><p><strong>exp_param</strong> (<em>string</em>) -- Indicates which columns values to group data for comparison i.e. vocab_size.</p></li>
+<li><p><strong>metric</strong> (<em>string</em>) -- Indicates which column name has the result values i.e. test_acc.</p></li>
+<li><p><strong>sig_level</strong> (<em>float</em>) -- The test significance level. Default=0.05.</p></li>
+<li><p><strong>show_result</strong> (<em>bool</em>) -- Whether to print the results of the test. Default=True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Columns are t-statistic and p-value.</p>
+<blockquote>
+<div><p>t-statistic   p-value</p>
+</div></blockquote>
+<p>0          2.598956  0.011838</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>t_test_frame (Dataframe)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.stats_utilities.tukey_hsd">
+<code class="sig-prename descclassname">data_processing.stats_utilities.</code><code class="sig-name descname">tukey_hsd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exp_param</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">sig_level</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">show_result</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.stats_utilities.tukey_hsd" title="Permalink to this definition">¶</a></dt>
+<dd><p>ANOVA and Tukey HSD post-hoc comparison from statsmodels.</p>
+<p>The Tukey HSD post-hoc comparison test controls for type I error and maintains the family-wise error rate at 0.05.
+The group1 and group2 columns are the groups being compared,
+meandiff column is the difference in means of the two groups being calculated as group2 – group1,
+lower/upper columns are the lower/upper boundaries of the 95% confidence interval,
+reject column states whether or not the null hypothesis should be rejected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dataframe</em>) -- Dataframe grouped by model_name and experiment_type values.</p></li>
+<li><p><strong>exp_param</strong> (<em>string</em>) -- Indicates which columns values to group data for comparison i.e. vocab_size.</p></li>
+<li><p><strong>metric</strong> (<em>string</em>) -- Indicates which column name has the result values i.e. test_acc.</p></li>
+<li><p><strong>sig_level</strong> (<em>float</em>) -- The test significance level. Default=0.05.</p></li>
+<li><p><strong>show_result</strong> (<em>bool</em>) -- Whether to print the results of the test. Default=True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Contains f-statistic, p-value and eta/omega effect sizes.</p>
+<blockquote>
+<div><p>model_name  group1  group2  meandiff  p-value   lower   upper  reject</p>
+</div></blockquote>
+<p>0          cnn     500    1000    0.0014   0.9000 -0.0021  0.0050   False
+1          cnn     500    1500    0.0041   0.0083  0.0006  0.0077    True
+2          cnn     500    2000    0.0051   0.0010  0.0016  0.0087    True</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tukey_frame (Dataframe)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processing.stats_utilities.two_way_anova_test">
+<code class="sig-prename descclassname">data_processing.stats_utilities.</code><code class="sig-name descname">two_way_anova_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exp_param1</span></em>, <em class="sig-param"><span class="n">exp_param2</span></em>, <em class="sig-param"><span class="n">metric</span></em>, <em class="sig-param"><span class="n">sig_level</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">show_result</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processing.stats_utilities.two_way_anova_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>ANOVA test with statsmodels.</p>
+<p>Eta-squared and omega-squared share the same suggested ranges for effect size classification:
+Low (0.01 – 0.059)
+Medium (0.06 – 0.139)
+Large (0.14+)
+Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dataframe</em>) -- Dataframe grouped by model_name and experiment_type values.</p></li>
+<li><p><strong>exp_param1</strong> (<em>string</em>) -- Indicates first columns values to group data for comparison i.e. embedding_dim.</p></li>
+<li><p><strong>exp_param2</strong> (<em>string</em>) -- Indicates second columns values to group data for comparison i.e. embedding_type.</p></li>
+<li><p><strong>metric</strong> (<em>string</em>) -- Indicates which column name has the result values i.e. test_acc.</p></li>
+<li><p><strong>sig_level</strong> (<em>float</em>) -- The test significance level. Default=0.05.</p></li>
+<li><p><strong>show_result</strong> (<em>bool</em>) -- Whether to print the results of the test. Default=True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Contains f-statistic, p-value and eta/omega effect sizes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>anova_frame (Dataframe)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>model_name                          exp_params    sum_sq   df   mean_sq         F    PR(&gt;F)    eta_sq  omega_sq</dt><dd><p>gru                    C(embedding_dim)  0.000023  4.0  0.000006  0.640506  0.634978  0.024733 -0.013749
+gru                   C(embedding_type)  0.000026  1.0  0.000026  2.944534  0.089609  0.028426  0.018592
+gru  C(embedding_dim):C(embedding_type)  0.000071  4.0  0.000018  2.020298  0.098257  0.078013  0.039022</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="early_stopper.html" class="btn btn-neutral float-left" title="Early Stopper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

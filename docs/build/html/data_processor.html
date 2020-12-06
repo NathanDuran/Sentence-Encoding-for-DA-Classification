@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Data Processor &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Embedding Processor" href="embedding_processor.html" />
+    <link rel="prev" title="Optimisers" href="optimisers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Data Processor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/data_processor.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-data_processor">
+<span id="data-processor"></span><h1>Data Processor<a class="headerlink" href="#module-data_processor" title="Permalink to this headline">¶</a></h1>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor" title="data_processor.DataProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataProcessor</span></code></a>(set_name, output_dir, ...[, ...])</p></td>
+<td><p>Converts sentences for dialogue act classification into data sets.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.InputExample" title="data_processor.InputExample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InputExample</span></code></a>(example_id, text, label)</p></td>
+<td><p>A single training/test example for dialogue act classification.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.batch" title="data_processor.batch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch</span></code></a>(input_arr, batch_size)</p></td>
+<td><p>Yield successive batch_size chunks from input_arr.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.batch_and_pad" title="data_processor.batch_and_pad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_and_pad</span></code></a>(text, labels, batch_size, ...)</p></td>
+<td><p>Sorts tokenised sentences by length and pads them so that sentences in each batch have the same length.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.from_one_hot" title="data_processor.from_one_hot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_one_hot</span></code></a>(one_hot, labels)</p></td>
+<td><p>Converts one-hot encoded label list into its string representation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.join_punctuation" title="data_processor.join_punctuation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">join_punctuation</span></code></a>(tokens[, characters])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.to_one_hot" title="data_processor.to_one_hot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_one_hot</span></code></a>(label, labels)</p></td>
+<td><p>Converts label string representation into one-hot encoded list.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="data_processor.DataProcessor">
+<em class="property">class </em><code class="sig-prename descclassname">data_processor.</code><code class="sig-name descname">DataProcessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_name</span></em>, <em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">max_seq_length</span></em>, <em class="sig-param"><span class="n">vocab_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">to_tokens</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">to_indices</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">pad_seq</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">to_lower</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">use_punct</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">label_index</span><span class="o">=</span><span class="default_value">2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Converts sentences for dialogue act classification into data sets.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor.build_dataset_for_bert" title="data_processor.DataProcessor.build_dataset_for_bert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_dataset_for_bert</span></code></a>(set_type, ...[, ...])</p></td>
+<td><p>Creates an numpy dataset for BERT from the specified .npz File</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.DataProcessor.build_dataset_from_numpy" title="data_processor.DataProcessor.build_dataset_from_numpy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_dataset_from_numpy</span></code></a>(set_type, batch_size)</p></td>
+<td><p>Creates an numpy dataset from the specified .npz file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor.build_dataset_from_record" title="data_processor.DataProcessor.build_dataset_from_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_dataset_from_record</span></code></a>(set_type, batch_size)</p></td>
+<td><p>Creates an iterable dataset from the specified TFRecord File</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.DataProcessor.convert_examples_to_numpy" title="data_processor.DataProcessor.convert_examples_to_numpy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_examples_to_numpy</span></code></a>(set_type, ...)</p></td>
+<td><p>Converts InputExamples to features and saves as .npz file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor.convert_examples_to_record" title="data_processor.DataProcessor.convert_examples_to_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_examples_to_record</span></code></a>(set_type, ...)</p></td>
+<td><p>Converts InputExamples to features and saves as TFRecord file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.DataProcessor.get_dataset" title="data_processor.DataProcessor.get_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataset</span></code></a>()</p></td>
+<td><p>Gets the metadata and all datasets (train, test, val) from the Github repository and saves to file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor.get_metadata" title="data_processor.DataProcessor.get_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata</span></code></a>()</p></td>
+<td><p>Generate a Vocabulary and label list from the whole dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.DataProcessor.get_test_examples" title="data_processor.DataProcessor.get_test_examples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_test_examples</span></code></a>()</p></td>
+<td><p>Gets the Test set from Github repository.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor.get_train_examples" title="data_processor.DataProcessor.get_train_examples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_train_examples</span></code></a>()</p></td>
+<td><p>Gets the Training set from Github repository.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.DataProcessor.get_val_examples" title="data_processor.DataProcessor.get_val_examples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_examples</span></code></a>()</p></td>
+<td><p>Gets the Validation set from Github repository.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor.load_labels" title="data_processor.DataProcessor.load_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_labels</span></code></a>()</p></td>
+<td><p>Load Labels from metadata file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#data_processor.DataProcessor.load_metadata" title="data_processor.DataProcessor.load_metadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_metadata</span></code></a>()</p></td>
+<td><p>Load Vocabulary and Labels from metadata file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#data_processor.DataProcessor.load_vocabulary" title="data_processor.DataProcessor.load_vocabulary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_vocabulary</span></code></a>()</p></td>
+<td><p>Load Vocabulary from metadata file.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="data_processor.DataProcessor.build_dataset_for_bert">
+<code class="sig-name descname">build_dataset_for_bert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_type</span></em>, <em class="sig-param"><span class="n">bert_tokenizer</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">is_training</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.build_dataset_for_bert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an numpy dataset for BERT from the specified .npz File</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>set_type</strong> (<em>str</em>) -- Specifies if this is the training, validation or test data</p></li>
+<li><p><strong>bert_tokenizer</strong> (<em>FullTokeniser</em>) -- The BERT tokeniser</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) -- The number of examples per batch</p></li>
+<li><p><strong>is_training</strong> (<em>bool</em>) -- Flag determines if training set is shuffled</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Numpy array of BERT input ids
+input_masks (np.array): Numpy array of BERT input masks
+segment_ids (np.array): Numpy array of BERT segment ids
+labels (np.array): Numpy array of target labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>input_ids (np.array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.build_dataset_from_numpy">
+<code class="sig-name descname">build_dataset_from_numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_type</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">is_training</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">use_crf</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.build_dataset_from_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an numpy dataset from the specified .npz file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>set_type</strong> (<em>str</em>) -- Specifies if this is the training, validation or test data</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) -- The number of examples per batch</p></li>
+<li><p><strong>is_training</strong> (<em>bool</em>) -- Flag determines if training set is shuffled</p></li>
+<li><p><strong>use_crf</strong> (<em>bool</em>) -- Using CRF as final layer requires labels shape [batch_size, num_labels, 1]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Numpy array of input text
+labels (np.array): Numpy array of target labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>text (np.array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.build_dataset_from_record">
+<code class="sig-name descname">build_dataset_from_record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_type</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">repeat</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_training</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">drop_remainder</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.build_dataset_from_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an iterable dataset from the specified TFRecord File</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>set_type</strong> (<em>str</em>) -- Specifies if this is the training, validation or test data</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) -- The number of examples per batch</p></li>
+<li><p><strong>repeat</strong> (<em>int</em>) -- How many times the dataset with repeat until it is exhausted, if 'None' repeats forever</p></li>
+<li><p><strong>is_training</strong> (<em>bool</em>) -- Flag determines if training set is shuffled</p></li>
+<li><p><strong>drop_remainder</strong> (<em>bool</em>) -- Flag determines if last batch is dropped if not of batch_size</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Iterable dataset of two tensors 'text' and 'label'</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dataset (TF Dataset)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.convert_examples_to_numpy">
+<code class="sig-name descname">convert_examples_to_numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_type</span></em>, <em class="sig-param"><span class="n">examples</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.convert_examples_to_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts InputExamples to features and saves as .npz file.</p>
+<dl class="simple">
+<dt>if to_tokens is True</dt><dd><p>Tokenizes all text and strips whitespace.
+Converts to lowercase if to_lower=True.
+Removes punctuation if use_punct=False.
+Pads sentence with &lt;unk&gt; tokens to max_seq_length if pad_seq=True
+Converts sentence tokens to indices.</p>
+</dd>
+</dl>
+<p>Converts labels to indices.</p>
+<p>Saves as .npz file.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>set_type (str): Specifies if this is the training, validation or test data
+examples (list): List of InputExamples
+vocabulary (Gluonnlp Vocab): Datasets vocabulary
+labels (list): Datasets labels list</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.convert_examples_to_record">
+<code class="sig-name descname">convert_examples_to_record</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">set_type</span></em>, <em class="sig-param"><span class="n">examples</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.convert_examples_to_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts InputExamples to features and saves as TFRecord file.</p>
+<dl class="simple">
+<dt>if to_tokens is True</dt><dd><p>Tokenizes all text and strips whitespace.
+Converts to lowercase if to_lower=True.
+Removes punctuation if use_punct=False.
+Pads sentence with &lt;unk&gt; tokens to max_seq_length if pad_seq=True
+Converts sentence tokens to indices.</p>
+</dd>
+</dl>
+<p>Converts labels to indices.</p>
+<p>Saves as TFRecord file.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>set_type (str): Specifies if this is the training, validation or test data
+examples (list): List of InputExamples
+vocabulary (Gluonnlp Vocab): Datasets vocabulary
+labels (list): Datasets labels list</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.get_dataset">
+<code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.get_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the metadata and all datasets (train, test, val) from the Github repository and saves to file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.get_metadata">
+<code class="sig-name descname">get_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a Vocabulary and label list from the whole dataset.</p>
+<p>Tokenizes all text and strips whitespace.
+Converts to lowercase if to_lower=True.
+Removes punctuation if use_punct=False.
+Keeps only vocab_size number of words.</p>
+<p>Counts labels and creates list of strings sorted in descending order of frequency</p>
+<p>Saves the vocabulary and labels to a pickle file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Datasets vocabulary
+labels (list): Datasets labels</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>vocabulary (Gluonnlp Vocab)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.get_test_examples">
+<code class="sig-name descname">get_test_examples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.get_test_examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the Test set from Github repository. Used to make predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of InputExamples for the training set</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>examples (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.get_train_examples">
+<code class="sig-name descname">get_train_examples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.get_train_examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the Training set from Github repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of InputExamples for the training set</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>examples (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.get_val_examples">
+<code class="sig-name descname">get_val_examples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.get_val_examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the Validation set from Github repository. Used to evaluate training.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of InputExamples for the training set</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>examples (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.load_labels">
+<code class="sig-name descname">load_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.load_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load Labels from metadata file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Datasets labels list</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>labels (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.load_metadata">
+<code class="sig-name descname">load_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.load_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load Vocabulary and Labels from metadata file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Datasets vocabulary
+labels (list): Datasets labels list</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>vocabulary (Gluonnlp Vocab)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="data_processor.DataProcessor.load_vocabulary">
+<code class="sig-name descname">load_vocabulary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.DataProcessor.load_vocabulary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load Vocabulary from metadata file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Datasets vocabulary</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>vocabulary (Gluonnlp Vocab)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="data_processor.InputExample">
+<em class="property">class </em><code class="sig-prename descclassname">data_processor.</code><code class="sig-name descname">InputExample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">example_id</span></em>, <em class="sig-param"><span class="n">text</span></em>, <em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.InputExample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A single training/test example for dialogue act classification.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processor.batch">
+<code class="sig-prename descclassname">data_processor.</code><code class="sig-name descname">batch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_arr</span></em>, <em class="sig-param"><span class="n">batch_size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield successive batch_size chunks from input_arr.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processor.batch_and_pad">
+<code class="sig-prename descclassname">data_processor.</code><code class="sig-name descname">batch_and_pad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">max_seq_length</span></em>, <em class="sig-param"><span class="n">min_seq_length</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">pad_value</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.batch_and_pad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts tokenised sentences by length and pads them so that sentences in each batch have the same length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>list</em>) -- List of tokenised sentences to batch.</p></li>
+<li><p><strong>labels</strong> (<em>list</em>) -- List of labels to batch.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) -- Number of sentences to put in each batch.</p></li>
+<li><p><strong>max_seq_length</strong> (<em>int</em>) -- Maximum length of any sequence.</p></li>
+<li><p><strong>min_seq_length</strong> (<em>int</em>) -- Minimum length of any sequence.</p></li>
+<li><p><strong>pad_value</strong> (<em>int/str</em>) -- Value to pad sequences with.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of batches (lists) of sentences.
+labels_batches (list): List of batches (lists) of labels.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>text_batches (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processor.from_one_hot">
+<code class="sig-prename descclassname">data_processor.</code><code class="sig-name descname">from_one_hot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">one_hot</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.from_one_hot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts one-hot encoded label list into its string representation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="data_processor.join_punctuation">
+<code class="sig-prename descclassname">data_processor.</code><code class="sig-name descname">join_punctuation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tokens</span></em>, <em class="sig-param"><span class="n">characters</span><span class="o">=</span><span class="default_value">'.,;?!'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.join_punctuation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="data_processor.to_one_hot">
+<code class="sig-prename descclassname">data_processor.</code><code class="sig-name descname">to_one_hot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_processor.to_one_hot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts label string representation into one-hot encoded list.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="embedding_processor.html" class="btn btn-neutral float-right" title="Embedding Processor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="optimisers.html" class="btn btn-neutral float-left" title="Optimisers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

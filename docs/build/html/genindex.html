@@ -1,0 +1,1028 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Index &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Index</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="optimisers.html#optimisers.adadelta">adadelta() (in module optimisers)</a>
+</li>
+      <li><a href="optimisers.html#optimisers.adagrad">adagrad() (in module optimisers)</a>
+</li>
+      <li><a href="optimisers.html#optimisers.adam">adam() (in module optimisers)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="optimisers.html#optimisers.adamax">adamax() (in module optimisers)</a>
+</li>
+      <li><a href="models.html#models.ALBERT">ALBERT (class in models)</a>
+</li>
+      <li><a href="layers.html#layers.albert_layer.AlbertLayer">AlbertLayer (class in layers.albert_layer)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tokenization.html#tokenization.BasicTokenizer">BasicTokenizer (class in tokenization)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.batch">batch() (in module data_processor)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.batch_and_pad">batch_and_pad() (in module data_processor)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.batch_pad">batch_pad() (layers.mlstm_char_lm_layer.Model static method)</a>
+</li>
+      <li><a href="models.html#models.BERT">BERT (class in models)</a>
+</li>
+      <li><a href="layers.html#layers.bert_layer.BertLayer">BertLayer (class in layers.bert_layer)</a>
+</li>
+      <li><a href="models.html#models.BiGRU">BiGRU (class in models)</a>
+</li>
+      <li><a href="models.html#models.BiGRUAttn">BiGRUAttn (class in models)</a>
+</li>
+      <li><a href="models.html#models.BiLSTM">BiLSTM (class in models)</a>
+</li>
+      <li><a href="models.html#models.BiLSTMAttn">BiLSTMAttn (class in models)</a>
+</li>
+      <li><a href="layers.html#layers.albert_layer.AlbertLayer.build">build() (layers.albert_layer.AlbertLayer method)</a>
+
+      <ul>
+        <li><a href="layers.html#layers.bert_layer.BertLayer.build">(layers.bert_layer.BertLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.convert_layer.ConveRTLayer.build">(layers.convert_layer.ConveRTLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.elmo_layer.ElmoLayer.build">(layers.elmo_layer.ElmoLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.folding.Folding.build">(layers.folding.Folding method)</a>
+</li>
+        <li><a href="layers.html#layers.kmaxpooling.KMaxPooling.build">(layers.kmaxpooling.KMaxPooling method)</a>
+</li>
+        <li><a href="layers.html#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.build">(layers.mlstm_char_lm_layer.MLSTMCharLMLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.build">(layers.nnlm_layer.NeuralNetworkLanguageModelLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.use_layer.UniversalSentenceEncoderLayer.build">(layers.use_layer.UniversalSentenceEncoderLayer method)</a>
+</li>
+      </ul></li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.build_dataset_for_bert">build_dataset_for_bert() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.build_dataset_from_numpy">build_dataset_from_numpy() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.build_dataset_from_record">build_dataset_from_record() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="models.html#models.ALBERT.build_model">build_model() (models.ALBERT method)</a>
+
+      <ul>
+        <li><a href="models.html#models.BERT.build_model">(models.BERT method)</a>
+</li>
+        <li><a href="models.html#models.BiGRU.build_model">(models.BiGRU method)</a>
+</li>
+        <li><a href="models.html#models.BiGRUAttn.build_model">(models.BiGRUAttn method)</a>
+</li>
+        <li><a href="models.html#models.BiLSTM.build_model">(models.BiLSTM method)</a>
+</li>
+        <li><a href="models.html#models.BiLSTMAttn.build_model">(models.BiLSTMAttn method)</a>
+</li>
+        <li><a href="models.html#models.CNN.build_model">(models.CNN method)</a>
+</li>
+        <li><a href="models.html#models.CNNAttn.build_model">(models.CNNAttn method)</a>
+</li>
+        <li><a href="models.html#models.ConveRT.build_model">(models.ConveRT method)</a>
+</li>
+        <li><a href="models.html#models.DCNN.build_model">(models.DCNN method)</a>
+</li>
+        <li><a href="models.html#models.DCNNAttn.build_model">(models.DCNNAttn method)</a>
+</li>
+        <li><a href="models.html#models.DeepBiGRU.build_model">(models.DeepBiGRU method)</a>
+</li>
+        <li><a href="models.html#models.DeepBiGRUAttn.build_model">(models.DeepBiGRUAttn method)</a>
+</li>
+        <li><a href="models.html#models.DeepBiLSTM.build_model">(models.DeepBiLSTM method)</a>
+</li>
+        <li><a href="models.html#models.DeepBiLSTMAttn.build_model">(models.DeepBiLSTMAttn method)</a>
+</li>
+        <li><a href="models.html#models.DeepGRU.build_model">(models.DeepGRU method)</a>
+</li>
+        <li><a href="models.html#models.DeepGRUAttn.build_model">(models.DeepGRUAttn method)</a>
+</li>
+        <li><a href="models.html#models.DeepLSTM.build_model">(models.DeepLSTM method)</a>
+</li>
+        <li><a href="models.html#models.DeepLSTMAttn.build_model">(models.DeepLSTMAttn method)</a>
+</li>
+        <li><a href="models.html#models.ELMo.build_model">(models.ELMo method)</a>
+</li>
+        <li><a href="models.html#models.GRU.build_model">(models.GRU method)</a>
+</li>
+        <li><a href="models.html#models.GRUAttn.build_model">(models.GRUAttn method)</a>
+</li>
+        <li><a href="models.html#models.GRUCRF.build_model">(models.GRUCRF method)</a>
+</li>
+        <li><a href="models.html#models.LSTM.build_model">(models.LSTM method)</a>
+</li>
+        <li><a href="models.html#models.LSTMAttn.build_model">(models.LSTMAttn method)</a>
+</li>
+        <li><a href="models.html#models.LSTMCRF.build_model">(models.LSTMCRF method)</a>
+</li>
+        <li><a href="models.html#models.MLSTMCharLM.build_model">(models.MLSTMCharLM method)</a>
+</li>
+        <li><a href="models.html#models.Model.build_model">(models.Model method)</a>
+</li>
+        <li><a href="models.html#models.NeuralNetworkLanguageModel.build_model">(models.NeuralNetworkLanguageModel method)</a>
+</li>
+        <li><a href="models.html#models.RCNN.build_model">(models.RCNN method)</a>
+</li>
+        <li><a href="models.html#models.RCNNAttn.build_model">(models.RCNNAttn method)</a>
+</li>
+        <li><a href="models.html#models.TextCNN.build_model">(models.TextCNN method)</a>
+</li>
+        <li><a href="models.html#models.TextCNNAttn.build_model">(models.TextCNNAttn method)</a>
+</li>
+        <li><a href="models.html#models.UniversalSentenceEncoder.build_model">(models.UniversalSentenceEncoder method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="layers.html#layers.albert_layer.AlbertLayer.call">call() (layers.albert_layer.AlbertLayer method)</a>
+
+      <ul>
+        <li><a href="layers.html#layers.bert_layer.BertLayer.call">(layers.bert_layer.BertLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.convert_layer.ConveRTLayer.call">(layers.convert_layer.ConveRTLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.elmo_layer.ElmoLayer.call">(layers.elmo_layer.ElmoLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.folding.Folding.call">(layers.folding.Folding method)</a>
+</li>
+        <li><a href="layers.html#layers.kmaxpooling.KMaxPooling.call">(layers.kmaxpooling.KMaxPooling method)</a>
+</li>
+        <li><a href="layers.html#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.call">(layers.mlstm_char_lm_layer.MLSTMCharLMLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.call">(layers.nnlm_layer.NeuralNetworkLanguageModelLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.use_layer.UniversalSentenceEncoderLayer.call">(layers.use_layer.UniversalSentenceEncoderLayer method)</a>
+</li>
+      </ul></li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.ceil_round_step">ceil_round_step() (layers.mlstm_char_lm_layer.Model static method)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.cell_transform">cell_transform() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li><a href="early_stopper.html#early_stopper.EarlyStopper.check_early_stop">check_early_stop() (early_stopper.EarlyStopper method)</a>
+</li>
+      <li>
+    check_pointer
+
+      <ul>
+        <li><a href="check_pointer.html#module-check_pointer">module</a>
+</li>
+      </ul></li>
+      <li><a href="check_pointer.html#check_pointer.Checkpointer">Checkpointer (class in check_pointer)</a>
+</li>
+      <li><a href="models.html#models.CNN">CNN (class in models)</a>
+</li>
+      <li><a href="models.html#models.CNNAttn">CNNAttn (class in models)</a>
+</li>
+      <li><a href="layers.html#layers.albert_layer.AlbertLayer.compute_output_shape">compute_output_shape() (layers.albert_layer.AlbertLayer method)</a>
+
+      <ul>
+        <li><a href="layers.html#layers.bert_layer.BertLayer.compute_output_shape">(layers.bert_layer.BertLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.convert_layer.ConveRTLayer.compute_output_shape">(layers.convert_layer.ConveRTLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.elmo_layer.ElmoLayer.compute_output_shape">(layers.elmo_layer.ElmoLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.folding.Folding.compute_output_shape">(layers.folding.Folding method)</a>
+</li>
+        <li><a href="layers.html#layers.kmaxpooling.KMaxPooling.compute_output_shape">(layers.kmaxpooling.KMaxPooling method)</a>
+</li>
+        <li><a href="layers.html#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.compute_output_shape">(layers.mlstm_char_lm_layer.MLSTMCharLMLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.compute_output_shape">(layers.nnlm_layer.NeuralNetworkLanguageModelLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.use_layer.UniversalSentenceEncoderLayer.compute_output_shape">(layers.use_layer.UniversalSentenceEncoderLayer method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#models.ConveRT">ConveRT (class in models)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.convert_by_vocab">convert_by_vocab() (in module tokenization)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.convert_examples_to_numpy">convert_examples_to_numpy() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.convert_examples_to_record">convert_examples_to_record() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.convert_ids_to_tokens">convert_ids_to_tokens() (in module tokenization)</a>
+
+      <ul>
+        <li><a href="tokenization.html#tokenization.FullTokenizer.convert_ids_to_tokens">(tokenization.FullTokenizer method)</a>
+</li>
+      </ul></li>
+      <li><a href="tokenization.html#tokenization.convert_to_unicode">convert_to_unicode() (in module tokenization)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.convert_tokens_to_ids">convert_tokens_to_ids() (in module tokenization)</a>
+
+      <ul>
+        <li><a href="tokenization.html#tokenization.FullTokenizer.convert_tokens_to_ids">(tokenization.FullTokenizer method)</a>
+</li>
+      </ul></li>
+      <li><a href="layers.html#layers.convert_layer.ConveRTLayer">ConveRTLayer (class in layers.convert_layer)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.create_colour_map">create_colour_map() (in module data_processing.plot_utilities)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    data_processing.data_utilities
+
+      <ul>
+        <li><a href="data_processing.html#module-data_processing.data_utilities">module</a>
+</li>
+      </ul></li>
+      <li>
+    data_processing.plot_utilities
+
+      <ul>
+        <li><a href="data_processing.html#module-data_processing.plot_utilities">module</a>
+</li>
+      </ul></li>
+      <li>
+    data_processing.stats_utilities
+
+      <ul>
+        <li><a href="data_processing.html#module-data_processing.stats_utilities">module</a>
+</li>
+      </ul></li>
+      <li>
+    data_processor
+
+      <ul>
+        <li><a href="data_processor.html#module-data_processor">module</a>
+</li>
+      </ul></li>
+      <li><a href="data_processor.html#data_processor.DataProcessor">DataProcessor (class in data_processor)</a>
+</li>
+      <li><a href="models.html#models.DCNN">DCNN (class in models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#models.DCNNAttn">DCNNAttn (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepBiGRU">DeepBiGRU (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepBiGRUAttn">DeepBiGRUAttn (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepBiLSTM">DeepBiLSTM (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepBiLSTMAttn">DeepBiLSTMAttn (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepGRU">DeepGRU (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepGRUAttn">DeepGRUAttn (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepLSTM">DeepLSTM (class in models)</a>
+</li>
+      <li><a href="models.html#models.DeepLSTMAttn">DeepLSTMAttn (class in models)</a>
+</li>
+      <li><a href="embedding_processor.html#embedding_processor.Dependency">Dependency (class in embedding_processor)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    early_stopper
+
+      <ul>
+        <li><a href="early_stopper.html#module-early_stopper">module</a>
+</li>
+      </ul></li>
+      <li><a href="early_stopper.html#early_stopper.EarlyStopper">EarlyStopper (class in early_stopper)</a>
+</li>
+      <li><a href="models.html#models.ELMo">ELMo (class in models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="layers.html#layers.elmo_layer.ElmoLayer">ElmoLayer (class in layers.elmo_layer)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.embd">embd() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li>
+    embedding_processor
+
+      <ul>
+        <li><a href="embedding_processor.html#module-embedding_processor">module</a>
+</li>
+      </ul></li>
+      <li><a href="embedding_processor.html#embedding_processor.EmbeddingProcessor">EmbeddingProcessor (class in embedding_processor)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="embedding_processor.html#embedding_processor.FastText">FastText (class in embedding_processor)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.fc">fc() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="layers.html#layers.folding.Folding">Folding (class in layers.folding)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.from_one_hot">from_one_hot() (in module data_processor)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.FullTokenizer">FullTokenizer (class in tokenization)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="check_pointer.html#check_pointer.Checkpointer.get_best">get_best() (check_pointer.Checkpointer method)</a>
+</li>
+      <li><a href="check_pointer.html#check_pointer.Checkpointer.get_best_ckpt">get_best_ckpt() (check_pointer.Checkpointer method)</a>
+</li>
+      <li><a href="check_pointer.html#check_pointer.Checkpointer.get_best_weights">get_best_weights() (check_pointer.Checkpointer method)</a>
+</li>
+      <li><a href="layers.html#layers.albert_layer.AlbertLayer.get_config">get_config() (layers.albert_layer.AlbertLayer method)</a>
+
+      <ul>
+        <li><a href="layers.html#layers.elmo_layer.ElmoLayer.get_config">(layers.elmo_layer.ElmoLayer method)</a>
+</li>
+        <li><a href="layers.html#layers.kmaxpooling.KMaxPooling.get_config">(layers.kmaxpooling.KMaxPooling method)</a>
+</li>
+      </ul></li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.get_dataset">get_dataset() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="embedding_processor.html#embedding_processor.get_embedding">get_embedding() (in module embedding_processor)</a>
+</li>
+      <li><a href="embedding_processor.html#embedding_processor.Dependency.get_embedding_matrix">get_embedding_matrix() (embedding_processor.Dependency method)</a>
+
+      <ul>
+        <li><a href="embedding_processor.html#embedding_processor.EmbeddingProcessor.get_embedding_matrix">(embedding_processor.EmbeddingProcessor method)</a>
+</li>
+        <li><a href="embedding_processor.html#embedding_processor.FastText.get_embedding_matrix">(embedding_processor.FastText method)</a>
+</li>
+        <li><a href="embedding_processor.html#embedding_processor.Glove.get_embedding_matrix">(embedding_processor.Glove method)</a>
+</li>
+        <li><a href="embedding_processor.html#embedding_processor.Numberbatch.get_embedding_matrix">(embedding_processor.Numberbatch method)</a>
+</li>
+        <li><a href="embedding_processor.html#embedding_processor.Random.get_embedding_matrix">(embedding_processor.Random method)</a>
+</li>
+        <li><a href="embedding_processor.html#embedding_processor.Word2Vec.get_embedding_matrix">(embedding_processor.Word2Vec method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_processing.html#data_processing.data_utilities.get_max">get_max() (in module data_processing.data_utilities)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.get_metadata">get_metadata() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="models.html#models.get_model">get_model() (in module models)</a>
+</li>
+      <li><a href="optimisers.html#optimisers.get_optimiser">get_optimiser() (in module optimisers)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.get_test_examples">get_test_examples() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.get_train_examples">get_train_examples() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.get_val_examples">get_val_examples() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="embedding_processor.html#embedding_processor.Glove">Glove (class in embedding_processor)</a>
+</li>
+      <li><a href="models.html#models.GRU">GRU (class in models)</a>
+</li>
+      <li><a href="models.html#models.GRUAttn">GRUAttn (class in models)</a>
+</li>
+      <li><a href="models.html#models.GRUCRF">GRUCRF (class in models)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_processor.html#data_processor.InputExample">InputExample (class in data_processor)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.iter_data">iter_data() (layers.mlstm_char_lm_layer.Model static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_processor.html#data_processor.join_punctuation">join_punctuation() (in module data_processor)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="layers.html#layers.kmaxpooling.KMaxPooling">KMaxPooling (class in layers.kmaxpooling)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    layers.albert_layer
+
+      <ul>
+        <li><a href="layers.html#module-layers.albert_layer">module</a>
+</li>
+      </ul></li>
+      <li>
+    layers.bert_layer
+
+      <ul>
+        <li><a href="layers.html#module-layers.bert_layer">module</a>
+</li>
+      </ul></li>
+      <li>
+    layers.convert_layer
+
+      <ul>
+        <li><a href="layers.html#module-layers.convert_layer">module</a>
+</li>
+      </ul></li>
+      <li>
+    layers.elmo_layer
+
+      <ul>
+        <li><a href="layers.html#module-layers.elmo_layer">module</a>
+</li>
+      </ul></li>
+      <li>
+    layers.folding
+
+      <ul>
+        <li><a href="layers.html#module-layers.folding">module</a>
+</li>
+      </ul></li>
+      <li>
+    layers.kmaxpooling
+
+      <ul>
+        <li><a href="layers.html#module-layers.kmaxpooling">module</a>
+</li>
+      </ul></li>
+      <li>
+    layers.mlstm_char_lm_layer
+
+      <ul>
+        <li><a href="layers.html#module-layers.mlstm_char_lm_layer">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    layers.nnlm_layer
+
+      <ul>
+        <li><a href="layers.html#module-layers.nnlm_layer">module</a>
+</li>
+      </ul></li>
+      <li>
+    layers.use_layer
+
+      <ul>
+        <li><a href="layers.html#module-layers.use_layer">module</a>
+</li>
+      </ul></li>
+      <li><a href="data_processing.html#data_processing.stats_utilities.levene_test">levene_test() (in module data_processing.stats_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.data_utilities.load_dataframe">load_dataframe() (in module data_processing.data_utilities)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.load_labels">load_labels() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.load_metadata">load_metadata() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.load_params">load_params() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.load_vocab">load_vocab() (in module tokenization)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.DataProcessor.load_vocabulary">load_vocabulary() (data_processor.DataProcessor method)</a>
+</li>
+      <li><a href="models.html#models.LSTM">LSTM (class in models)</a>
+</li>
+      <li><a href="models.html#models.LSTMAttn">LSTMAttn (class in models)</a>
+</li>
+      <li><a href="models.html#models.LSTMCRF">LSTMCRF (class in models)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    metrics
+
+      <ul>
+        <li><a href="metrics.html#module-metrics">module</a>
+</li>
+      </ul></li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.mlstm">mlstm() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li><a href="models.html#models.MLSTMCharLM">MLSTMCharLM (class in models)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.MLSTMCharLMLayer">MLSTMCharLMLayer (class in layers.mlstm_char_lm_layer)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model">Model (class in layers.mlstm_char_lm_layer)</a>
+
+      <ul>
+        <li><a href="models.html#models.Model">(class in models)</a>
+</li>
+      </ul></li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.model">model() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li>
+    models
+
+      <ul>
+        <li><a href="models.html#module-models">module</a>
+</li>
+      </ul></li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="check_pointer.html#module-check_pointer">check_pointer</a>
+</li>
+        <li><a href="data_processing.html#module-data_processing.data_utilities">data_processing.data_utilities</a>
+</li>
+        <li><a href="data_processing.html#module-data_processing.plot_utilities">data_processing.plot_utilities</a>
+</li>
+        <li><a href="data_processing.html#module-data_processing.stats_utilities">data_processing.stats_utilities</a>
+</li>
+        <li><a href="data_processor.html#module-data_processor">data_processor</a>
+</li>
+        <li><a href="early_stopper.html#module-early_stopper">early_stopper</a>
+</li>
+        <li><a href="embedding_processor.html#module-embedding_processor">embedding_processor</a>
+</li>
+        <li><a href="layers.html#module-layers.albert_layer">layers.albert_layer</a>
+</li>
+        <li><a href="layers.html#module-layers.bert_layer">layers.bert_layer</a>
+</li>
+        <li><a href="layers.html#module-layers.convert_layer">layers.convert_layer</a>
+</li>
+        <li><a href="layers.html#module-layers.elmo_layer">layers.elmo_layer</a>
+</li>
+        <li><a href="layers.html#module-layers.folding">layers.folding</a>
+</li>
+        <li><a href="layers.html#module-layers.kmaxpooling">layers.kmaxpooling</a>
+</li>
+        <li><a href="layers.html#module-layers.mlstm_char_lm_layer">layers.mlstm_char_lm_layer</a>
+</li>
+        <li><a href="layers.html#module-layers.nnlm_layer">layers.nnlm_layer</a>
+</li>
+        <li><a href="layers.html#module-layers.use_layer">layers.use_layer</a>
+</li>
+        <li><a href="metrics.html#module-metrics">metrics</a>
+</li>
+        <li><a href="models.html#module-models">models</a>
+</li>
+        <li><a href="optimisers.html#module-optimisers">optimisers</a>
+</li>
+        <li><a href="tokenization.html#module-tokenization">tokenization</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#models.NeuralNetworkLanguageModel">NeuralNetworkLanguageModel (class in models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="layers.html#layers.nnlm_layer.NeuralNetworkLanguageModelLayer">NeuralNetworkLanguageModelLayer (class in layers.nnlm_layer)</a>
+</li>
+      <li><a href="embedding_processor.html#embedding_processor.Numberbatch">Numberbatch (class in embedding_processor)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_processing.html#data_processing.stats_utilities.one_way_anova_test">one_way_anova_test() (in module data_processing.stats_utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    optimisers
+
+      <ul>
+        <li><a href="optimisers.html#module-optimisers">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_bar_chart">plot_bar_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_box_chart">plot_box_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="metrics.html#metrics.plot_confusion_matrix">plot_confusion_matrix() (in module metrics)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_dist_chart">plot_dist_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_facetgrid">plot_facetgrid() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_heatmap">plot_heatmap() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_line_bar_chart">plot_line_bar_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_line_chart">plot_line_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_lmplot_chart">plot_lmplot_chart() (in module data_processing.plot_utilities)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_relplot">plot_relplot() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_scatter_chart">plot_scatter_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_strip_chart">plot_strip_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_swarm_chart">plot_swarm_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_table">plot_table() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.plot_utilities.plot_violin_chart">plot_violin_chart() (in module data_processing.plot_utilities)</a>
+</li>
+      <li><a href="metrics.html#metrics.precision_recall_f1">precision_recall_f1() (in module metrics)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.preprocess">preprocess() (layers.mlstm_char_lm_layer.Model static method)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.printable_text">printable_text() (in module tokenization)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="embedding_processor.html#embedding_processor.Random">Random (class in embedding_processor)</a>
+</li>
+      <li><a href="models.html#models.RCNN">RCNN (class in models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#models.RCNNAttn">RCNNAttn (class in models)</a>
+</li>
+      <li><a href="optimisers.html#optimisers.rmsprop">rmsprop() (in module optimisers)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="check_pointer.html#check_pointer.Checkpointer.save">save() (check_pointer.Checkpointer method)</a>
+</li>
+      <li><a href="check_pointer.html#check_pointer.Checkpointer.save_best">save_best() (check_pointer.Checkpointer method)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.data_utilities.save_dataframe">save_dataframe() (in module data_processing.data_utilities)</a>
+</li>
+      <li><a href="check_pointer.html#check_pointer.Checkpointer.save_embeddings">save_embeddings() (check_pointer.Checkpointer method)</a>
+</li>
+      <li><a href="metrics.html#metrics.save_experiment">save_experiment() (in module metrics)</a>
+</li>
+      <li><a href="metrics.html#metrics.save_history">save_history() (in module metrics)</a>
+</li>
+      <li><a href="metrics.html#metrics.save_predictions">save_predictions() (in module metrics)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="metrics.html#metrics.save_results">save_results() (in module metrics)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.seq_cells">seq_cells() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.seq_rep">seq_rep() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li><a href="optimisers.html#optimisers.sgd">sgd() (in module optimisers)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.stats_utilities.shapiro_wilk_test">shapiro_wilk_test() (in module data_processing.stats_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.data_utilities.sort_dataframe_by_list">sort_dataframe_by_list() (in module data_processing.data_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.data_utilities.sort_dataframe_by_list_and_param">sort_dataframe_by_list_and_param() (in module data_processing.data_utilities)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_processing.html#data_processing.stats_utilities.t_test">t_test() (in module data_processing.stats_utilities)</a>
+</li>
+      <li><a href="models.html#models.TextCNN">TextCNN (class in models)</a>
+</li>
+      <li><a href="models.html#models.TextCNNAttn">TextCNNAttn (class in models)</a>
+</li>
+      <li><a href="data_processor.html#data_processor.to_one_hot">to_one_hot() (in module data_processor)</a>
+</li>
+      <li>
+    tokenization
+
+      <ul>
+        <li><a href="tokenization.html#module-tokenization">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tokenization.html#tokenization.BasicTokenizer.tokenize">tokenize() (tokenization.BasicTokenizer method)</a>
+
+      <ul>
+        <li><a href="tokenization.html#tokenization.FullTokenizer.tokenize">(tokenization.FullTokenizer method)</a>
+</li>
+        <li><a href="tokenization.html#tokenization.WordpieceTokenizer.tokenize">(tokenization.WordpieceTokenizer method)</a>
+</li>
+      </ul></li>
+      <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.transform">transform() (layers.mlstm_char_lm_layer.Model method)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.stats_utilities.tukey_hsd">tukey_hsd() (in module data_processing.stats_utilities)</a>
+</li>
+      <li><a href="data_processing.html#data_processing.stats_utilities.two_way_anova_test">two_way_anova_test() (in module data_processing.stats_utilities)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#models.UniversalSentenceEncoder">UniversalSentenceEncoder (class in models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="layers.html#layers.use_layer.UniversalSentenceEncoderLayer">UniversalSentenceEncoderLayer (class in layers.use_layer)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tokenization.html#tokenization.whitespace_tokenize">whitespace_tokenize() (in module tokenization)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="embedding_processor.html#embedding_processor.Word2Vec">Word2Vec (class in embedding_processor)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.WordpieceTokenizer">WordpieceTokenizer (class in tokenization)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

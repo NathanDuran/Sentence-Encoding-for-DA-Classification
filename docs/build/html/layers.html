@@ -1,0 +1,881 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Layers &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Optimisers" href="optimisers.html" />
+    <link rel="prev" title="Models" href="models.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Layers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.albert_layer">Albert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.bert_layer">BERT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.convert_layer">ConveRT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.elmo_layer">ELMo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.mlstm_char_lm_layer">mLSTM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.nnlm_layer">NNLM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.use_layer">USE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.folding">Folding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers.kmaxpooling">K Max Pooling</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Layers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/layers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="layers">
+<h1>Layers<a class="headerlink" href="#layers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-layers.albert_layer">
+<span id="albert"></span><h2>Albert<a class="headerlink" href="#module-layers.albert_layer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.albert_layer.AlbertLayer" title="layers.albert_layer.AlbertLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AlbertLayer</span></code></a>(model_url[, albert_model, ...])</p></td>
+<td><p>Wraps the ALBERT module from Tensorflow Hub in a Keras Layer.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.albert_layer.AlbertLayer">
+<em class="property">class </em><code class="sig-prename descclassname">layers.albert_layer.</code><code class="sig-name descname">AlbertLayer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_url</span></em>, <em class="sig-param"><span class="n">albert_model</span><span class="o">=</span><span class="default_value">'base'</span></em>, <em class="sig-param"><span class="n">output_mode</span><span class="o">=</span><span class="default_value">'sequence'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.albert_layer.AlbertLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Wraps the ALBERT module from Tensorflow Hub in a Keras Layer.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.albert_layer.AlbertLayer.build" title="layers.albert_layer.AlbertLayer.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.albert_layer.AlbertLayer.call" title="layers.albert_layer.AlbertLayer.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x[, mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.albert_layer.AlbertLayer.compute_output_shape" title="layers.albert_layer.AlbertLayer.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.albert_layer.AlbertLayer.get_config" title="layers.albert_layer.AlbertLayer.get_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_config</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.albert_layer.AlbertLayer.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.albert_layer.AlbertLayer.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.albert_layer.AlbertLayer.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.albert_layer.AlbertLayer.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.albert_layer.AlbertLayer.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.albert_layer.AlbertLayer.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.albert_layer.AlbertLayer.get_config">
+<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#layers.albert_layer.AlbertLayer.get_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.bert_layer">
+<span id="bert"></span><h2>BERT<a class="headerlink" href="#module-layers.bert_layer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.bert_layer.BertLayer" title="layers.bert_layer.BertLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BertLayer</span></code></a>(model_url[, bert_model, ...])</p></td>
+<td><p>Wraps the BERT module from Tensorflow Hub in a Keras Layer.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.bert_layer.BertLayer">
+<em class="property">class </em><code class="sig-prename descclassname">layers.bert_layer.</code><code class="sig-name descname">BertLayer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_url</span></em>, <em class="sig-param"><span class="n">bert_model</span><span class="o">=</span><span class="default_value">'base'</span></em>, <em class="sig-param"><span class="n">num_fine_tune_layers</span><span class="o">=</span><span class="default_value">12</span></em>, <em class="sig-param"><span class="n">output_mode</span><span class="o">=</span><span class="default_value">'sequence'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.bert_layer.BertLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Wraps the BERT module from Tensorflow Hub in a Keras Layer.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.bert_layer.BertLayer.build" title="layers.bert_layer.BertLayer.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.bert_layer.BertLayer.call" title="layers.bert_layer.BertLayer.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(inputs, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.bert_layer.BertLayer.compute_output_shape" title="layers.bert_layer.BertLayer.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.bert_layer.BertLayer.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.bert_layer.BertLayer.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.bert_layer.BertLayer.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.bert_layer.BertLayer.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.bert_layer.BertLayer.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.bert_layer.BertLayer.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.convert_layer">
+<span id="convert"></span><h2>ConveRT<a class="headerlink" href="#module-layers.convert_layer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.convert_layer.ConveRTLayer" title="layers.convert_layer.ConveRTLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConveRTLayer</span></code></a>(**kwargs)</p></td>
+<td><p>Wraps the ConveRT Tensorflow Hub module in a Keras Layer.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.convert_layer.ConveRTLayer">
+<em class="property">class </em><code class="sig-prename descclassname">layers.convert_layer.</code><code class="sig-name descname">ConveRTLayer</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.convert_layer.ConveRTLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Wraps the ConveRT Tensorflow Hub module in a Keras Layer.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.convert_layer.ConveRTLayer.build" title="layers.convert_layer.ConveRTLayer.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.convert_layer.ConveRTLayer.call" title="layers.convert_layer.ConveRTLayer.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x[, mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.convert_layer.ConveRTLayer.compute_output_shape" title="layers.convert_layer.ConveRTLayer.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.convert_layer.ConveRTLayer.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.convert_layer.ConveRTLayer.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.convert_layer.ConveRTLayer.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.convert_layer.ConveRTLayer.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.convert_layer.ConveRTLayer.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.convert_layer.ConveRTLayer.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.elmo_layer">
+<span id="elmo"></span><h2>ELMo<a class="headerlink" href="#module-layers.elmo_layer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.elmo_layer.ElmoLayer" title="layers.elmo_layer.ElmoLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElmoLayer</span></code></a>(model_url[, input_mode, output_mode])</p></td>
+<td><p>Wraps the Elmo module from Tensorflow Hub in a Keras Layer.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.elmo_layer.ElmoLayer">
+<em class="property">class </em><code class="sig-prename descclassname">layers.elmo_layer.</code><code class="sig-name descname">ElmoLayer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_url</span></em>, <em class="sig-param"><span class="n">input_mode</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">output_mode</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.elmo_layer.ElmoLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Wraps the Elmo module from Tensorflow Hub in a Keras Layer.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.elmo_layer.ElmoLayer.build" title="layers.elmo_layer.ElmoLayer.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.elmo_layer.ElmoLayer.call" title="layers.elmo_layer.ElmoLayer.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x[, mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.elmo_layer.ElmoLayer.compute_output_shape" title="layers.elmo_layer.ElmoLayer.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.elmo_layer.ElmoLayer.get_config" title="layers.elmo_layer.ElmoLayer.get_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_config</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.elmo_layer.ElmoLayer.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.elmo_layer.ElmoLayer.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.elmo_layer.ElmoLayer.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.elmo_layer.ElmoLayer.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.elmo_layer.ElmoLayer.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.elmo_layer.ElmoLayer.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.elmo_layer.ElmoLayer.get_config">
+<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#layers.elmo_layer.ElmoLayer.get_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.mlstm_char_lm_layer">
+<span id="mlstm"></span><h2>mLSTM<a class="headerlink" href="#module-layers.mlstm_char_lm_layer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer" title="layers.mlstm_char_lm_layer.MLSTMCharLMLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLSTMCharLMLayer</span></code></a>([batch_size, ...])</p></td>
+<td><p>Wraps the mLSTM Character Language Model in a Keras Layer.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model" title="layers.mlstm_char_lm_layer.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code></a>(weights_path[, batch_size, ...])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.mlstm_char_lm_layer.MLSTMCharLMLayer">
+<em class="property">class </em><code class="sig-prename descclassname">layers.mlstm_char_lm_layer.</code><code class="sig-name descname">MLSTMCharLMLayer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">max_seq_length</span><span class="o">=</span><span class="default_value">640</span></em>, <em class="sig-param"><span class="n">dimensions</span><span class="o">=</span><span class="default_value">4096</span></em>, <em class="sig-param"><span class="n">output_mode</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Wraps the mLSTM Character Language Model in a Keras Layer.</p>
+<p>Radford, A., Jozefowicz, R. and Sutskever, I. (2018) ‘Learning to Generate Reviews and Discovering Sentiment’,
+arXiv. Available at: <a class="reference external" href="http://arxiv.org/abs/1704.01444">http://arxiv.org/abs/1704.01444</a>
+<a class="reference external" href="https://github.com/openai/generating-reviews-discovering-sentiment">https://github.com/openai/generating-reviews-discovering-sentiment</a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.build" title="layers.mlstm_char_lm_layer.MLSTMCharLMLayer.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.call" title="layers.mlstm_char_lm_layer.MLSTMCharLMLayer.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.compute_output_shape" title="layers.mlstm_char_lm_layer.MLSTMCharLMLayer.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.MLSTMCharLMLayer.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.MLSTMCharLMLayer.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.MLSTMCharLMLayer.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.MLSTMCharLMLayer.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="layers.mlstm_char_lm_layer.Model">
+<em class="property">class </em><code class="sig-prename descclassname">layers.mlstm_char_lm_layer.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">weights_path</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">max_seq_length</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">hidden_dim</span><span class="o">=</span><span class="default_value">4096</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.batch_pad" title="layers.mlstm_char_lm_layer.Model.batch_pad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_pad</span></code></a>(xs, n_batch, n_steps)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.ceil_round_step" title="layers.mlstm_char_lm_layer.Model.ceil_round_step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ceil_round_step</span></code></a>(n, step)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.cell_transform" title="layers.mlstm_char_lm_layer.Model.cell_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cell_transform</span></code></a>(xs[, indexes])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.embd" title="layers.mlstm_char_lm_layer.Model.embd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">embd</span></code></a>(X, ndim[, scope])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.fc" title="layers.mlstm_char_lm_layer.Model.fc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fc</span></code></a>(x, n_out, act[, wn, bias, scope])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.iter_data" title="layers.mlstm_char_lm_layer.Model.iter_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_data</span></code></a>(*data, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.load_params" title="layers.mlstm_char_lm_layer.Model.load_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_params</span></code></a>(shape, dtype, *args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.mlstm" title="layers.mlstm_char_lm_layer.Model.mlstm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mlstm</span></code></a>(inputs, c, h, M, n_dim[, scope, wn])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.model" title="layers.mlstm_char_lm_layer.Model.model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code></a>(X, S[, M, reuse])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.preprocess" title="layers.mlstm_char_lm_layer.Model.preprocess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocess</span></code></a>(text, max_seq_length[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.seq_cells" title="layers.mlstm_char_lm_layer.Model.seq_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seq_cells</span></code></a>(xmb, mmb, smb)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.seq_rep" title="layers.mlstm_char_lm_layer.Model.seq_rep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seq_rep</span></code></a>(xmb, mmb, smb)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.mlstm_char_lm_layer.Model.transform" title="layers.mlstm_char_lm_layer.Model.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(xs)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.batch_pad">
+<em class="property">static </em><code class="sig-name descname">batch_pad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xs</span></em>, <em class="sig-param"><span class="n">n_batch</span></em>, <em class="sig-param"><span class="n">n_steps</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.batch_pad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.ceil_round_step">
+<em class="property">static </em><code class="sig-name descname">ceil_round_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.ceil_round_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.cell_transform">
+<code class="sig-name descname">cell_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xs</span></em>, <em class="sig-param"><span class="n">indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.cell_transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.embd">
+<code class="sig-name descname">embd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">ndim</span></em>, <em class="sig-param"><span class="n">scope</span><span class="o">=</span><span class="default_value">'embedding'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.embd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.fc">
+<code class="sig-name descname">fc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">n_out</span></em>, <em class="sig-param"><span class="n">act</span></em>, <em class="sig-param"><span class="n">wn</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bias</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">scope</span><span class="o">=</span><span class="default_value">'fc'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.fc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.iter_data">
+<em class="property">static </em><code class="sig-name descname">iter_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">data</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.iter_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.load_params">
+<code class="sig-name descname">load_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span></em>, <em class="sig-param"><span class="n">dtype</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.load_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.mlstm">
+<code class="sig-name descname">mlstm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">h</span></em>, <em class="sig-param"><span class="n">M</span></em>, <em class="sig-param"><span class="n">n_dim</span></em>, <em class="sig-param"><span class="n">scope</span><span class="o">=</span><span class="default_value">'lstm'</span></em>, <em class="sig-param"><span class="n">wn</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.mlstm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.model">
+<code class="sig-name descname">model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">S</span></em>, <em class="sig-param"><span class="n">M</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reuse</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.preprocess">
+<em class="property">static </em><code class="sig-name descname">preprocess</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span></em>, <em class="sig-param"><span class="n">max_seq_length</span></em>, <em class="sig-param"><span class="n">front_pad</span><span class="o">=</span><span class="default_value">'\n '</span></em>, <em class="sig-param"><span class="n">end_pad</span><span class="o">=</span><span class="default_value">' '</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.preprocess" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.seq_cells">
+<code class="sig-name descname">seq_cells</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xmb</span></em>, <em class="sig-param"><span class="n">mmb</span></em>, <em class="sig-param"><span class="n">smb</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.seq_cells" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.seq_rep">
+<code class="sig-name descname">seq_rep</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xmb</span></em>, <em class="sig-param"><span class="n">mmb</span></em>, <em class="sig-param"><span class="n">smb</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.seq_rep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.mlstm_char_lm_layer.Model.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.mlstm_char_lm_layer.Model.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.nnlm_layer">
+<span id="nnlm"></span><h2>NNLM<a class="headerlink" href="#module-layers.nnlm_layer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer" title="layers.nnlm_layer.NeuralNetworkLanguageModelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NeuralNetworkLanguageModelLayer</span></code></a>(model_url, ...)</p></td>
+<td><p>Wraps the Universal Sentence Encoder module from Tensorflow Hub in a Keras Layer.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.nnlm_layer.NeuralNetworkLanguageModelLayer">
+<em class="property">class </em><code class="sig-prename descclassname">layers.nnlm_layer.</code><code class="sig-name descname">NeuralNetworkLanguageModelLayer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Wraps the Universal Sentence Encoder module from Tensorflow Hub in a Keras Layer.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.build" title="layers.nnlm_layer.NeuralNetworkLanguageModelLayer.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.call" title="layers.nnlm_layer.NeuralNetworkLanguageModelLayer.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x[, mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.compute_output_shape" title="layers.nnlm_layer.NeuralNetworkLanguageModelLayer.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.nnlm_layer.NeuralNetworkLanguageModelLayer.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.nnlm_layer.NeuralNetworkLanguageModelLayer.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.nnlm_layer.NeuralNetworkLanguageModelLayer.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.nnlm_layer.NeuralNetworkLanguageModelLayer.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.use_layer">
+<span id="use"></span><h2>USE<a class="headerlink" href="#module-layers.use_layer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.use_layer.UniversalSentenceEncoderLayer" title="layers.use_layer.UniversalSentenceEncoderLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniversalSentenceEncoderLayer</span></code></a>(model_url, ...)</p></td>
+<td><p>Wraps the Universal Sentence Encoder module from Tensorflow Hub in a Keras Layer.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.use_layer.UniversalSentenceEncoderLayer">
+<em class="property">class </em><code class="sig-prename descclassname">layers.use_layer.</code><code class="sig-name descname">UniversalSentenceEncoderLayer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.use_layer.UniversalSentenceEncoderLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Wraps the Universal Sentence Encoder module from Tensorflow Hub in a Keras Layer.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.use_layer.UniversalSentenceEncoderLayer.build" title="layers.use_layer.UniversalSentenceEncoderLayer.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.use_layer.UniversalSentenceEncoderLayer.call" title="layers.use_layer.UniversalSentenceEncoderLayer.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x[, mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.use_layer.UniversalSentenceEncoderLayer.compute_output_shape" title="layers.use_layer.UniversalSentenceEncoderLayer.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.use_layer.UniversalSentenceEncoderLayer.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.use_layer.UniversalSentenceEncoderLayer.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.use_layer.UniversalSentenceEncoderLayer.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.use_layer.UniversalSentenceEncoderLayer.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.use_layer.UniversalSentenceEncoderLayer.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.use_layer.UniversalSentenceEncoderLayer.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.folding">
+<span id="folding"></span><h2>Folding<a class="headerlink" href="#module-layers.folding" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.folding.Folding" title="layers.folding.Folding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Folding</span></code></a>(**kwargs)</p></td>
+<td><p>Folding Layer code from: &quot;<a class="reference external" href="https://github.com/AlexYangLi/TextClassification">https://github.com/AlexYangLi/TextClassification</a>&quot;</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.folding.Folding">
+<em class="property">class </em><code class="sig-prename descclassname">layers.folding.</code><code class="sig-name descname">Folding</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.folding.Folding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Folding Layer code from: &quot;<a class="reference external" href="https://github.com/AlexYangLi/TextClassification">https://github.com/AlexYangLi/TextClassification</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.folding.Folding.build" title="layers.folding.Folding.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.folding.Folding.call" title="layers.folding.Folding.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x[, mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.folding.Folding.compute_output_shape" title="layers.folding.Folding.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.folding.Folding.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.folding.Folding.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.folding.Folding.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.folding.Folding.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.folding.Folding.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.folding.Folding.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-layers.kmaxpooling">
+<span id="k-max-pooling"></span><h2>K Max Pooling<a class="headerlink" href="#module-layers.kmaxpooling" title="Permalink to this headline">¶</a></h2>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.kmaxpooling.KMaxPooling" title="layers.kmaxpooling.KMaxPooling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KMaxPooling</span></code></a>([k])</p></td>
+<td><p>Implemetation of temporal k-max pooling layer, which was first proposed in:</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="layers.kmaxpooling.KMaxPooling">
+<em class="property">class </em><code class="sig-prename descclassname">layers.kmaxpooling.</code><code class="sig-name descname">KMaxPooling</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.kmaxpooling.KMaxPooling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
+<p>Implemetation of temporal k-max pooling layer, which was first proposed in:</p>
+<p>Kalchbrenner, N., Grefenstette, E. and Blunsom, P. (2014) A Convolutional Neural Network for Modelling Sentences.
+Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics.</p>
+<p>This layer allows to detect the k most important features in a sentence, independent of their
+specific position, preserving their relative order.</p>
+<p>Layer code from: &quot;<a class="reference external" href="https://github.com/AlexYangLi/TextClassification">https://github.com/AlexYangLi/TextClassification</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.kmaxpooling.KMaxPooling.build" title="layers.kmaxpooling.KMaxPooling.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.kmaxpooling.KMaxPooling.call" title="layers.kmaxpooling.KMaxPooling.call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call</span></code></a>(x[, mask])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#layers.kmaxpooling.KMaxPooling.compute_output_shape" title="layers.kmaxpooling.KMaxPooling.compute_output_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_output_shape</span></code></a>(input_shape)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#layers.kmaxpooling.KMaxPooling.get_config" title="layers.kmaxpooling.KMaxPooling.get_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_config</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="layers.kmaxpooling.KMaxPooling.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.kmaxpooling.KMaxPooling.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.kmaxpooling.KMaxPooling.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.kmaxpooling.KMaxPooling.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.kmaxpooling.KMaxPooling.compute_output_shape">
+<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#layers.kmaxpooling.KMaxPooling.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="layers.kmaxpooling.KMaxPooling.get_config">
+<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#layers.kmaxpooling.KMaxPooling.get_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="optimisers.html" class="btn btn-neutral float-right" title="Optimisers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="models.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

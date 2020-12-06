@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Embedding Processor &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Metrics" href="metrics.html" />
+    <link rel="prev" title="Data Processor" href="data_processor.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Embedding Processor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/embedding_processor.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-embedding_processor">
+<span id="embedding-processor"></span><h1>Embedding Processor<a class="headerlink" href="#module-embedding_processor" title="Permalink to this headline">¶</a></h1>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Dependency" title="embedding_processor.Dependency"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dependency</span></code></a>()</p></td>
+<td><p>Generates Dependency-based embeddings matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#embedding_processor.EmbeddingProcessor" title="embedding_processor.EmbeddingProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EmbeddingProcessor</span></code></a>()</p></td>
+<td><p>EmbeddingProcessor abstract class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.FastText" title="embedding_processor.FastText"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FastText</span></code></a>()</p></td>
+<td><p>Generates FastText embedding martix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#embedding_processor.Glove" title="embedding_processor.Glove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Glove</span></code></a>()</p></td>
+<td><p>Generates GloVe embedding martix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Numberbatch" title="embedding_processor.Numberbatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Numberbatch</span></code></a>()</p></td>
+<td><p>Generates ConceptNet Numberbatch embeddings matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#embedding_processor.Random" title="embedding_processor.Random"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Random</span></code></a>()</p></td>
+<td><p>Generates random embeddings matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Word2Vec" title="embedding_processor.Word2Vec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Word2Vec</span></code></a>()</p></td>
+<td><p>Generates Word2Vec embedding martix.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.get_embedding" title="embedding_processor.get_embedding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding</span></code></a>(embedding_dir, embedding_type, ...)</p></td>
+<td><p>Utility function for returning an embedding matrix generated by an EmbeddingProcessor.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="embedding_processor.Dependency">
+<em class="property">class </em><code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">Dependency</code><a class="headerlink" href="#embedding_processor.Dependency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#embedding_processor.EmbeddingProcessor" title="embedding_processor.EmbeddingProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">embedding_processor.EmbeddingProcessor</span></code></a></p>
+<p>Generates Dependency-based embeddings matrix.
+Levy, O., &amp; Goldberg, Y. (2014). Dependency-Based Word Embeddings.
+Proceedings Of the 52nd Annual Meeting Ofthe Association for Computational Linguistics, 302–308.</p>
+<p>Embedding source available from: <a class="reference external" href="https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/">https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/</a></p>
+<p>Valid FastText source files:
+'deps'</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Dependency.get_embedding_matrix" title="embedding_processor.Dependency.get_embedding_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding_matrix</span></code></a>(embedding_dir, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="embedding_processor.Dependency.get_embedding_matrix">
+<code class="sig-name descname">get_embedding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.Dependency.get_embedding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="embedding_processor.EmbeddingProcessor">
+<em class="property">class </em><code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">EmbeddingProcessor</code><a class="headerlink" href="#embedding_processor.EmbeddingProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>EmbeddingProcessor abstract class. Contains function for mapping word tokens to embedding vectors.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.EmbeddingProcessor.get_embedding_matrix" title="embedding_processor.EmbeddingProcessor.get_embedding_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding_matrix</span></code></a>(embedding_dir, ...)</p></td>
+<td><p>Loads embeddings and maps word tokens to embedding vectors.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="embedding_processor.EmbeddingProcessor.get_embedding_matrix">
+<code class="sig-name descname">get_embedding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.EmbeddingProcessor.get_embedding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads embeddings and maps word tokens to embedding vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_dir</strong> (<em>str</em>) -- The location to store and load embedding files</p></li>
+<li><p><strong>embedding_source</strong> (<em>string</em>) -- Specifies which embedding source file to load</p></li>
+<li><p><strong>embedding_dim</strong> (<em>int</em>) -- Length of vector to map tokens to, raises error if longer than loaded source files</p></li>
+<li><p><strong>vocabulary</strong> (<em>Gluonnlp Vocabulary</em>) -- Maps word tokens to attached embedding vectors</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A matrix of shape (vocabulary_size, embedding_dim) which maps words to embeddings</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>matrix (numpy array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="embedding_processor.FastText">
+<em class="property">class </em><code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">FastText</code><a class="headerlink" href="#embedding_processor.FastText" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#embedding_processor.EmbeddingProcessor" title="embedding_processor.EmbeddingProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">embedding_processor.EmbeddingProcessor</span></code></a></p>
+<p>Generates FastText embedding martix.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.FastText.get_embedding_matrix" title="embedding_processor.FastText.get_embedding_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding_matrix</span></code></a>(embedding_dir, ...)</p></td>
+<td><p>Loads FastText embeddings and maps word tokens to embedding vectors.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="embedding_processor.FastText.get_embedding_matrix">
+<code class="sig-name descname">get_embedding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.FastText.get_embedding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads FastText embeddings and maps word tokens to embedding vectors.</p>
+<p>Valid FastText source files:
+'crawl-300d-2M', 'crawl-300d-2M-subword', 'wiki.simple'</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="embedding_processor.Glove">
+<em class="property">class </em><code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">Glove</code><a class="headerlink" href="#embedding_processor.Glove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#embedding_processor.EmbeddingProcessor" title="embedding_processor.EmbeddingProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">embedding_processor.EmbeddingProcessor</span></code></a></p>
+<p>Generates GloVe embedding martix.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Glove.get_embedding_matrix" title="embedding_processor.Glove.get_embedding_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding_matrix</span></code></a>(embedding_dir, ...)</p></td>
+<td><p>Loads GloVe embeddings and maps word tokens to embedding vectors.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="embedding_processor.Glove.get_embedding_matrix">
+<code class="sig-name descname">get_embedding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.Glove.get_embedding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads GloVe embeddings and maps word tokens to embedding vectors.</p>
+<p>Valid GloVe source files:
+'glove.42B.300d', 'glove.6B.100d', 'glove.6B.200d', 'glove.6B.300d', 'glove.6B.50d', 'glove.840B.300d',
+'glove.twitter.27B.100d', 'glove.twitter.27B.200d', 'glove.twitter.27B.25d', 'glove.twitter.27B.50d'</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="embedding_processor.Numberbatch">
+<em class="property">class </em><code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">Numberbatch</code><a class="headerlink" href="#embedding_processor.Numberbatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#embedding_processor.EmbeddingProcessor" title="embedding_processor.EmbeddingProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">embedding_processor.EmbeddingProcessor</span></code></a></p>
+<p>Generates ConceptNet Numberbatch embeddings matrix.
+Speer, R., Chin, J., &amp; Havasi, C. (2016). ConceptNet 5.5: An Open Multilingual Graph of General Knowledge.
+Proceedings of the Thirty-First AAAI Conference on Artificial Intelligence (AAAI-17) ConceptNet, 4444–4451.</p>
+<p>Embedding source available from: <a class="reference external" href="https://github.com/commonsense/conceptnet-numberbatch">https://github.com/commonsense/conceptnet-numberbatch</a></p>
+<p>Valid FastText source files:
+'numberbatch-en'</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Numberbatch.get_embedding_matrix" title="embedding_processor.Numberbatch.get_embedding_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding_matrix</span></code></a>(embedding_dir, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="embedding_processor.Numberbatch.get_embedding_matrix">
+<code class="sig-name descname">get_embedding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.Numberbatch.get_embedding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="embedding_processor.Random">
+<em class="property">class </em><code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">Random</code><a class="headerlink" href="#embedding_processor.Random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#embedding_processor.EmbeddingProcessor" title="embedding_processor.EmbeddingProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">embedding_processor.EmbeddingProcessor</span></code></a></p>
+<p>Generates random embeddings matrix.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Random.get_embedding_matrix" title="embedding_processor.Random.get_embedding_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding_matrix</span></code></a>(embedding_dir, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="embedding_processor.Random.get_embedding_matrix">
+<code class="sig-name descname">get_embedding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.Random.get_embedding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="embedding_processor.Word2Vec">
+<em class="property">class </em><code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">Word2Vec</code><a class="headerlink" href="#embedding_processor.Word2Vec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#embedding_processor.EmbeddingProcessor" title="embedding_processor.EmbeddingProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">embedding_processor.EmbeddingProcessor</span></code></a></p>
+<p>Generates Word2Vec embedding martix.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#embedding_processor.Word2Vec.get_embedding_matrix" title="embedding_processor.Word2Vec.get_embedding_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_embedding_matrix</span></code></a>(embedding_dir, ...)</p></td>
+<td><p>Loads Word2Vec embeddings and maps word tokens to embedding vectors.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="embedding_processor.Word2Vec.get_embedding_matrix">
+<code class="sig-name descname">get_embedding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.Word2Vec.get_embedding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads Word2Vec embeddings and maps word tokens to embedding vectors.</p>
+<p>Valid Word2Vec source files:
+'GoogleNews-vectors-negative300', 'freebase-vectors-skipgram1000-en', 'freebase-vectors-skipgram1000'</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="embedding_processor.get_embedding">
+<code class="sig-prename descclassname">embedding_processor.</code><code class="sig-name descname">get_embedding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">embedding_dir</span></em>, <em class="sig-param"><span class="n">embedding_type</span></em>, <em class="sig-param"><span class="n">embedding_source</span></em>, <em class="sig-param"><span class="n">embedding_dim</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#embedding_processor.get_embedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for returning an embedding matrix generated by an EmbeddingProcessor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_dir</strong> (<em>str</em>) -- The location to store and load embedding files</p></li>
+<li><p><strong>embedding_type</strong> (<em>str</em>) -- The name of the EmbeddingProcessor</p></li>
+<li><p><strong>embedding_source</strong> (<em>string</em>) -- Specifies which embedding source file to load</p></li>
+<li><p><strong>embedding_dim</strong> (<em>int</em>) -- Length of vector to map tokens to, raises error if longer than loaded source files</p></li>
+<li><p><strong>vocabulary</strong> (<em>Gluonnlp Vocabulary</em>) -- Maps word tokens to attached embedding vectors</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A matrix of shape (vocabulary_size, embedding_dim) which maps words to embeddings</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>matrix (numpy array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="metrics.html" class="btn btn-neutral float-right" title="Metrics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="data_processor.html" class="btn btn-neutral float-left" title="Data Processor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

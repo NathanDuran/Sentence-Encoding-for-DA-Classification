@@ -284,7 +284,7 @@ class DataProcessor:
         return metadata['vocabulary']
 
     def get_dataset(self):
-        """Helper function. Gets the metadata and all datasets from the Github repository and saves to file."""
+        """Gets the metadata and all datasets (train, test, val) from the Github repository and saves to file."""
 
         vocabulary, labels = self.get_metadata()
 

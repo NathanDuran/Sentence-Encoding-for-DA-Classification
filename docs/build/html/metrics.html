@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Metrics &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Checkpointer" href="check_pointer.html" />
+    <link rel="prev" title="Embedding Processor" href="embedding_processor.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Metrics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/metrics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-metrics">
+<span id="metrics"></span><h1>Metrics<a class="headerlink" href="#module-metrics" title="Permalink to this headline">¶</a></h1>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metrics.plot_confusion_matrix" title="metrics.plot_confusion_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_confusion_matrix</span></code></a>(true_labels, ...[, ...])</p></td>
+<td><p>Generates a confusion matrix for the given predictions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metrics.precision_recall_f1" title="metrics.precision_recall_f1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">precision_recall_f1</span></code></a>(true_labels, ...)</p></td>
+<td><p>Generates classification metrics precision, recall and F1 for the given predictions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metrics.save_experiment" title="metrics.save_experiment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_experiment</span></code></a>(file_name, params, ...)</p></td>
+<td><p>Saves/appends all experiment parameters and results to .csv file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metrics.save_history" title="metrics.save_history"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_history</span></code></a>(file_name, history)</p></td>
+<td><p>Saves training history dictionary as numpy arrays in .npz file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metrics.save_predictions" title="metrics.save_predictions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_predictions</span></code></a>(file_name, true_labels, ...)</p></td>
+<td><p>Saves predictions to .csv file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metrics.save_results" title="metrics.save_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_results</span></code></a>(file_name, test_loss, ...)</p></td>
+<td><p>Saves test metrics to a .txt file.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="metrics.plot_confusion_matrix">
+<code class="sig-prename descclassname">metrics.</code><code class="sig-name descname">plot_confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">true_labels</span></em>, <em class="sig-param"><span class="n">predicted_labels</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">matrix_dim</span><span class="o">=</span><span class="default_value">15</span></em>, <em class="sig-param"><span class="n">normalise</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fig_size</span><span class="o">=</span><span class="default_value">(10, 10)</span></em>, <em class="sig-param"><span class="n">font_size</span><span class="o">=</span><span class="default_value">15</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metrics.plot_confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a confusion matrix for the given predictions.</p>
+<p>Uses sklearn to generate the confusion matrix.
+Uses matplotlib and seaborn to generate the figure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_labels</strong> (<em>np.array</em>) -- The ground truth labels for the data</p></li>
+<li><p><strong>predicted_labels</strong> (<em>np.array</em>) -- The predicted labels for the data</p></li>
+<li><p><strong>labels</strong> (<em>list</em>) -- List of label names</p></li>
+<li><p><strong>title</strong> (<em>str</em>) -- The title for the figure</p></li>
+<li><p><strong>matrix_dim</strong> (<em>int</em>) -- The number of classes to show on the matrix, if None or -1 creates full matrix</p></li>
+<li><p><strong>normalise</strong> (<em>bool</em>) -- Whether to normalise the matrix or use original values</p></li>
+<li><p><strong>fig_size</strong> (<em>tuple</em>) -- Tuple for the horizontal and vertical size the figure</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>) -- Font size for figure labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The confusion matrix figure
+matrix (numpy array): The 2d confusion matrix array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>fig (matplotlib figure)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="metrics.precision_recall_f1">
+<code class="sig-prename descclassname">metrics.</code><code class="sig-name descname">precision_recall_f1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">true_labels</span></em>, <em class="sig-param"><span class="n">predicted_labels</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metrics.precision_recall_f1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates classification metrics precision, recall and F1 for the given predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>true_labels</strong> (<em>np.array</em>) -- The ground truth labels for the data</p></li>
+<li><p><strong>predicted_labels</strong> (<em>np.array</em>) -- The predicted labels for the data</p></li>
+<li><p><strong>labels</strong> (<em>list</em>) -- List of label names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of micro, macro and weighted precision, recall and F1 scores
+metrics_str (str): Formatted string with metric data for all classes and totals</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>metrics_dict (dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="metrics.save_experiment">
+<code class="sig-prename descclassname">metrics.</code><code class="sig-name descname">save_experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">train_loss</span></em>, <em class="sig-param"><span class="n">train_acc</span></em>, <em class="sig-param"><span class="n">val_loss</span></em>, <em class="sig-param"><span class="n">val_acc</span></em>, <em class="sig-param"><span class="n">test_loss</span></em>, <em class="sig-param"><span class="n">test_acc</span></em>, <em class="sig-param"><span class="n">metrics</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metrics.save_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves/appends all experiment parameters and results to .csv file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="metrics.save_history">
+<code class="sig-prename descclassname">metrics.</code><code class="sig-name descname">save_history</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">history</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metrics.save_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves training history dictionary as numpy arrays in .npz file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="metrics.save_predictions">
+<code class="sig-prename descclassname">metrics.</code><code class="sig-name descname">save_predictions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">true_labels</span></em>, <em class="sig-param"><span class="n">predicted_labels</span></em>, <em class="sig-param"><span class="n">predictions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metrics.save_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves predictions to .csv file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="metrics.save_results">
+<code class="sig-prename descclassname">metrics.</code><code class="sig-name descname">save_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">test_loss</span></em>, <em class="sig-param"><span class="n">test_accuracy</span></em>, <em class="sig-param"><span class="n">metrics</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metrics.save_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves test metrics to a .txt file.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="check_pointer.html" class="btn btn-neutral float-right" title="Checkpointer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="embedding_processor.html" class="btn btn-neutral float-left" title="Embedding Processor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

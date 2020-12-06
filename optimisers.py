@@ -108,6 +108,7 @@ def rmsprop(lr, clip_args, **kwargs):
 
 
 def sgd(lr, clip_args, **kwargs):
+    """Stochastic Gradient Descent."""
     momentum = kwargs['momentum'] if 'momentum' in kwargs.keys() else 0.0
     nesterov = kwargs['nesterov'] if 'nesterov' in kwargs.keys() else False
     return tf.keras.optimizers.SGD(learning_rate=lr, momentum=momentum, nesterov=nesterov, **clip_args)

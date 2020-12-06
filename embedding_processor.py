@@ -67,6 +67,7 @@ class Random(EmbeddingProcessor):
 
 
 class Glove(EmbeddingProcessor):
+    """Generates GloVe embedding martix."""
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
         """Loads GloVe embeddings and maps word tokens to embedding vectors.
@@ -109,6 +110,7 @@ class Glove(EmbeddingProcessor):
 
 
 class Word2Vec(EmbeddingProcessor):
+    """Generates Word2Vec embedding martix."""
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
         """Loads Word2Vec embeddings and maps word tokens to embedding vectors.
@@ -149,6 +151,7 @@ class Word2Vec(EmbeddingProcessor):
 
 
 class FastText(EmbeddingProcessor):
+    """Generates FastText embedding martix."""
 
     def get_embedding_matrix(self, embedding_dir, embedding_source, embedding_dim, vocabulary):
         """Loads FastText embeddings and maps word tokens to embedding vectors.

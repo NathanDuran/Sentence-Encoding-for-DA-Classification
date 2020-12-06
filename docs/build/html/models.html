@@ -1,0 +1,1268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Models &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Layers" href="layers.html" />
+    <link rel="prev" title="Sentence Encoding for Dialogue Act Classification" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/models.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-models">
+<span id="models"></span><h1>Models<a class="headerlink" href="#module-models" title="Permalink to this headline">¶</a></h1>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.ALBERT" title="models.ALBERT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALBERT</span></code></a>([name])</p></td>
+<td><p>Uses an ALBERT from Tensorflow Hub as embedding layer from: <a class="reference external" href="https://tfhub.dev/google/albert_base/3">https://tfhub.dev/google/albert_base/3</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.BERT" title="models.BERT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BERT</span></code></a>([name])</p></td>
+<td><p>Uses an BERT from Tensorflow Hub as embedding layer from: <a class="reference external" href="https://github.com/strongio/keras-bert/blob/master/keras-bert.py">https://github.com/strongio/keras-bert/blob/master/keras-bert.py</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.BiGRU" title="models.BiGRU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiGRU</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.BiGRUAttn" title="models.BiGRUAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiGRUAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.BiLSTM" title="models.BiLSTM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiLSTM</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.BiLSTMAttn" title="models.BiLSTMAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiLSTMAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.CNN" title="models.CNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CNN</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.CNNAttn" title="models.CNNAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CNNAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.ConveRT" title="models.ConveRT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConveRT</span></code></a>([name])</p></td>
+<td><p>Uses ConveRT Tensorflow Hub module as embedding layer from: <a class="reference external" href="https://github.com/PolyAI-LDN/polyai-models">https://github.com/PolyAI-LDN/polyai-models</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.DCNN" title="models.DCNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DCNN</span></code></a>([name])</p></td>
+<td><p>Implements the DCNN model from:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DCNNAttn" title="models.DCNNAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DCNNAttn</span></code></a>([name])</p></td>
+<td><p>Implements the DCNN model from:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.DeepBiGRU" title="models.DeepBiGRU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepBiGRU</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepBiGRUAttn" title="models.DeepBiGRUAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepBiGRUAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.DeepBiLSTM" title="models.DeepBiLSTM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepBiLSTM</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepBiLSTMAttn" title="models.DeepBiLSTMAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepBiLSTMAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.DeepGRU" title="models.DeepGRU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepGRU</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepGRUAttn" title="models.DeepGRUAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepGRUAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.DeepLSTM" title="models.DeepLSTM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepLSTM</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepLSTMAttn" title="models.DeepLSTMAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeepLSTMAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.ELMo" title="models.ELMo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ELMo</span></code></a>([name])</p></td>
+<td><p>Uses ELMo from Tensorflow Hub as embedding layer from: <a class="reference external" href="https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb">https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb</a> <a class="reference external" href="https://github.com/JHart96/keras_elmo_embedding_layer/blob/master/elmo.py">https://github.com/JHart96/keras_elmo_embedding_layer/blob/master/elmo.py</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.GRU" title="models.GRU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRU</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.GRUAttn" title="models.GRUAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRUAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.GRUCRF" title="models.GRUCRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRUCRF</span></code></a>([name])</p></td>
+<td><p>Uses CRF layer from keras_contrib: <a class="reference external" href="https://github.com/keras-team/keras-contrib/tree/master/keras_contrib">https://github.com/keras-team/keras-contrib/tree/master/keras_contrib</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.LSTM" title="models.LSTM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LSTM</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.LSTMAttn" title="models.LSTMAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LSTMAttn</span></code></a>([name])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.LSTMCRF" title="models.LSTMCRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LSTMCRF</span></code></a>([name])</p></td>
+<td><p>Uses CRF layer from keras_contrib: <a class="reference external" href="https://github.com/keras-team/keras-contrib/tree/master/keras_contrib">https://github.com/keras-team/keras-contrib/tree/master/keras_contrib</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.MLSTMCharLM" title="models.MLSTMCharLM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLSTMCharLM</span></code></a>([name])</p></td>
+<td><p>Uses an mLSTM Character Language Model as embedding layer from: <a class="reference external" href="https://github.com/openai/generating-reviews-discovering-sentiment">https://github.com/openai/generating-reviews-discovering-sentiment</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code></a>([name])</p></td>
+<td><p>Model abstract class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.NeuralNetworkLanguageModel" title="models.NeuralNetworkLanguageModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NeuralNetworkLanguageModel</span></code></a>([name])</p></td>
+<td><p>Uses Neural Network Language Model from Tensorflow Hub.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.RCNN" title="models.RCNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RCNN</span></code></a>([name])</p></td>
+<td><p>Implements the Recurrent Convolutional Network from:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.RCNNAttn" title="models.RCNNAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RCNNAttn</span></code></a>([name])</p></td>
+<td><p>Implements the Recurrent Convolutional Network from:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.TextCNN" title="models.TextCNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TextCNN</span></code></a>([name])</p></td>
+<td><p>Implements the Text CNN model from:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.TextCNNAttn" title="models.TextCNNAttn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TextCNNAttn</span></code></a>([name])</p></td>
+<td><p>Implements the Text CNN model from:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#models.UniversalSentenceEncoder" title="models.UniversalSentenceEncoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniversalSentenceEncoder</span></code></a>([name])</p></td>
+<td><p>Uses an Universal Sentence Encoder from Tensorflow Hub as embedding layer.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.get_model" title="models.get_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model</span></code></a>(model_name, input_shape, ...[, ...])</p></td>
+<td><p>Utility function for returning a Keras model.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="models.ALBERT">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">ALBERT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'ALBERT'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.ALBERT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses an ALBERT from Tensorflow Hub as embedding layer from:
+<a class="reference external" href="https://tfhub.dev/google/albert_base/3">https://tfhub.dev/google/albert_base/3</a></p>
+<p>Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush Sharma, Radu Soricut.
+ALBERT: A Lite BERT for Self-supervised Learning of Language Representations. arXiv preprint arXiv:1909.11942, 2019.</p>
+<p>Module urls:
+albert_base - &quot;<a class="reference external" href="https://tfhub.dev/google/albert_base/3">https://tfhub.dev/google/albert_base/3</a>&quot;
+albert_large - &quot;<a class="reference external" href="https://tfhub.dev/google/albert_large/3">https://tfhub.dev/google/albert_large/3</a>&quot;
+albert_xlarge - &quot;<a class="reference external" href="https://tfhub.dev/google/albert_xlarge/3">https://tfhub.dev/google/albert_xlarge/3</a>&quot;
+albert_xxlarge - &quot;<a class="reference external" href="https://tfhub.dev/google/albert_xxlarge/3">https://tfhub.dev/google/albert_xxlarge/3</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.ALBERT.build_model" title="models.ALBERT.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.ALBERT.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.ALBERT.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.BERT">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">BERT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'BERT'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BERT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses an BERT from Tensorflow Hub as embedding layer from:
+<a class="reference external" href="https://github.com/strongio/keras-bert/blob/master/keras-bert.py">https://github.com/strongio/keras-bert/blob/master/keras-bert.py</a></p>
+<p>Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova.
+BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.
+arXiv preprint arXiv:1810.04805, 2018.</p>
+<p>Module urls:
+bert_base - &quot;<a class="reference external" href="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1">https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1</a>&quot;
+bert_large - &quot;<a class="reference external" href="https://tfhub.dev/google/bert_uncased_L-24_H-1024_A-16/1">https://tfhub.dev/google/bert_uncased_L-24_H-1024_A-16/1</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.BERT.build_model" title="models.BERT.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.BERT.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BERT.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.BiGRU">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">BiGRU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'BiGRU'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiGRU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.BiGRU.build_model" title="models.BiGRU.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.BiGRU.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiGRU.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.BiGRUAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">BiGRUAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'BiGRUAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiGRUAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.BiGRUAttn.build_model" title="models.BiGRUAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.BiGRUAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiGRUAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.BiLSTM">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">BiLSTM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'BiLSTM'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiLSTM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.BiLSTM.build_model" title="models.BiLSTM.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.BiLSTM.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiLSTM.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.BiLSTMAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">BiLSTMAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'BiLSTMAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiLSTMAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.BiLSTMAttn.build_model" title="models.BiLSTMAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.BiLSTMAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.BiLSTMAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.CNN">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">CNN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'CNN'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.CNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.CNN.build_model" title="models.CNN.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.CNN.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.CNN.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.CNNAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">CNNAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'CNNAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.CNNAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.CNNAttn.build_model" title="models.CNNAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.CNNAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.CNNAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.ConveRT">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">ConveRT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'ConveRT'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.ConveRT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses ConveRT Tensorflow Hub module as embedding layer from: <a class="reference external" href="https://github.com/PolyAI-LDN/polyai-models">https://github.com/PolyAI-LDN/polyai-models</a></p>
+<p>Henderson, M., Casanueva, I., Mrkšić, N., Su, P.-H., Tsung-Hsien and Vulić, I. (2019)
+ConveRT: Efficient and Accurate Conversational Representations from Transformers. arXiv [online].
+Available from: <a class="reference external" href="http://arxiv.org/abs/1911.03688">http://arxiv.org/abs/1911.03688</a> [Accessed 13 November 2019].</p>
+<p>Module url: &quot;<a class="reference external" href="http://models.poly-ai.com/convert/v1/model.tar.gz">http://models.poly-ai.com/convert/v1/model.tar.gz</a>&quot;</p>
+<p>Note: Requires tensorflow-text to be installed (TODO currently unavailable on windows).</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.ConveRT.build_model" title="models.ConveRT.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.ConveRT.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.ConveRT.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DCNN">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DCNN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DCNN'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DCNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Implements the DCNN model from:</p>
+<p>Kalchbrenner, N., Grefenstette, E. and Blunsom, P. (2014) A Convolutional Neural Network for Modelling Sentences.
+Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics.</p>
+<p>Model code from: &quot;<a class="reference external" href="https://github.com/AlexYangLi/TextClassification">https://github.com/AlexYangLi/TextClassification</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DCNN.build_model" title="models.DCNN.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DCNN.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DCNN.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DCNNAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DCNNAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DCNNAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DCNNAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Implements the DCNN model from:</p>
+<p>Kalchbrenner, N., Grefenstette, E. and Blunsom, P. (2014) A Convolutional Neural Network for Modelling Sentences.
+Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics.</p>
+<p>Model code from: &quot;<a class="reference external" href="https://github.com/AlexYangLi/TextClassification">https://github.com/AlexYangLi/TextClassification</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DCNNAttn.build_model" title="models.DCNNAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DCNNAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DCNNAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepBiGRU">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepBiGRU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepBiGRU'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiGRU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepBiGRU.build_model" title="models.DeepBiGRU.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepBiGRU.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiGRU.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepBiGRUAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepBiGRUAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepBiGRUAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiGRUAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepBiGRUAttn.build_model" title="models.DeepBiGRUAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepBiGRUAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiGRUAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepBiLSTM">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepBiLSTM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepBiLSTM'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiLSTM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepBiLSTM.build_model" title="models.DeepBiLSTM.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepBiLSTM.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiLSTM.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepBiLSTMAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepBiLSTMAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepBiLSTMAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiLSTMAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepBiLSTMAttn.build_model" title="models.DeepBiLSTMAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepBiLSTMAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepBiLSTMAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepGRU">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepGRU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepGRU'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepGRU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepGRU.build_model" title="models.DeepGRU.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepGRU.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepGRU.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepGRUAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepGRUAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepGRUAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepGRUAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepGRUAttn.build_model" title="models.DeepGRUAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepGRUAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepGRUAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepLSTM">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepLSTM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepLSTM'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepLSTM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepLSTM.build_model" title="models.DeepLSTM.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepLSTM.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepLSTM.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.DeepLSTMAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">DeepLSTMAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'DeepLSTMAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepLSTMAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.DeepLSTMAttn.build_model" title="models.DeepLSTMAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.DeepLSTMAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.DeepLSTMAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.ELMo">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">ELMo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'ELMo'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.ELMo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses ELMo from Tensorflow Hub as embedding layer from:
+<a class="reference external" href="https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb">https://github.com/strongio/keras-elmo/blob/master/Elmo%20Keras.ipynb</a>
+<a class="reference external" href="https://github.com/JHart96/keras_elmo_embedding_layer/blob/master/elmo.py">https://github.com/JHart96/keras_elmo_embedding_layer/blob/master/elmo.py</a></p>
+<p>Matthew E. Peters, Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, Luke Zettlemoyer.
+Deep contextualized word representations. arXiv preprint arXiv:1802.05365, 2018.</p>
+<p>Module url: &quot;<a class="reference external" href="https://tfhub.dev/google/elmo/2">https://tfhub.dev/google/elmo/2</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.ELMo.build_model" title="models.ELMo.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.ELMo.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.ELMo.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.GRU">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">GRU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'GRU'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.GRU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.GRU.build_model" title="models.GRU.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.GRU.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.GRU.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.GRUAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">GRUAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'GRUAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.GRUAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.GRUAttn.build_model" title="models.GRUAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.GRUAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.GRUAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.GRUCRF">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">GRUCRF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'GRUCRF'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.GRUCRF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses CRF layer from keras_contrib:
+<a class="reference external" href="https://github.com/keras-team/keras-contrib/tree/master/keras_contrib">https://github.com/keras-team/keras-contrib/tree/master/keras_contrib</a></p>
+<p>Note: The labels must be of shape [batch_size, num_labels, 1]</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.GRUCRF.build_model" title="models.GRUCRF.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.GRUCRF.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.GRUCRF.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.LSTM">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">LSTM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'LSTM'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.LSTM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.LSTM.build_model" title="models.LSTM.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.LSTM.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.LSTM.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.LSTMAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">LSTMAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'LSTMAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.LSTMAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.LSTMAttn.build_model" title="models.LSTMAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.LSTMAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.LSTMAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.LSTMCRF">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">LSTMCRF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'LSTMCRF'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.LSTMCRF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses CRF layer from keras_contrib:
+<a class="reference external" href="https://github.com/keras-team/keras-contrib/tree/master/keras_contrib">https://github.com/keras-team/keras-contrib/tree/master/keras_contrib</a></p>
+<p>Note: The labels must be of shape [batch_size, num_labels, 1]</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.LSTMCRF.build_model" title="models.LSTMCRF.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.LSTMCRF.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.LSTMCRF.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.MLSTMCharLM">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">MLSTMCharLM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'mLSTMCharLM'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.MLSTMCharLM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses an mLSTM Character Language Model as embedding layer from:
+<a class="reference external" href="https://github.com/openai/generating-reviews-discovering-sentiment">https://github.com/openai/generating-reviews-discovering-sentiment</a></p>
+<p>Radford, A., Jozefowicz, R. and Sutskever, I. (2018) 'Learning to Generate Reviews and Discovering Sentiment',
+arXiv. Available at: <a class="reference external" href="http://arxiv.org/abs/1704.01444">http://arxiv.org/abs/1704.01444</a></p>
+<p>Implements the model as described in (if return_type='mean' and max_seq_length=64):
+Bothe, C. et al. (2018) 'A Context-based Approach for Dialogue Act Recognition using Simple Recurrent Neural Networks',</p>
+<blockquote>
+<div><p>in Eleventh International Conference on Language Resources and Evaluation (LREC 2018).</p>
+</div></blockquote>
+<p>Note: batch_size and max_seq_length must be manually set for the MLSTMCharLMLayer, see mlstm_char_lm_layer.py.
+Default embedding dimension is 4,096.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.MLSTMCharLM.build_model" title="models.MLSTMCharLM.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.MLSTMCharLM.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.MLSTMCharLM.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.Model">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'model'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Model abstract class.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.Model.build_model" title="models.Model.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p>Defines the model architecture using the Keras functional API.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.Model.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.Model.build_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the model architecture using the Keras functional API.</p>
+<p>Example of 2 layer feed forward network with embeddings:</p>
+<p># Unpack key word arguments
+dense_units = kwargs['dense_units'] if 'dense_units' in kwargs.keys() else 100</p>
+<p># Define model
+inputs = tf.keras.Input(shape=input_shape, name='input_layer')
+x = tf.keras.layers_t.Embedding(input_dim=embedding_matrix.shape[0],  # Vocab size</p>
+<blockquote>
+<div><p>output_dim=embedding_matrix.shape[1],  # Embedding dim
+embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
+input_length=input_shape[0],  # Max seq length
+trainable=train_embeddings,
+name='embedding_layer')(inputs)</p>
+</div></blockquote>
+<p>x = tf.keras.layers_t.GlobalMaxPooling1D(name='global_pool')(x)
+x = tf.keras.layers_t.Dense(dense_units, activation='relu', name='dense_1')(x)
+outputs = tf.keras.layers_t.Dense(output_shape, activation='softmax', name='output_layer')(x)</p>
+<p># Create keras model
+model = tf.keras.Model(inputs=inputs, outputs=outputs, name=self.name)</p>
+<p># Create optimiser
+optimiser = optimisers.get_optimiser(optimiser_type=optimiser, lr=learning_rate, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs)</p>
+<p># Compile the model
+model.compile(loss='sparse_categorical_crossentropy', optimizer=optimiser, metrics=['accuracy'])</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_shape</strong> (<em>tuple</em>) -- The input shape excluding batch size, i.e (sequence_length, )</p></li>
+<li><p><strong>output_shape</strong> (<em>int</em>) -- The output shape, i.e. number of classes to predict</p></li>
+<li><p><strong>embedding_matrix</strong> (<em>nb.array</em>) -- A matrix of vocabulary_size rows and embedding_dim columns</p></li>
+<li><p><strong>train_embeddings</strong> (<em>bool</em>) -- Whether to keep embeddings fixed during training</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) -- Optional dictionary of model parameters to use for specific implementations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keras model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>model (tf.keras.Model)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.NeuralNetworkLanguageModel">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">NeuralNetworkLanguageModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'NeuralNetworkLanguageModel'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.NeuralNetworkLanguageModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses Neural Network Language Model from Tensorflow Hub.</p>
+<p>Yoshua Bengio, Rejean Ducharme, Pascal Vincent, Christian Jauvin. A Neural Probabilistic Language Model.
+Journal of Machine Learning Research, 3:1137-1155, 2003.</p>
+<p>Module url: &quot;<a class="reference external" href="https://tfhub.dev/google/nnlm-en-dim128/1">https://tfhub.dev/google/nnlm-en-dim128/1</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.NeuralNetworkLanguageModel.build_model" title="models.NeuralNetworkLanguageModel.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.NeuralNetworkLanguageModel.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.NeuralNetworkLanguageModel.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.RCNN">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">RCNN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'RCNN'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.RCNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Implements the Recurrent Convolutional Network from:</p>
+<p>Lai, S. et al. (2015) 'Recurrent Convolutional Neural Networks for Text Classification',
+in Proceedings of the 29th AAAI Conference on Artificial Intelligence (AAAI'15).</p>
+<p>Model code from: &quot;<a class="reference external" href="https://github.com/AlexYangLi/TextClassification">https://github.com/AlexYangLi/TextClassification</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.RCNN.build_model" title="models.RCNN.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.RCNN.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.RCNN.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.RCNNAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">RCNNAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'RCNNAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.RCNNAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Implements the Recurrent Convolutional Network from:</p>
+<p>Lai, S. et al. (2015) 'Recurrent Convolutional Neural Networks for Text Classification',
+in Proceedings of the 29th AAAI Conference on Artificial Intelligence (AAAI'15).</p>
+<p>Model code from: &quot;<a class="reference external" href="https://github.com/AlexYangLi/TextClassification">https://github.com/AlexYangLi/TextClassification</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.RCNNAttn.build_model" title="models.RCNNAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.RCNNAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.RCNNAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.TextCNN">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">TextCNN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'TextCNN'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.TextCNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Implements the Text CNN model from:</p>
+<p>Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
+Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.TextCNN.build_model" title="models.TextCNN.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.TextCNN.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.TextCNN.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.TextCNNAttn">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">TextCNNAttn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'TextCNNAttn'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.TextCNNAttn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Implements the Text CNN model from:</p>
+<p>Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification.
+Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.TextCNNAttn.build_model" title="models.TextCNNAttn.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.TextCNNAttn.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.TextCNNAttn.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.UniversalSentenceEncoder">
+<em class="property">class </em><code class="sig-prename descclassname">models.</code><code class="sig-name descname">UniversalSentenceEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'UniversalSentenceEncoder'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.UniversalSentenceEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.Model" title="models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.Model</span></code></a></p>
+<p>Uses an Universal Sentence Encoder from Tensorflow Hub as embedding layer.</p>
+<p>Daniel Cer, Yinfei Yang, Sheng-yi Kong, Nan Hua, Nicole Limtiaco, Rhomni St. John, Noah Constant,
+Mario Guajardo-Cespedes, Steve Yuan, Chris Tar, Yun-Hsuan Sung, Brian Strope, Ray Kurzweil.
+Universal Sentence Encoder. arXiv:1803.11175, 2018.</p>
+<p>Module url: &quot;<a class="reference external" href="https://tfhub.dev/google/universal-sentence-encoder-large/3">https://tfhub.dev/google/universal-sentence-encoder-large/3</a>&quot;</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.UniversalSentenceEncoder.build_model" title="models.UniversalSentenceEncoder.build_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_model</span></code></a>(input_shape, output_shape, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="models.UniversalSentenceEncoder.build_model">
+<code class="sig-name descname">build_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">embedding_matrix</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.UniversalSentenceEncoder.build_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="models.get_model">
+<code class="sig-prename descclassname">models.</code><code class="sig-name descname">get_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_name</span></em>, <em class="sig-param"><span class="n">input_shape</span></em>, <em class="sig-param"><span class="n">output_shape</span></em>, <em class="sig-param"><span class="n">model_params</span></em>, <em class="sig-param"><span class="n">embeddings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">train_embeddings</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for returning a Keras model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>) -- The name of the model</p></li>
+<li><p><strong>input_shape</strong> (<em>tuple</em>) -- The input shape excluding batch size, i.e (sequence_length, )</p></li>
+<li><p><strong>output_shape</strong> (<em>int</em>) -- The output shape, i.e. number of classes to predict</p></li>
+<li><p><strong>model_params</strong> (<em>dict</em>) -- Optional dictionary of model parameters to use for specific implementations</p></li>
+<li><p><strong>embeddings</strong> (<em>nb.array</em>) -- A matrix of vocabulary_size rows and embedding_dim columns</p></li>
+<li><p><strong>train_embeddings</strong> (<em>bool</em>) -- Whether to keep embeddings fixed during training</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keras model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>model (tf.keras.Model)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="layers.html" class="btn btn-neutral float-right" title="Layers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Sentence Encoding for Dialogue Act Classification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

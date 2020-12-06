@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Checkpointer &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Early Stopper" href="early_stopper.html" />
+    <link rel="prev" title="Metrics" href="metrics.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisers.html">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Checkpointer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/check_pointer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-check_pointer">
+<span id="checkpointer"></span><h1>Checkpointer<a class="headerlink" href="#module-check_pointer" title="Permalink to this headline">¶</a></h1>
+<p><strong>Classes:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#check_pointer.Checkpointer" title="check_pointer.Checkpointer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Checkpointer</span></code></a>(checkpoint_dir, ...[, ...])</p></td>
+<td><p>Class for saving a models checkpoints, weight files and embeddings.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="check_pointer.Checkpointer">
+<em class="property">class </em><code class="sig-prename descclassname">check_pointer.</code><code class="sig-name descname">Checkpointer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">checkpoint_dir</span></em>, <em class="sig-param"><span class="n">experiment_name</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">save_ckpt</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_weights</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">keep_best</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">minimise</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#check_pointer.Checkpointer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for saving a models checkpoints, weight files and embeddings.</p>
+<p><strong>Methods:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#check_pointer.Checkpointer.get_best" title="check_pointer.Checkpointer.get_best"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best</span></code></a>()</p></td>
+<td><p>Returns the key (step) with the best monitored metric from the current training session.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#check_pointer.Checkpointer.get_best_ckpt" title="check_pointer.Checkpointer.get_best_ckpt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_ckpt</span></code></a>()</p></td>
+<td><p>Returns the file name of the best checkpoint from the current training session, if it exists.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#check_pointer.Checkpointer.get_best_weights" title="check_pointer.Checkpointer.get_best_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_weights</span></code></a>()</p></td>
+<td><p>Returns the file name of the best weights from the current training session, if it exists.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#check_pointer.Checkpointer.save" title="check_pointer.Checkpointer.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(step)</p></td>
+<td><p>Creates a new checkpoint and/or weight file for the model at the current step.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#check_pointer.Checkpointer.save_best" title="check_pointer.Checkpointer.save_best"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_best</span></code></a>(metric_val, step)</p></td>
+<td><p>Creates a new checkpoint/weights file if the current metric value is better than the least best.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#check_pointer.Checkpointer.save_embeddings" title="check_pointer.Checkpointer.save_embeddings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_embeddings</span></code></a>(output_dir, vocabulary[, ...])</p></td>
+<td><p>Creates a word embedding .txt file from the models embedding layer.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="check_pointer.Checkpointer.get_best">
+<code class="sig-name descname">get_best</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#check_pointer.Checkpointer.get_best" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the key (step) with the best monitored metric from the current training session.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="check_pointer.Checkpointer.get_best_ckpt">
+<code class="sig-name descname">get_best_ckpt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#check_pointer.Checkpointer.get_best_ckpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the file name of the best checkpoint from the current training session, if it exists.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="check_pointer.Checkpointer.get_best_weights">
+<code class="sig-name descname">get_best_weights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#check_pointer.Checkpointer.get_best_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the file name of the best weights from the current training session, if it exists.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="check_pointer.Checkpointer.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#check_pointer.Checkpointer.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new checkpoint and/or weight file for the model at the current step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>step</strong> (<em>int</em>) -- The current global step of the training model, used for creating file names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="check_pointer.Checkpointer.save_best">
+<code class="sig-name descname">save_best</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metric_val</span></em>, <em class="sig-param"><span class="n">step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#check_pointer.Checkpointer.save_best" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new checkpoint/weights file if the current metric value is better than the least best.</p>
+<p>Keeps the number according to keep_best value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_val</strong> (<em>float</em>) -- The current metric value to compare</p></li>
+<li><p><strong>step</strong> (<em>int</em>) -- The current global step of the training model, used for creating file names</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="check_pointer.Checkpointer.save_embeddings">
+<code class="sig-name descname">save_embeddings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">vocabulary</span></em>, <em class="sig-param"><span class="n">layer_name</span><span class="o">=</span><span class="default_value">'embedding'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#check_pointer.Checkpointer.save_embeddings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a word embedding .txt file from the models embedding layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>str</em>) -- Location to save the embedding file</p></li>
+<li><p><strong>vocabulary</strong> (<em>Gluonnlp Vocab</em>) -- Data sets vocabulary for mapping indexes to words</p></li>
+<li><p><strong>layer_name</strong> (<em>str</em>) -- Name of the embedding layer, default = 'embedding'</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="early_stopper.html" class="btn btn-neutral float-right" title="Early Stopper" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="metrics.html" class="btn btn-neutral float-left" title="Metrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

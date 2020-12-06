@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Optimisers &mdash; Sentence Encoding for Dialogue Act Classification 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Processor" href="data_processor.html" />
+    <link rel="prev" title="Layers" href="layers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sentence Encoding for Dialogue Act Classification
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Optimisers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processor.html">Data Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embedding_processor.html">Embedding Processor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="check_pointer.html">Checkpointer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="early_stopper.html">Early Stopper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_processing.html">Data/Results Processingg</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sentence Encoding for Dialogue Act Classification</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Optimisers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/optimisers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-optimisers">
+<span id="optimisers"></span><h1>Optimisers<a class="headerlink" href="#module-optimisers" title="Permalink to this headline">¶</a></h1>
+<p><strong>Functions:</strong></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#optimisers.adadelta" title="optimisers.adadelta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adadelta</span></code></a>(lr, clip_args, **kwargs)</p></td>
+<td><p>Adadelta optimization is a stochastic gradient descent method that is based on adaptive learning rate per</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#optimisers.adagrad" title="optimisers.adagrad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adagrad</span></code></a>(lr, clip_args, **kwargs)</p></td>
+<td><p>Adagrad is an optimizer with parameter-specific learning rates, which are adapted relative to how frequently a parameter gets updated during training.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#optimisers.adam" title="optimisers.adam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adam</span></code></a>(lr, clip_args, **kwargs)</p></td>
+<td><p>Adam optimization is a stochastic gradient descent method that is based on adaptive estimation of first-order and second-order moments. According to the paper Adam: A Method for Stochastic Optimization.Kingma et al., 2014, the method is &quot;computationally efficient, has little memory requirement,invariant to diagonal rescaling of  gradients, and is well suited for problems that are large in terms of data/parameters&quot;.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#optimisers.adamax" title="optimisers.adamax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adamax</span></code></a>(lr, clip_args, **kwargs)</p></td>
+<td><p>It is a variant of Adam based on the infinity norm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#optimisers.get_optimiser" title="optimisers.get_optimiser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_optimiser</span></code></a>([optimiser_type, lr])</p></td>
+<td><p>Utility function for returning a Keras optimiser.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#optimisers.rmsprop" title="optimisers.rmsprop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rmsprop</span></code></a>(lr, clip_args, **kwargs)</p></td>
+<td><p>This optimizer is usually a good choice for recurrent neural networks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#optimisers.sgd" title="optimisers.sgd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sgd</span></code></a>(lr, clip_args, **kwargs)</p></td>
+<td><p>Stochastic Gradient Descent.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="optimisers.adadelta">
+<code class="sig-prename descclassname">optimisers.</code><code class="sig-name descname">adadelta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lr</span></em>, <em class="sig-param"><span class="n">clip_args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimisers.adadelta" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Adadelta optimization is a stochastic gradient descent method that is based on adaptive learning rate per</dt><dd><p>dimension to address two drawbacks:
+1) the continual decay of learning rates throughout training
+2) the need for a manually selected global learning rate</p>
+</dd>
+</dl>
+<p>Two accumulation steps are required:
+1) the accumulation of gradients squared,
+2) the accumulation of updates squared.</p>
+<p>Adadelta is a more robust extension of Adagrad that adapts learning rates based on a moving window of gradient
+updates, instead of accumulating all past gradients.
+This way, Adadelta continues learning even when many updates have been done.
+Compared to Adagrad, in the original version of Adadelta you don't have to set an initial learning rate.
+In this version, initial learning rate can be set, as in most other Keras optimizers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optimisers.adagrad">
+<code class="sig-prename descclassname">optimisers.</code><code class="sig-name descname">adagrad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lr</span></em>, <em class="sig-param"><span class="n">clip_args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimisers.adagrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adagrad is an optimizer with parameter-specific learning rates, which are adapted relative to how frequently
+a parameter gets updated during training. The more updates a parameter receives, the smaller the updates.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optimisers.adam">
+<code class="sig-prename descclassname">optimisers.</code><code class="sig-name descname">adam</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lr</span></em>, <em class="sig-param"><span class="n">clip_args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimisers.adam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adam optimization is a stochastic gradient descent method that is based on adaptive estimation of first-order
+and second-order moments. According to the paper Adam: A Method for Stochastic Optimization.Kingma et al., 2014,
+the method is &quot;computationally efficient, has little memory requirement,invariant to diagonal rescaling of</p>
+<blockquote>
+<div><p>gradients, and is well suited for problems that are large in terms of data/parameters&quot;.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optimisers.adamax">
+<code class="sig-prename descclassname">optimisers.</code><code class="sig-name descname">adamax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lr</span></em>, <em class="sig-param"><span class="n">clip_args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimisers.adamax" title="Permalink to this definition">¶</a></dt>
+<dd><p>It is a variant of Adam based on the infinity norm. Default parameters follow those provided in the paper.
+Adamax is sometimes superior to adam, specially in models with embeddings.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optimisers.get_optimiser">
+<code class="sig-prename descclassname">optimisers.</code><code class="sig-name descname">get_optimiser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optimiser_type</span><span class="o">=</span><span class="default_value">'sgd'</span></em>, <em class="sig-param"><span class="n">lr</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimisers.get_optimiser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for returning a Keras optimiser.
+<a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/keras/optimizers">https://www.tensorflow.org/api_docs/python/tf/keras/optimizers</a></p>
+<p>If no arguments provided then defaults to SGD with learning rate of 0.01.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optimiser_type</strong> (<em>str</em>) -- The name of the optimisation algorithm, must be in the optimisers dict</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) -- The learning rate to use</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) -- Can contain any keyword arguments for the keras optimisers, otherwise uses default values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance of a keras optimiser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>optimiser (tf.keras.optimizers.Optimizer)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optimisers.rmsprop">
+<code class="sig-prename descclassname">optimisers.</code><code class="sig-name descname">rmsprop</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lr</span></em>, <em class="sig-param"><span class="n">clip_args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimisers.rmsprop" title="Permalink to this definition">¶</a></dt>
+<dd><p>This optimizer is usually a good choice for recurrent neural networks.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optimisers.sgd">
+<code class="sig-prename descclassname">optimisers.</code><code class="sig-name descname">sgd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lr</span></em>, <em class="sig-param"><span class="n">clip_args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimisers.sgd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stochastic Gradient Descent.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="data_processor.html" class="btn btn-neutral float-right" title="Data Processor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="layers.html" class="btn btn-neutral float-left" title="Layers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Nathan Duran
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
