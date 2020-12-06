@@ -1,6 +1,6 @@
 jupyter==1.0.0
 Comet-ml==3.1.14
-graphviz==0.8.1
+graphviz==0.11.1
 pydot==1.4.1
 numpy==1.19.0
 pandas==1.0.5
