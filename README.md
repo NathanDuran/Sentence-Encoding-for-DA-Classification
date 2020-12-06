@@ -123,11 +123,22 @@ Currently the data processor supports 4 different corpora:
 
 # Embeddings <a name="embeddings-link">
 
+Embeddings are generated with the [embedding_processor.py](embedding_processor.py) script by running the ```embedding_processor.get_embedding()``` function with the appropriate parameters. Word2Vec, GloVe and FastText are automatically downloaded with [GluonNLP](https://nlp.gluon.ai/). The [Dependency](https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/) and [Numberbatch](https://github.com/commonsense/conceptnet-numberbatch) embeddings must be downloaded seprately and stored in the embeddings directory.
 
+Note: This is already implemented in each of the run scripts, and is only necessary for supervised models. You only neeed to specify the embedding_type, embedding_dim and embedding_source (file name) in the experiment_params.
+
+Currently the embedding processor supports 6 different embeddings:
+
+- Word2Vec [(Mikolov et al., 2013)](https://arxiv.org/abs/1301.3781)
+- GloVe [(Pennington, Socher and Manning, 2014)](https://www.aclweb.org/anthology/D14-1162/)
+- FastText [(Joulin et al., 2017)](https://research.fb.com/downloads/fasttext/)
+- Dependency [(Levy and Goldberg, 2014)](http://www.aclweb.org/anthology/P14-2050)
+- Numberbatch [(Speer, Chin and Havasi, 2016)](https://arxiv.org/abs/1612.03975)
+- Random
 
 # Results <a name="results-link">
 
-All of the results can be viewed in the [comet project](https://www.comet.ml/nathanduran/sentence-encoding-for-da/).
+All of the results for idividual experiment types can be viewed in the [comet project](https://www.comet.ml/nathanduran/sentence-encoding-for-da/).
 
 # Citation
 ---------------

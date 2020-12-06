@@ -13,7 +13,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
-autodoc_mock_imports = ['tokenization']
+autodoc_mock_imports = ['tokenization', 'models']
 
 # -- Project information -----------------------------------------------------
 
@@ -39,7 +39,6 @@ autosummary_generate = True
 
 master_doc = 'index'
 
-exclude_patterns = ['**/*.json']
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
