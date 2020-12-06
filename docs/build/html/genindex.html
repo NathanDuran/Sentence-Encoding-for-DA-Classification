@@ -203,6 +203,8 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tokenization.html#tokenization.BasicTokenizer">BasicTokenizer (class in tokenization)</a>
+</li>
       <li><a href="data_processor.html#data_processor.batch">batch() (in module data_processor)</a>
 </li>
       <li><a href="data_processor.html#data_processor.batch_and_pad">batch_and_pad() (in module data_processor)</a>
@@ -358,8 +360,6 @@
       </ul></li>
       <li><a href="check_pointer.html#check_pointer.Checkpointer">Checkpointer (class in check_pointer)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#models.CNN">CNN (class in models)</a>
 </li>
       <li><a href="models.html#models.CNNAttn">CNNAttn (class in models)</a>
@@ -384,12 +384,30 @@
         <li><a href="layers.html#layers.use_layer.UniversalSentenceEncoderLayer.compute_output_shape">(layers.use_layer.UniversalSentenceEncoderLayer method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#models.ConveRT">ConveRT (class in models)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.convert_by_vocab">convert_by_vocab() (in module tokenization)</a>
 </li>
       <li><a href="data_processor.html#data_processor.DataProcessor.convert_examples_to_numpy">convert_examples_to_numpy() (data_processor.DataProcessor method)</a>
 </li>
       <li><a href="data_processor.html#data_processor.DataProcessor.convert_examples_to_record">convert_examples_to_record() (data_processor.DataProcessor method)</a>
 </li>
+      <li><a href="tokenization.html#tokenization.convert_ids_to_tokens">convert_ids_to_tokens() (in module tokenization)</a>
+
+      <ul>
+        <li><a href="tokenization.html#tokenization.FullTokenizer.convert_ids_to_tokens">(tokenization.FullTokenizer method)</a>
+</li>
+      </ul></li>
+      <li><a href="tokenization.html#tokenization.convert_to_unicode">convert_to_unicode() (in module tokenization)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.convert_tokens_to_ids">convert_tokens_to_ids() (in module tokenization)</a>
+
+      <ul>
+        <li><a href="tokenization.html#tokenization.FullTokenizer.convert_tokens_to_ids">(tokenization.FullTokenizer method)</a>
+</li>
+      </ul></li>
       <li><a href="layers.html#layers.convert_layer.ConveRTLayer">ConveRTLayer (class in layers.convert_layer)</a>
 </li>
       <li><a href="data_processing.html#data_processing.plot_utilities.create_colour_map">create_colour_map() (in module data_processing.plot_utilities)</a>
@@ -501,6 +519,8 @@
       <li><a href="layers.html#layers.folding.Folding">Folding (class in layers.folding)</a>
 </li>
       <li><a href="data_processor.html#data_processor.from_one_hot">from_one_hot() (in module data_processor)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.FullTokenizer">FullTokenizer (class in tokenization)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -675,6 +695,8 @@
 </li>
       <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.load_params">load_params() (layers.mlstm_char_lm_layer.Model method)</a>
 </li>
+      <li><a href="tokenization.html#tokenization.load_vocab">load_vocab() (in module tokenization)</a>
+</li>
       <li><a href="data_processor.html#data_processor.DataProcessor.load_vocabulary">load_vocabulary() (data_processor.DataProcessor method)</a>
 </li>
       <li><a href="models.html#models.LSTM">LSTM (class in models)</a>
@@ -815,10 +837,10 @@
 </li>
       <li><a href="data_processing.html#data_processing.plot_utilities.plot_line_chart">plot_line_chart() (in module data_processing.plot_utilities)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_processing.html#data_processing.plot_utilities.plot_lmplot_chart">plot_lmplot_chart() (in module data_processing.plot_utilities)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_processing.html#data_processing.plot_utilities.plot_relplot">plot_relplot() (in module data_processing.plot_utilities)</a>
 </li>
       <li><a href="data_processing.html#data_processing.plot_utilities.plot_scatter_chart">plot_scatter_chart() (in module data_processing.plot_utilities)</a>
@@ -834,6 +856,8 @@
       <li><a href="metrics.html#metrics.precision_recall_f1">precision_recall_f1() (in module metrics)</a>
 </li>
       <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.preprocess">preprocess() (layers.mlstm_char_lm_layer.Model static method)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.printable_text">printable_text() (in module tokenization)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -901,13 +925,21 @@
 </li>
       <li><a href="data_processor.html#data_processor.to_one_hot">to_one_hot() (in module data_processor)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     tokenization
 
       <ul>
         <li><a href="tokenization.html#module-tokenization">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tokenization.html#tokenization.BasicTokenizer.tokenize">tokenize() (tokenization.BasicTokenizer method)</a>
+
+      <ul>
+        <li><a href="tokenization.html#tokenization.FullTokenizer.tokenize">(tokenization.FullTokenizer method)</a>
+</li>
+        <li><a href="tokenization.html#tokenization.WordpieceTokenizer.tokenize">(tokenization.WordpieceTokenizer method)</a>
 </li>
       </ul></li>
       <li><a href="layers.html#layers.mlstm_char_lm_layer.Model.transform">transform() (layers.mlstm_char_lm_layer.Model method)</a>
@@ -934,7 +966,13 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tokenization.html#tokenization.whitespace_tokenize">whitespace_tokenize() (in module tokenization)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="embedding_processor.html#embedding_processor.Word2Vec">Word2Vec (class in embedding_processor)</a>
+</li>
+      <li><a href="tokenization.html#tokenization.WordpieceTokenizer">WordpieceTokenizer (class in tokenization)</a>
 </li>
   </ul></td>
 </tr></table>
