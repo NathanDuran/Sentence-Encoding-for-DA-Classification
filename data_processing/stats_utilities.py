@@ -61,7 +61,7 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     Levene’s test is an alternative to Bartlett’s test bartlett in the case where there are significant deviations
     from normality.
 
-              model_name     t-stat   p-value
+          model_name     t-stat   p-value
         0        cnn  22.431538  0.096978
         1   text cnn  13.273237  0.581202
         2       dcnn  13.045170  0.598809
@@ -134,9 +134,6 @@ def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
 
     Returns:
         t_test_frame (Dataframe): Columns are t-statistic and p-value.
-
-                 t-statistic   p-value
-        0          2.598956  0.011838
     """
 
     # Ensure only two groups are being tested
@@ -180,6 +177,11 @@ def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True
     Large (0.14+)
     Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.
 
+                        F    PR(>F)    df    eta_sq   mean_sq  omega_sq    sum_sq
+        cnn       5.055341  0.000000  15.0  0.344949  0.000139  0.275461  0.002084
+        text cnn  4.298028  0.000001  15.0  0.309255  0.000080  0.236169  0.001198
+        dcnn      3.555700  0.000032  15.0  0.270278  0.000102  0.193286  0.001528
+
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
@@ -189,11 +191,6 @@ def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True
 
     Returns:
         anova_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
-
-                         F    PR(>F)    df    eta_sq   mean_sq  omega_sq    sum_sq
-        cnn       5.055341  0.000000  15.0  0.344949  0.000139  0.275461  0.002084
-        text cnn  4.298028  0.000001  15.0  0.309255  0.000080  0.236169  0.001198
-        dcnn      3.555700  0.000032  15.0  0.270278  0.000102  0.193286  0.001528
     """
 
     def _anova_table(aov_data):
@@ -269,6 +266,11 @@ def two_way_anova_test(data, exp_param1, exp_param2, metric, sig_level=0.05, sho
     Large (0.14+)
     Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.
 
+    model_name                          exp_params    sum_sq   df   mean_sq         F    PR(>F)    eta_sq  omega_sq
+            gru                    C(embedding_dim)  0.000023  4.0  0.000006  0.640506  0.634978  0.024733 -0.013749
+            gru                   C(embedding_type)  0.000026  1.0  0.000026  2.944534  0.089609  0.028426  0.018592
+            gru  C(embedding_dim):C(embedding_type)  0.000071  4.0  0.000018  2.020298  0.098257  0.078013  0.039022
+
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param1 (string): Indicates first columns values to group data for comparison i.e. embedding_dim.
@@ -279,10 +281,6 @@ def two_way_anova_test(data, exp_param1, exp_param2, metric, sig_level=0.05, sho
 
     Returns:
         anova_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
-    model_name                          exp_params    sum_sq   df   mean_sq         F    PR(>F)    eta_sq  omega_sq
-            gru                    C(embedding_dim)  0.000023  4.0  0.000006  0.640506  0.634978  0.024733 -0.013749
-            gru                   C(embedding_type)  0.000026  1.0  0.000026  2.944534  0.089609  0.028426  0.018592
-            gru  C(embedding_dim):C(embedding_type)  0.000071  4.0  0.000018  2.020298  0.098257  0.078013  0.039022
     """
 
     def _anova_table(aov_data):
@@ -339,6 +337,11 @@ def tukey_hsd(data, exp_param, metric, sig_level=0.5, show_result=True):
     lower/upper columns are the lower/upper boundaries of the 95% confidence interval,
     reject column states whether or not the null hypothesis should be rejected.
 
+            model_name  group1  group2  meandiff  p-value   lower   upper  reject
+        0          cnn     500    1000    0.0014   0.9000 -0.0021  0.0050   False
+        1          cnn     500    1500    0.0041   0.0083  0.0006  0.0077    True
+        2          cnn     500    2000    0.0051   0.0010  0.0016  0.0087    True
+
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
@@ -348,11 +351,6 @@ def tukey_hsd(data, exp_param, metric, sig_level=0.5, show_result=True):
 
     Returns:
         tukey_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
-
-            model_name  group1  group2  meandiff  p-value   lower   upper  reject
-        0          cnn     500    1000    0.0014   0.9000 -0.0021  0.0050   False
-        1          cnn     500    1500    0.0041   0.0083  0.0006  0.0077    True
-        2          cnn     500    2000    0.0051   0.0010  0.0016  0.0087    True
     """
 
     if exp_param != 'model_name':

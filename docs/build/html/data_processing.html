@@ -423,6 +423,14 @@ Low (0.01 – 0.059)
 Medium (0.06 – 0.139)
 Large (0.14+)
 Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.</p>
+<blockquote>
+<div><blockquote>
+<div><p>F    PR(&gt;F)    df    eta_sq   mean_sq  omega_sq    sum_sq</p>
+</div></blockquote>
+<p>cnn       5.055341  0.000000  15.0  0.344949  0.000139  0.275461  0.002084
+text cnn  4.298028  0.000001  15.0  0.309255  0.000080  0.236169  0.001198
+dcnn      3.555700  0.000032  15.0  0.270278  0.000102  0.193286  0.001528</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -434,14 +442,7 @@ Omega is considered a better measure of effect size than eta because it is unbia
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>Contains f-statistic, p-value and eta/omega effect sizes.</p>
-<blockquote>
-<div><p>F    PR(&gt;F)    df    eta_sq   mean_sq  omega_sq    sum_sq</p>
-</div></blockquote>
-<p>cnn       5.055341  0.000000  15.0  0.344949  0.000139  0.275461  0.002084
-text cnn  4.298028  0.000001  15.0  0.309255  0.000080  0.236169  0.001198
-dcnn      3.555700  0.000032  15.0  0.270278  0.000102  0.193286  0.001528</p>
-</p>
+<dd class="field-even"><p>Contains f-statistic, p-value and eta/omega effect sizes.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>anova_frame (Dataframe)</p>
@@ -495,12 +496,7 @@ The Shapiro-Wilk test tests the null hypothesis that the data was drawn from a n
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>Columns are t-statistic and p-value.</p>
-<blockquote>
-<div><p>t-statistic   p-value</p>
-</div></blockquote>
-<p>0          2.598956  0.011838</p>
-</p>
+<dd class="field-even"><p>Columns are t-statistic and p-value.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>t_test_frame (Dataframe)</p>
@@ -517,6 +513,14 @@ The group1 and group2 columns are the groups being compared,
 meandiff column is the difference in means of the two groups being calculated as group2 – group1,
 lower/upper columns are the lower/upper boundaries of the 95% confidence interval,
 reject column states whether or not the null hypothesis should be rejected.</p>
+<blockquote>
+<div><blockquote>
+<div><p>model_name  group1  group2  meandiff  p-value   lower   upper  reject</p>
+</div></blockquote>
+<p>0          cnn     500    1000    0.0014   0.9000 -0.0021  0.0050   False
+1          cnn     500    1500    0.0041   0.0083  0.0006  0.0077    True
+2          cnn     500    2000    0.0051   0.0010  0.0016  0.0087    True</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -528,14 +532,7 @@ reject column states whether or not the null hypothesis should be rejected.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>Contains f-statistic, p-value and eta/omega effect sizes.</p>
-<blockquote>
-<div><p>model_name  group1  group2  meandiff  p-value   lower   upper  reject</p>
-</div></blockquote>
-<p>0          cnn     500    1000    0.0014   0.9000 -0.0021  0.0050   False
-1          cnn     500    1500    0.0041   0.0083  0.0006  0.0077    True
-2          cnn     500    2000    0.0051   0.0010  0.0016  0.0087    True</p>
-</p>
+<dd class="field-even"><p>Contains f-statistic, p-value and eta/omega effect sizes.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>tukey_frame (Dataframe)</p>
@@ -552,6 +549,12 @@ Low (0.01 – 0.059)
 Medium (0.06 – 0.139)
 Large (0.14+)
 Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.</p>
+<dl class="simple">
+<dt>model_name                          exp_params    sum_sq   df   mean_sq         F    PR(&gt;F)    eta_sq  omega_sq</dt><dd><p>gru                    C(embedding_dim)  0.000023  4.0  0.000006  0.640506  0.634978  0.024733 -0.013749
+gru                   C(embedding_type)  0.000026  1.0  0.000026  2.944534  0.089609  0.028426  0.018592
+gru  C(embedding_dim):C(embedding_type)  0.000071  4.0  0.000018  2.020298  0.098257  0.078013  0.039022</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -568,12 +571,6 @@ Omega is considered a better measure of effect size than eta because it is unbia
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>anova_frame (Dataframe)</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>model_name                          exp_params    sum_sq   df   mean_sq         F    PR(&gt;F)    eta_sq  omega_sq</dt><dd><p>gru                    C(embedding_dim)  0.000023  4.0  0.000006  0.640506  0.634978  0.024733 -0.013749
-gru                   C(embedding_type)  0.000026  1.0  0.000026  2.944534  0.089609  0.028426  0.018592
-gru  C(embedding_dim):C(embedding_type)  0.000071  4.0  0.000018  2.020298  0.098257  0.078013  0.039022</p>
 </dd>
 </dl>
 </dd></dl>
