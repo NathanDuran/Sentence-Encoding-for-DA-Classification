@@ -7,7 +7,6 @@ Albert
 .. automodule:: layers.albert_layer
    :members:
    :undoc-members:
-   :show-inheritance:
 
 BERT
 -------------------------

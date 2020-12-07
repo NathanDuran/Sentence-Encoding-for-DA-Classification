@@ -61,6 +61,11 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     Levene’s test is an alternative to Bartlett’s test bartlett in the case where there are significant deviations
     from normality.
 
+              model_name     t-stat   p-value
+        0        cnn  22.431538  0.096978
+        1   text cnn  13.273237  0.581202
+        2       dcnn  13.045170  0.598809
+
     Args:
         data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
@@ -70,11 +75,6 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
 
     Returns:
         levene_frame (Dataframe): Columns are model_name, t-statistic and p-value.
-
-          model_name     t-stat   p-value
-        0        cnn  22.431538  0.096978
-        1   text cnn  13.273237  0.581202
-        2       dcnn  13.045170  0.598809
     """
 
     if exp_param != 'model_name':

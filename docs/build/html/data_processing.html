@@ -387,6 +387,14 @@
 The Levene test tests the null hypothesis that all input samples are from populations with equal variances.
 Levene’s test is an alternative to Bartlett’s test bartlett in the case where there are significant deviations
 from normality.</p>
+<blockquote>
+<div><blockquote>
+<div><p>model_name     t-stat   p-value</p>
+</div></blockquote>
+<p>0        cnn  22.431538  0.096978
+1   text cnn  13.273237  0.581202
+2       dcnn  13.045170  0.598809</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -398,14 +406,7 @@ from normality.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>Columns are model_name, t-statistic and p-value.</p>
-<blockquote>
-<div><p>model_name     t-stat   p-value</p>
-</div></blockquote>
-<p>0        cnn  22.431538  0.096978
-1   text cnn  13.273237  0.581202
-2       dcnn  13.045170  0.598809</p>
-</p>
+<dd class="field-even"><p>Columns are model_name, t-statistic and p-value.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>levene_frame (Dataframe)</p>
