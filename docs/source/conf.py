@@ -40,7 +40,7 @@ master_doc = 'index'
 
 if os.environ.get('READTHEDOCS'):
     autodoc_mock_imports = ['jupyter', 'graphviz', 'sklearn', 'mxnet', 'comet_ml', 'spacy', 'gluonnlp',
-                            'tensorflow', 'tensorflow_text', 'seaborn', 'numpy', 'pandas',
+                            'tensorflow', 'tensorflow_hub', 'tensorflow_text', 'seaborn', 'numpy', 'pandas',
                             'scipy', 'statsmodels', 'matplotlib']
 
 # Add any paths that contain templates here, relative to this directory.
