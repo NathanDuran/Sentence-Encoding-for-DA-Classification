@@ -138,7 +138,7 @@ Currently the embedding processor supports 6 different embeddings:
 
 # Results <a name="results-link">
 
-Results and analysis for Switchboard and Maptask data can be viewed in the [swda_results.ipynb](swda_results.ipynb) and [maptask_results.ipynb](maptask_results.ipynb) Jupyter notebooks.
+Results and analysis for Switchboard and Maptask data can be viewed in the [swda_results.ipynb](data_processing/swda_results.ipynb) and [maptask_results.ipynb](data_processing/maptask_results.ipynb) Jupyter notebooks.
 
 All of the data for individual experiment types can be viewed in the [comet project](https://www.comet.ml/nathanduran/sentence-encoding-for-da/).
 
