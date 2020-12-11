@@ -84,7 +84,7 @@ All of the optimisation results can be viewed in the [comet project](https://www
 
 All models are implemented using TensorFlow, and Keras. For each of the 6 Transformer based models we additionally use the [Huggingface Transformers](https://huggingface.co/transformers/) library. For the language models, any tokenisation was performed as appropriate for that model. For example, most Transformer based language models utilise WordPiece or SentencePiece tokenisation, and BERT requires sequences to have a special [CLS] token prepended. Again, tokenisation was performed using the HuggingFace Transformers library, to maintain consistency with the vocabulary and any special tokens associated with the particular model.
 
-All of the model implementations are in [models.py](models.py) and implement the same abstract class. Valid model names are listed in the get_model() function at the top of [models.py](models.py). Some of the models require, or in the case of the language models have been wrapped in, custom Keras layers. These are all defined in the layers directory.
+All of the model implementations are in [models.py](https://sentence-encoding-for-da-classification.readthedocs.io/models.html) and implement the same abstract class. Valid model names are listed in the ```get_model()``` function at the top of [models.py](https://sentence-encoding-for-da-classification.readthedocs.io/models.html). Some of the models require, or in the case of the language models have been wrapped in, custom Keras layers. These are all defined in the layers directory.
 
 Each model has default parameters defined, however, they can also be specified (or changed) in [model_params.json](model_params.json). These include the learining rate, optimiser, dropout, number of hidden units, etc.
 
@@ -104,7 +104,7 @@ Each model has default parameters defined, however, they can also be specified (
 
 # Datasets <a name="datasets-link">
 
-Datasets are acquired and processed via the [data_processor.py](data_processor.py) script. First a DataProcessor must be instantiated with the task_name, and various other options for data preprocessing. The entire dataset can then be downloaded and processed with ```get_dataset()``` function, which saves a local copy in .npz format. The train, test and val sets can then be built using one of the 'build dataset' functions.
+Datasets are acquired and processed via the [data_processor.py](https://sentence-encoding-for-da-classification.readthedocs.io/data_processor.html) script. First a DataProcessor must be instantiated with the task_name, and various other options for data preprocessing. The entire dataset can then be downloaded and processed with ```get_dataset()``` function, which saves a local copy in .npz format. The train, test and val sets can then be built using one of the 'build dataset' functions.
 
 Note: All of these steps are already implemented in each of the run scripts, you simply need to specify the task_name and preprocessing parameters in the experiment_params.
 
@@ -123,7 +123,7 @@ Currently the data processor supports 4 different corpora:
 
 # Embeddings <a name="embeddings-link">
 
-Embeddings are generated with the [embedding_processor.py](embedding_processor.py) script by running the ```embedding_processor.get_embedding()``` function with the appropriate parameters. Word2Vec, GloVe and FastText are automatically downloaded with [GluonNLP](https://nlp.gluon.ai/). The [Dependency](https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/) and [Numberbatch](https://github.com/commonsense/conceptnet-numberbatch) embeddings must be downloaded seprately and stored in the embeddings directory.
+Embeddings are generated with the [embedding_processor.py](https://sentence-encoding-for-da-classification.readthedocs.io/embedding_processor.html) script by running the ```embedding_processor.get_embedding()``` function with the appropriate parameters. Word2Vec, GloVe and FastText are automatically downloaded with [GluonNLP](https://nlp.gluon.ai/). The [Dependency](https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/) and [Numberbatch](https://github.com/commonsense/conceptnet-numberbatch) embeddings must be downloaded seprately and stored in the embeddings directory.
 
 Note: This is already implemented in each of the run scripts, and is only necessary for supervised models. You only neeed to specify the embedding_type, embedding_dim and embedding_source (file name) in the experiment_params.
 
@@ -138,9 +138,12 @@ Currently the embedding processor supports 6 different embeddings:
 
 # Results <a name="results-link">
 
-All of the results for idividual experiment types can be viewed in the [comet project](https://www.comet.ml/nathanduran/sentence-encoding-for-da/).
+Results and analysis for Switchboard and Maptask data can be viewed in the [swda_results.ipynb](swda_results.ipynb) and [maptask_results.ipynb](maptask_results.ipynb) Jupyter notebooks.
 
-# Citation
+All of the data for individual experiment types can be viewed in the [comet project](https://www.comet.ml/nathanduran/sentence-encoding-for-da/).
+
 ---------------
+# Citation
+
 
 
