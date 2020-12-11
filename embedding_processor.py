@@ -27,6 +27,9 @@ def get_embedding(embedding_dir, embedding_type, embedding_source, embedding_dim
                   'numberbatch': Numberbatch(),
                   'deps': Dependency()}
 
+    if not os.path.exists(embedding_dir):
+        raise Exception("Cannot find the embedding directory " + embedding_dir)
+
     if embedding_type.lower() in embeddings.keys():
         processor = embeddings[embedding_type.lower()]
         return processor.get_embedding_matrix(embedding_dir, embedding_source, embedding_dim, vocabulary)
@@ -245,7 +248,7 @@ class Numberbatch(EmbeddingProcessor):
 class Dependency(EmbeddingProcessor):
     """Generates Dependency-based embeddings matrix.
     Levy, O., & Goldberg, Y. (2014). Dependency-Based Word Embeddings.
-    Proceedings Of the 52nd Annual Meeting Ofthe Association for Computational Linguistics, 302–308.
+    Proceedings Of the 52nd Annual Meeting Of the Association for Computational Linguistics, 302–308.
 
     Embedding source available from: https://levyomer.wordpress.com/2014/04/25/dependency-based-word-embeddings/
 

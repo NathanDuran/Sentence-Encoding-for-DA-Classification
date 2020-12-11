@@ -23,8 +23,6 @@ Note: Each of these can be appended with '_attn', to run their attentional varia
 ### CNN <a name="cnn-link">
 The Convolutional Neural Network is intended as a simple baseline for convolutional architectures. It consists of two convolution layers with a max pooling operation after each. We use 64 filters with a kernel size of 5 for each layer and a pool size of 8.
 
-![alt text](images/cnn.png)
-
 ### Text-CNN <a name="text_cnn-link">
 An implementation of the CNN for text classification proposed by [Kim, (2014)](https://www.aclweb.org/anthology/D14-1181/). It is comprised of 5 parallel convolution layers with a max pooling operation after each. Convolutional layers use the same filter size of 128 but with different kernel sizes in the range [1, 5]. The use of different kernel sizes is intended to capture the relationships between words at different positions within the input sentence. For dimensionality reduction the output of each pooling operation is concatenated before flattening into a single sequence vector.
 

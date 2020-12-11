@@ -1,8 +1,16 @@
+__pycache__/
+*.py[cod]
+*$py.class
 *.pyc
 *.pyo
 
+# Sphinx documentation
+docs/build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
 .idea
 .comet.config
-embeddings
+embeddings/*
 trash
-/swda/vocab_size_experiments/

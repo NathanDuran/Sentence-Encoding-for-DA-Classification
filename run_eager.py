@@ -86,7 +86,7 @@ for i in range(1, 11):
     embeddings_dir = 'embeddings'
 
     # Create appropriate directories if they don't exist
-    for directory in [task_name, dataset_dir, output_dir, checkpoint_dir]:
+    for directory in [task_name, dataset_dir, output_dir, checkpoint_dir, embeddings_dir]:
         if not os.path.exists(directory):
             os.mkdir(directory)
 
@@ -125,7 +125,6 @@ for i in range(1, 11):
     embedding_dim = experiment_params['embedding_dim']
     embedding_type = experiment_params['embedding_type']
     embedding_source = experiment_params['embedding_source']
-    use_crf = model_params['use_crf'] if 'use_crf' in model_params else False
 
     # Initialize the dataset processor
     data_set = data_processor.DataProcessor(task_name, dataset_dir, max_seq_length, vocab_size=vocab_size,

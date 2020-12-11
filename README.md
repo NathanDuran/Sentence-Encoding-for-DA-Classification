@@ -1,5 +1,5 @@
 # Sentence Encoding Methods for Dialogue Act Classification
-[![Documentation Status](https://readthedocs.org/projects/sentence-encoding-for-da-classification/badge/?version=latest)](https://sentence-encoding-for-da-classification.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/sentence-encoding-for-da-classification/badge/?version=latest)](https://sentence-encoding-for-da-classification.readthedocs.io/)
 
 # Overview
 This repository contains all code, data and results/analysis for the paper Sentence Encoding for Dialogue Act Classification (TODO: ADD LINK TO PAPER).

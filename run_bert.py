@@ -81,7 +81,6 @@ for i in range(1, 11):
     dataset_dir = os.path.join(task_name, dataset_name)
     output_dir = os.path.join(task_name, experiment_name)
     checkpoint_dir = os.path.join(output_dir, 'checkpoints')
-    embeddings_dir = 'embeddings'
 
     # Create appropriate directories if they don't exist
     for directory in [task_name, dataset_dir, output_dir, checkpoint_dir]:

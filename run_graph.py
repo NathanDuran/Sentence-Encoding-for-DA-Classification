@@ -83,7 +83,7 @@ for i in range(1, 11):
     embeddings_dir = 'embeddings'
 
     # Create appropriate directories if they don't exist
-    for directory in [task_name, dataset_dir, output_dir, checkpoint_dir]:
+    for directory in [task_name, dataset_dir, output_dir, checkpoint_dir, embeddings_dir]:
         if not os.path.exists(directory):
             os.mkdir(directory)
 

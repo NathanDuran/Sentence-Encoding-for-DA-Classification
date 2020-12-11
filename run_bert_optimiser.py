@@ -51,13 +51,11 @@ model_optimiser = Optimizer(optimiser_config)
 # Data set and output paths
 dataset_name = 'token_dataset' if experiment_params['to_tokens'] else 'text_dataset'
 dataset_dir = os.path.join(task_name, dataset_name)
-embeddings_dir = 'embeddings'
 
 # Create appropriate directories if they don't exist
-if not os.path.exists(task_name):
-    os.mkdir(task_name)
-if not os.path.exists(dataset_dir):
-    os.makedirs(dataset_dir)
+for directory in [task_name, dataset_dir]:
+    if not os.path.exists(directory):
+        os.mkdir(directory)
 
 print("------------------------------------")
 print("Running experiment...")

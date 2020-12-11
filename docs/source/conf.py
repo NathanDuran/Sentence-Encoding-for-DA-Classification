@@ -38,10 +38,10 @@ autosummary_generate = True
 
 master_doc = 'index'
 
+# Have to mock all of the imports (apart from tensorflow because inheritance wont work i.e. tf.keras.layer.Layer)
 if os.environ.get('READTHEDOCS'):
-    autodoc_mock_imports = ['jupyter', 'graphviz', 'sklearn', 'mxnet', 'comet_ml', 'spacy', 'gluonnlp',
-                            'tensorflow_hub', 'tensorflow_text', 'seaborn', 'pandas',
-                            'scipy', 'statsmodels', 'matplotlib']
+    autodoc_mock_imports = ['jupyter', 'graphviz', 'sklearn', 'mxnet', 'comet_ml', 'spacy', 'gluonnlp', 'tensorflow_hub',
+                            'tensorflow_text', 'seaborn', 'pandas', 'scipy', 'statsmodels', 'matplotlib']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

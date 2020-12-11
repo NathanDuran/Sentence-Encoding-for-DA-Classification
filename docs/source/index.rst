@@ -6,6 +6,8 @@
 Sentence Encoding for Dialogue Act Classification
 =============================================================================
 
+Documentation for `Sentence Encoding for Dialogue Act Classification <https://github.com/NathanDuran/Sentence-Encoding-for-DA-Classification>`_
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
