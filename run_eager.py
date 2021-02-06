@@ -60,6 +60,7 @@ for i in range(1, 11):
 
     # Task and experiment name
     task_name = experiment_params['task_name']
+    experiment_type = experiment_params['experiment_type']
     experiment_name = experiment_params['experiment_name']
     model_name = experiment_params['model_name']
     training = experiment_params['training']

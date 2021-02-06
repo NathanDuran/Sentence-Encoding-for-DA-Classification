@@ -90,7 +90,7 @@ class EmbeddingProcessor(ABC):
                 word_embedding = np.zeros(embedding_dim)
             else:
                 word_embedding = vocabulary.embedding[vocabulary.idx_to_token[i]].asnumpy()
-                # If the embedding is not in the embeddings set to random
+                # If the words embedding is not in the original embeddings set to random
                 if np.count_nonzero(word_embedding) == 0:
                     word_embedding = np.random.uniform(low=-1, high=1, size=embedding_dim)
 
@@ -104,10 +104,15 @@ class Character(EmbeddingProcessor):
 
     Uses the ELMo special character vocabulary. Specifically, char ids 0-255 come from utf-8 encoding bytes.
     Above 256 are reserved for special tokens:
+
     <bos> (256) – The index of beginning of the sentence character is 256 in ELMo.
+
     <eos> (257) – The index of end of the sentence character is 257 in ELMo.
+
     <bow> (258) – The index of beginning of the word character is 258 in ELMo.
+
     <eow> (259) – The index of end of the word character is 259 in ELMo.
+
     <pad> (260) – The index of padding character is 260 in ELMo. Encoded as 0's.
     """
 
@@ -118,7 +123,7 @@ class Character(EmbeddingProcessor):
         # Generate random numpy matrix of shape (vocabulary_size, embedding_dim) in range [-1, 1]
         embedding_matrix = np.random.uniform(low=-1, high=1, size=(vocabulary_size, embedding_dim))
 
-        # Set the <unk> token set to 0's
+        # Set the <pad> token to 0's
         embedding_matrix[special_tokens['<pad>']] = np.zeros(embedding_dim)
         return embedding_matrix
 
@@ -131,7 +136,7 @@ class Random(EmbeddingProcessor):
         # Generate random numpy matrix of shape (vocabulary_size, embedding_dim) in range [-1, 1]
         embedding_matrix = np.random.uniform(low=-1, high=1, size=(len(vocabulary), embedding_dim))
 
-        # Set the <pad>/<unk> token set to 0's
+        # Set the <pad>/<unk> tokens to 0's
         embedding_matrix[vocabulary.token_to_idx[vocabulary.padding_token]] = np.zeros(embedding_dim)
         embedding_matrix[vocabulary.token_to_idx[vocabulary.unknown_token]] = np.zeros(embedding_dim)
         return embedding_matrix
