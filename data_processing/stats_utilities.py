@@ -1,16 +1,21 @@
 import pandas as pd
-from scipy.stats import shapiro, bartlett, levene, ttest_ind
+import numpy as np
+from math import sqrt
+from statistics import variance, mean
+from scipy.stats import shapiro, bartlett, levene, ttest_ind, ttest_rel
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import MultiComparison
+from statsmodels.stats.oneway import effectsize_oneway
+from statsmodels.stats.power import TTestIndPower, FTestAnovaPower
 
 
-def shapiro_wilk_test(data, exp_param, metric, sig_level=0.05, show_result=True):
+def shapiro_wilk_test(input_data, exp_param, metric, sig_level=0.05, show_result=True):
     """Scipy Shapiro-Wilk test for normality.
     The Shapiro-Wilk test tests the null hypothesis that the data was drawn from a normal distribution.
 
     Args:
-        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        input_data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
         sig_level (float): The test significance level. Default=0.05.
@@ -24,6 +29,7 @@ def shapiro_wilk_test(data, exp_param, metric, sig_level=0.05, show_result=True)
         1          cnn       1000  0.934968  0.498493
         2          cnn       1500  0.904710  0.246593
     """
+    data = input_data.copy(deep=True)
 
     # Create results frame
     shapiro_frame = pd.DataFrame(columns=['model_name', exp_param, 't-stat', 'p-value'])
@@ -55,7 +61,7 @@ def shapiro_wilk_test(data, exp_param, metric, sig_level=0.05, show_result=True)
     return shapiro_frame
 
 
-def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
+def levene_test(input_data, exp_param, metric, sig_level=0.05, show_result=True):
     """Scipy Levene test for equal variance (Homoscedasticity).
     The Levene test tests the null hypothesis that all input samples are from populations with equal variances.
     Levene’s test is an alternative to Bartlett’s test bartlett in the case where there are significant deviations
@@ -67,7 +73,7 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
         2       dcnn  13.045170  0.598809
 
     Args:
-        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        input_data (Dataframe): Dataframe grouped by model_name and experiment_type values.
         exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
         metric (string): Indicates which column name has the result values i.e. test_acc.
         sig_level (float): The test significance level. Default=0.05.
@@ -76,6 +82,7 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
     Returns:
         levene_frame (Dataframe): Columns are model_name, t-statistic and p-value.
     """
+    data = input_data.copy(deep=True)
 
     if exp_param != 'model_name':
         # Create results frame
@@ -119,7 +126,119 @@ def levene_test(data, exp_param, metric, sig_level=0.05, show_result=True):
             if p_value > sig_level:
                 print("All models have equal variance. P-value = " + str(round(p_value, 5)))
             else:
-                print("Some models do not have equal variance. P-value = " + str(round(p_value, 5)))
+                print("Some models do not have equal variance. " + str(data['model_name'].unique()) + " P-value = " + str(round(p_value, 5)))
+
+
+def cohen_d(data_a, data_b):
+    """"Cohens d effect size, for calculating the difference between the mean value of groups.
+
+    Args:
+        data_a (list): One group of samples.
+        data_b (list): One group of samples.
+
+    Returns:
+        cohens_d (float): Cohens d effect size.
+    """
+    # Calculate the size of samples
+    n1, n2 = len(data_a), len(data_b)
+
+    # Calculate the variance of the samples
+    s1, s2 = np.var(data_a, ddof=1), np.var(data_b, ddof=1)
+
+    # Calculate the pooled standard deviation
+    s = sqrt(((n1 - 1) * s1 + (n2 - 1) * s2) / (n1 + n2 - 2))
+
+    # Calculate the means of the samples
+    u1, u2 = np.mean(data_a), np.mean(data_b)
+
+    # Calculate the effect size
+    return (u1 - u2) / s
+
+
+def coehen_f(data, groups, metric):
+    """"Cohens f, for calculating the effect size for anova power analysis.
+
+    Args:
+        data (DataFrame): DataFrame with columns 'groups' and 'metric'.
+        groups (str): Name of the groups column in the data, i.e. the groups for the anova test.
+        metric (str): Name of the metric column in the data, i.e. the dependant variable.
+
+    Returns:
+        cohens_f (float): Cohens f effect size.
+    """
+    # Get the means and variance of the data
+    means = data.groupby([groups], sort=False).apply(lambda x: mean(x[metric])).to_list()
+    variances = data.groupby([groups], sort=False).apply(lambda x: variance(x[metric])).to_list()
+
+    # Calculate effect size
+    cohens_f = effectsize_oneway(means, variances, len(data), use_var='equal')
+    return cohens_f
+
+
+def t_test_power_analysis(data_a, data_b, alpha=0.05, power=0.8):
+    """Performs statistical power analysis for t-test.
+    First calculates cohens d effect size,
+    then calculates an expected number of samples for given power, and the actual power given the actual sample size.
+
+    Args:
+        data_a (list): One group of samples.
+        data_b (list): One group of samples.
+        alpha (float): Significance level.
+        power (float): Desired statistical power for calculating the expected num samples.
+
+    Returns:
+        cohens_d (float): Cohens d effect size.
+        exp_n_samples (float): The expected number of samples given desired power, effect size and alpha.
+        act_power (float): The actual power given the actual n_samples, effect size and alpha.
+    """
+    # Parameters for power analysis
+    effect = cohen_d(data_a, data_b)  # Cohens d effect size
+    n_samples = len(data_a)
+
+    # perform power analysis
+    analysis = TTestIndPower()
+    exp_n_samples = analysis.solve_power(effect_size=effect, power=power, ratio=1.0, alpha=alpha)
+    # print('Expected Sample Size: %.3f' % exp_n_samples)
+
+    act_power = analysis.solve_power(effect_size=effect, nobs1=n_samples, ratio=1.0, alpha=alpha)
+    # print('Actual Power: %.3f' % act_power)
+    return effect, exp_n_samples, act_power
+
+
+def anova_power_analysis(data, groups, metric, alpha=0.05, power=0.8):
+    """Performs statistical power analysis for t-test.
+    First calculates cohens d effect size,
+    then calculates an expected number of samples for given power, and the actual power given the actual sample size.
+
+    Args:
+        data (DataFrame): DataFrame with columns 'groups' and 'metric'.
+        groups (str): Name of the groups column in the data, i.e. the groups for the anova test.
+        metric (str): Name of the metric column in the data, i.e. the dependant variable.
+        alpha (float): Significance level.
+        power (float): Desired statistical power for calculating the expected num samples.
+
+    Returns:
+        cohens_f (float): Cohens f effect size.
+        exp_n_samples (float): The expected number of samples given desired power, effect size and alpha.
+        act_power (float): The actual power given the actual n_samples, effect size and alpha.
+    """
+    # Calculate Cohen's f effect size
+    effect = coehen_f(data, groups, metric)
+    # FTestAnovaPower() cannot handle large effect sizes so just manually set
+    if effect > 1.4:
+        effect = 1.4
+
+    # Number of samples
+    n_samples = len(data)
+    n_groups = len(data[groups].unique())
+
+    # Expected num samples
+    exp_n_samples = FTestAnovaPower().solve_power(effect_size=sqrt(effect), alpha=alpha, power=power, k_groups=n_groups)
+    # print('Expected Sample Size: %.3f' % exp_n_samples)
+    act_power = FTestAnovaPower().solve_power(effect_size=sqrt(effect), nobs=n_samples, alpha=alpha, k_groups=n_groups)
+    # print('Actual Power: %.3f' % act_power)
+
+    return effect, exp_n_samples, act_power
 
 
 def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
@@ -152,11 +271,16 @@ def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
         data_a = data.loc[(data['model_name'] == model) & (data[exp_param] == groups[0])][metric]
         data_b = data.loc[(data['model_name'] == model) & (data[exp_param] == groups[1])][metric]
 
+        # Perform power analysis
+        effect, exp_n, act_power = t_test_power_analysis(data_a, data_b, alpha=sig_level, power=0.8)
+
         # T-test
         t, p = ttest_ind(data_a, data_b)
 
         # Append to result frame
-        t_test_frame = t_test_frame.append({'model_name': model, 't-stat': t, 'p-value': p}, ignore_index=True)
+        t_test_frame = t_test_frame.append({'model_name': model, 't-stat': t, 'p-value': p, 'cohen-d': effect,
+                                            'n': len(data_a), 'exp_n': exp_n, 'power': act_power, 'exp_power': 0.8},
+                                           ignore_index=True)
 
     if show_result:
         if all(p_value <= sig_level for p_value in t_test_frame['p-value']):
@@ -220,8 +344,13 @@ def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True
             anova_table = _anova_table(anova_table)
             #print(anova_table)
 
+            # Add power analysis
+            effect, exp_n, power = anova_power_analysis(model_values_list, exp_param, metric, alpha=sig_level, power=0.8)
+
             # Add this models results to the dict
             results_dict[model] = anova_table.loc['C(' + exp_param + ')'].to_dict()
+            power_analysis_cols = {'cohen_f': effect, 'n': len(model_values_list), 'exp_n': exp_n, 'power': power, 'exp_power': 0.8}
+            results_dict[model] = {**results_dict[model], **power_analysis_cols}
 
         # Create dataframe
         anova_frame = pd.DataFrame.from_dict(results_dict, orient='columns').T
@@ -245,6 +374,12 @@ def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True
         # Add effect size to table
         anova_table = _anova_table(anova_table)
         #print(anova_table)
+
+        # Add power analysis
+        effect, exp_n, power = anova_power_analysis(data, exp_param, metric, alpha=sig_level, power=0.8)
+
+        power_analysis_cols = {'cohen_f': effect, 'n': len(data), 'exp_n': exp_n, 'power': power, 'exp_power': 0.8}
+        anova_table = anova_table.assign(**power_analysis_cols)
 
         p_value = anova_table.iloc[0]['PR(>F)']
 
