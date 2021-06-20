@@ -68,7 +68,7 @@ def get_max(data, exp_params):
     max_test.drop('model_name', axis=1, inplace=True)
 
     max_f1 = data.loc[data.groupby(['model_name'], sort=False)['test_acc'].idxmax()].reset_index()
-    max_f1.drop(max_f1.columns.difference(['model_name', 'f1_micro', 'f1_micro_std']), 1, inplace=True)
+    max_f1.drop(max_f1.columns.difference(['model_name', 'f1_weighted', 'f1_weighted_std']), 1, inplace=True)
     max_f1.drop('model_name', axis=1, inplace=True)
 
     # Group the validation and test data

@@ -20,7 +20,8 @@ def precision_recall_f1(true_labels, predicted_labels, labels):
 
     Returns:
         metrics_dict (dict): Dictionary of micro, macro and weighted precision, recall and F1 scores
-        metrics_str (str): Formatted string with metric data for all classes and totals
+        cls_report_str (str): Formatted string with metric data for all classes and totals
+        cls_report_dct (dict): Dictionary containing all metric data of metrics string
     """
 
     assert len(true_labels) == len(predicted_labels), "True labels " + str(len(true_labels)) + \
@@ -59,9 +60,10 @@ def precision_recall_f1(true_labels, predicted_labels, labels):
         del labels[index]
 
     # Generate classification report for each label/totals
-    metric_str = classification_report(true_labels, predicted_labels, target_names=labels)
+    cls_report_str = classification_report(true_labels, predicted_labels, target_names=labels)
+    cls_report_dct = classification_report(true_labels, predicted_labels, target_names=labels, output_dict=True)
 
-    return metrics_dict, metric_str
+    return metrics_dict, cls_report_str, cls_report_dct
 
 
 def plot_confusion_matrix(true_labels, predicted_labels, labels,  matrix_dim=15, normalise=False,

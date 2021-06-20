@@ -317,12 +317,18 @@ for i in range(1, 11):
             experiment.log_asset(predictions_file)
 
             # Generate metrics and confusion matrix
+            metrics, cls_report_str, cls_report_dct = precision_recall_f1(true_labels, predicted_labels, labels)
+            print(cls_report_str)
             test_results_file = os.path.join(output_dir, experiment_name + "_results.txt")
-            metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)
             save_results(test_results_file, np.mean(test_loss), np.mean(test_accuracy), metrics)
             experiment.log_asset(test_results_file)
             experiment.log_metrics(metrics)
-            print(metric_str)
+
+            # Optionally save per-label recall, precision and F1
+            # label_metrics = pd.DataFrame.from_dict(cls_report_dct, orient='index')
+            # label_metrics_file = os.path.join(output_dir, experiment_name + "_label_metrics.csv")
+            # label_metrics.to_csv(label_metrics_file)
+            # experiment.log_asset(label_metrics_file)
 
             conf_matrix_fig, confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
             confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
