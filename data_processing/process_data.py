@@ -7,7 +7,7 @@ pd.set_option('display.width', 500)
 task_name = 'maptask'
 
 # Set data dir
-data_dir = os.path.join('..', task_name)
+data_dir = os.path.join('raw_data', task_name)
 
 
 """Process all input sequence data"""

@@ -16,7 +16,7 @@ import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Disable GPU
-# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 # Enable Tensorflow eager execution
 tf.enable_eager_execution()
@@ -25,11 +25,17 @@ config.gpu_options.allow_growth = True
 session = tf.InteractiveSession(config=config)
 
 
-for i in range(1, 11):
+print("Test GPU available: "),
+print(tf.test.is_gpu_available())
+
+if tf.test.gpu_device_name():
+    print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
+
+for i in range(1, 2):
     experiment_params = {'task_name': 'swda',
-                         'experiment_type': 'vocab_size',
-                         'experiment_name': 'text_cnn_' + str(i),
-                         'model_name': 'text_cnn',
+                         'experiment_type': 'bi_directional',
+                         'experiment_name': 'bi_lstm_' + str(i),
+                         'model_name': 'bi_lstm',
                          'training': True,
                          'testing': True,
                          'save_model': True,
@@ -40,15 +46,15 @@ for i in range(1, 11):
                          'evaluate_steps': 500,
                          'early_stopping': False,
                          'patience': 3,
-                         'vocab_size': 10000,
-                         'max_seq_length': 128,
+                         'vocab_size': 7000,
+                         'max_seq_length': 25,
                          'to_tokens': True,
                          'to_lower': True,
                          'use_punct': True,
                          'train_embeddings': True,
-                         'embedding_dim': 50,
+                         'embedding_dim': 300,
                          'embedding_type': 'glove',
-                         'embedding_source': 'glove.6B.50d'}
+                         'embedding_source': 'glove.840B.300d'}
 
     # Load model params if file exists otherwise defaults will be used
     model_param_file = 'model_params.json'
@@ -71,7 +77,7 @@ for i in range(1, 11):
 
     # Set up comet experiment
     # experiment = Experiment(project_name="sentence-encoding-for-da", workspace="nathanduran", auto_output_logging='simple')
-    experiment = Experiment(auto_output_logging='simple', disabled=False)
+    experiment = Experiment(auto_output_logging='simple', disabled=True)
     experiment.set_name(experiment_name)
     # Log parameters
     experiment.log_parameters(model_params)
@@ -319,12 +325,18 @@ for i in range(1, 11):
             experiment.log_asset(predictions_file)
 
             # Generate metrics and confusion matrix
+            metrics, cls_report_str, cls_report_dct = precision_recall_f1(true_labels, predicted_labels, labels)
+            print(cls_report_str)
             test_results_file = os.path.join(output_dir, experiment_name + "_results.txt")
-            metrics, metric_str = precision_recall_f1(true_labels, predicted_labels, labels)
             save_results(test_results_file, test_loss.result().numpy(), test_accuracy.result().numpy(), metrics)
             experiment.log_asset(test_results_file)
             experiment.log_metrics(metrics)
-            print(metric_str)
+
+            # Optionally save per-label recall, precision and F1
+            label_metrics = pd.DataFrame.from_dict(cls_report_dct, orient='index')
+            label_metrics_file = os.path.join(output_dir, experiment_name + "_label_metrics.csv")
+            label_metrics.to_csv(label_metrics_file)
+            experiment.log_asset(label_metrics_file)
 
             conf_matrix_fig, confusion_matrix = plot_confusion_matrix(true_labels, predicted_labels, labels)
             confusion_matrix_file = os.path.join(output_dir, experiment_name + "_confusion_matrix.png")
