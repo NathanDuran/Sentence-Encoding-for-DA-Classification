@@ -1,13 +1,26 @@
+import os
 import pandas as pd
 import numpy as np
 from math import sqrt
+import itertools
+from data_utilities import load_predictions
+import bayesian_tests as bt
+import pingouin as pg
 from statistics import variance, mean
-from scipy.stats import shapiro, bartlett, levene, ttest_ind, ttest_rel
+from scipy.stats import shapiro, bartlett, levene, ttest_ind, ttest_rel, wilcoxon
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import MultiComparison
 from statsmodels.stats.oneway import effectsize_oneway
 from statsmodels.stats.power import TTestIndPower, FTestAnovaPower
+from statsmodels.stats.contingency_tables import mcnemar
+from statsmodels.stats.multitest import multipletests
+
+
+def _add_subjects(x, num=10):
+    """Adds a 'subjects' column to dataframe."""
+    x['subject'] = [i for i in range(1, num+1)]  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    return x
 
 
 def shapiro_wilk_test(input_data, exp_param, metric, sig_level=0.05, show_result=True):
@@ -127,6 +140,50 @@ def levene_test(input_data, exp_param, metric, sig_level=0.05, show_result=True)
                 print("All models have equal variance. P-value = " + str(round(p_value, 5)))
             else:
                 print("Some models do not have equal variance. " + str(data['model_name'].unique()) + " P-value = " + str(round(p_value, 5)))
+
+
+def mauchly_test(input_data, exp_param, metric, sig_level=0.05, show_result=True):
+    """Pingouin Mauchly and JNS test for sphericity.
+
+    Args:
+        input_data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
+
+    Returns:
+        mauch_frame (Dataframe): Columns are model_name, t-statistic and p-value.
+    """
+    data = input_data.copy(deep=True)
+
+    # Add 'subjects' to all models
+    data = data.groupby(['model_name', exp_param]).apply(_add_subjects)
+
+    # Create results frame
+    mauch_frame = pd.DataFrame(columns=['model_name', exp_param, 'sphere', 'W', 'chisq', 'p-value'])
+
+    # Get the list of models and ranges of experiment
+    model_names = data['model_name'].unique()
+    for model in model_names:
+
+        # Create a list of all experiment values for this model
+        model_data = data.loc[(data['model_name'] == model)]
+
+        # Run Mauchley's
+        spher, W, chisq, dof, pval = pg.sphericity(model_data, dv=metric, within=exp_param, subject='subject')
+
+        # Append to result frame
+        mauch_frame = mauch_frame.append({'model_name': model, 'sphere': spher, 'W': W, 'chisq':chisq, 'p-value': pval}, ignore_index=True)
+
+    if show_result:
+        if all(p_value > sig_level for p_value in mauch_frame['p-value']):
+            print("All models " + exp_param + " sphericity assumption is met.")
+        else:
+            print("The following models " + exp_param + " sphericity assumption is not met.")
+            print(mauch_frame.loc[mauch_frame['p-value'] <= sig_level])
+
+        return mauch_frame
 
 
 def cohen_d(data_a, data_b):
@@ -275,7 +332,7 @@ def t_test(data, exp_param, metric, sig_level=0.05, show_result=True):
         effect, exp_n, act_power = t_test_power_analysis(data_a, data_b, alpha=sig_level, power=0.8)
 
         # T-test
-        t, p = ttest_ind(data_a, data_b)
+        t, p = ttest_rel(data_a, data_b)
 
         # Append to result frame
         t_test_frame = t_test_frame.append({'model_name': model, 't-stat': t, 'p-value': p, 'cohen-d': effect,
@@ -377,7 +434,6 @@ def one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True
 
         # Add power analysis
         effect, exp_n, power = anova_power_analysis(data, exp_param, metric, alpha=sig_level, power=0.8)
-
         power_analysis_cols = {'cohen_f': effect, 'n': len(data), 'exp_n': exp_n, 'power': power, 'exp_power': 0.8}
         anova_table = anova_table.assign(**power_analysis_cols)
 
@@ -463,7 +519,144 @@ def two_way_anova_test(data, exp_param1, exp_param2, metric, sig_level=0.05, sho
     return anova_frame
 
 
-def tukey_hsd(data, exp_param, metric, sig_level=0.5, show_result=True):
+def rm_one_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True):
+    """RM ANOVA test with pingouin.
+
+    Eta-squared and omega-squared share the same suggested ranges for effect size classification:
+    Low (0.01 – 0.059)
+    Medium (0.06 – 0.139)
+    Large (0.14+)
+    Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.
+
+                        F    PR(>F)    df    eta_sq   mean_sq  omega_sq    sum_sq
+        cnn       5.055341  0.000000  15.0  0.344949  0.000139  0.275461  0.002084
+        text cnn  4.298028  0.000001  15.0  0.309255  0.000080  0.236169  0.001198
+        dcnn      3.555700  0.000032  15.0  0.270278  0.000102  0.193286  0.001528
+
+    Args:
+        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
+
+    Returns:
+        anova_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
+    """
+
+    def _add_subjects(x):
+        x['subject'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        return x
+    # Add 'subjects' to all models
+    data = data.groupby(['model_name', exp_param]).apply(_add_subjects)
+    if exp_param != 'model_name':
+        # Get the list of models and ranges of experiment
+        model_names = data['model_name'].unique()
+        results_dict = dict()
+        for model in model_names:
+            # Create a list of all experiment values for this model
+            model_values_list = data.loc[(data['model_name'] == model)]
+
+            # Run ANOVA
+            aov = pg.rm_anova(model_values_list, dv=metric, within=exp_param,
+                              subject='subject', correction=True, detailed=True, effsize="np2")
+
+            # Add this models results to the dict
+            results_dict[model] = aov.iloc[0].to_dict()
+
+            # Add power analysis
+            effect, exp_n, power = anova_power_analysis(model_values_list, exp_param, metric, alpha=sig_level, power=0.8)
+            power_analysis_cols = {'cohen_f': effect, 'n': len(model_values_list), 'exp_n': exp_n, 'power': power, 'exp_power': 0.8}
+            results_dict[model] = {**results_dict[model], **power_analysis_cols}
+
+        # Create dataframe
+        anova_frame = pd.DataFrame.from_dict(results_dict, orient='columns').T
+        if show_result:
+            if all(p_value <= sig_level for p_value in anova_frame['p-GG-corr']):
+                print("All models have significant p-values when comparing " + str(exp_param) + " groups.")
+            else:
+                print("The following models do not have significant p-values when comparing " + str(exp_param) + " groups.")
+                print(anova_frame.loc[anova_frame['p-GG-corr'] > sig_level])
+
+            return anova_frame
+    else:
+        # Run ANOVA
+        aov = pg.rm_anova(data, dv=metric, within=exp_param,
+                          subject='subject', correction=True, detailed=True, effsize="np2")
+
+        # Add power analysis
+        effect, exp_n, power = anova_power_analysis(data, exp_param, metric, alpha=sig_level, power=0.8)
+        power_analysis_cols = {'cohen_f': effect, 'n': len(data), 'exp_n': exp_n, 'power': power, 'exp_power': 0.8}
+        aov = aov.assign(**power_analysis_cols)
+
+    if show_result:
+
+        p_value = aov.iloc[0]['p-GG-corr']
+        if p_value <= sig_level:
+            print("The models have significant p-values when comparing groups. P-value = " + str(round(p_value, 5)))
+        else:
+            print("The models do not have significant p-values when comparing groups. P-value = " + str(round(p_value, 5)))
+
+        return aov
+
+
+def rm_two_way_anova_test(data, exp_param, metric, sig_level=0.05, show_result=True):
+    """RM ANOVA test with pingouin.
+
+    Eta-squared and omega-squared share the same suggested ranges for effect size classification:
+    Low (0.01 – 0.059)
+    Medium (0.06 – 0.139)
+    Large (0.14+)
+    Omega is considered a better measure of effect size than eta because it is unbiased in it’s calculation.
+
+                        F    PR(>F)    df    eta_sq   mean_sq  omega_sq    sum_sq
+        cnn       5.055341  0.000000  15.0  0.344949  0.000139  0.275461  0.002084
+        text cnn  4.298028  0.000001  15.0  0.309255  0.000080  0.236169  0.001198
+        dcnn      3.555700  0.000032  15.0  0.270278  0.000102  0.193286  0.001528
+
+    Args:
+        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        exp_param (list): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
+
+    Returns:
+        anova_frame (Dataframe): Contains f-statistic, p-value and eta/omega effect sizes.
+    """
+
+    # Add 'subjects' to all models
+    data = data.groupby(['model_name'] + exp_param).apply(_add_subjects)
+
+    # Get the list of models and ranges of experiment
+    model_names = data['model_name'].unique()
+    results_dict = []
+    for model in model_names:
+        # Create a list of all experiment values for this model
+        model_values_list = data.loc[(data['model_name'] == model)]
+
+        # Run ANOVA
+        aov = pg.rm_anova(model_values_list, dv=metric, within=exp_param,
+                          subject='subject', correction=True, detailed=True, effsize="np2")
+        aov.insert(0, 'model_name', model)
+
+        # Add this models results to the dict
+        results_dict.append(aov)
+
+    # Create dataframe
+    anova_frame = pd.concat(results_dict, axis=0).reset_index(drop=True)
+
+    if show_result:
+        if all(p_value <= sig_level for p_value in anova_frame['p-GG-corr']):
+            print("All models have significant p-values when comparing " + str(exp_param) + " groups.")
+        else:
+            print("The following models do not have significant p-values when comparing " + str(exp_param) + " groups.")
+            print(anova_frame.loc[anova_frame['p-GG-corr'] > sig_level])
+
+        return anova_frame
+
+
+def tukey_hsd(data, exp_param, metric, sig_level=0.05, show_result=True):
     """ANOVA and Tukey HSD post-hoc comparison from statsmodels.
 
     The Tukey HSD post-hoc comparison test controls for type I error and maintains the family-wise error rate at 0.05.
@@ -527,3 +720,231 @@ def tukey_hsd(data, exp_param, metric, sig_level=0.5, show_result=True):
 
         if show_result:
             print(tukey_results)
+
+
+def wilcoxon_rank(data, exp_param, metric, sig_level=0.05, show_result=True):
+    """Scipy Wilcoxon signed ranks test for two experiment groups.
+
+    Args:
+        data (Dataframe): Dataframe grouped by model_name and experiment_type values.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=True.
+
+    Returns:
+        w_test_frame (Dataframe): Columns are t-statistic and p-value.
+    """
+
+    # Ensure only two groups are being tested
+    if len(data[exp_param].unique()) != 2:
+        raise ValueError("Too many groups in groups column! Found " + str(len(data[exp_param].unique())) + " but should == 2.")
+
+    # Create results frame
+    w_test_frame = pd.DataFrame(columns=['model_name', 't-stat', 'p-value'])
+
+    # Get the list of models and experiment params
+    model_names = data['model_name'].unique()
+    groups = data[exp_param].unique()
+    for model in model_names:
+
+        # Select the data to compare
+        data_a = data.loc[(data['model_name'] == model) & (data[exp_param] == groups[0])][metric]
+        data_b = data.loc[(data['model_name'] == model) & (data[exp_param] == groups[1])][metric]
+
+        # Perform power analysis
+        effect, exp_n, act_power = t_test_power_analysis(data_a, data_b, alpha=sig_level, power=0.8)
+
+        # T-test
+        t, p = wilcoxon(data_a, y=data_b)
+
+        # Append to result frame
+        w_test_frame = w_test_frame.append({'model_name': model, 't-stat': t, 'p-value': p, 'cohen-d': effect,
+                                            'n': len(data_a), 'exp_n': exp_n, 'power': act_power, 'exp_power': 0.8},
+                                           ignore_index=True)
+
+    if show_result:
+        if all(p_value <= sig_level for p_value in w_test_frame['p-value']):
+            print("All models have significant p-values when comparing " + exp_param + " groups.")
+        else:
+            print("The following models do not have significant p-values when comparing " + exp_param + " groups.")
+            print(w_test_frame.loc[w_test_frame['p-value'] > sig_level])
+
+    return w_test_frame
+
+
+def mcnemar_test(pred_a, pred_b, exact=False, correction=True, show_result=True):
+    """Mcnemar's test of homogeneity from statsmodels.
+
+    Args:
+        pred_a (Dataframe): Predictions of model A with columns 'true', and 'predicted'.
+        pred_b (Dataframe): Predictions of model B with columns 'true', and 'predicted'.
+        exact (bool): If exact is true, then the binomial distribution will be used. If exact is false,
+            then the chisquare distribution will be used, which is the approximation to the distribution of the test
+             statistic for large sample sizes.
+        correction (bool): If true, then a continuity correction is used for the chisquare distribution (if exact is false.)
+        show_result (bool): Whether to print the results of the test. Default=True.
+
+    Returns:
+        statistic (float): The test statistic is the chisquare statistic if exact is false.
+        p-value (float): p-value of the null hypothesis of equal marginal distributions.
+    """
+
+    # Check predictions are the same length
+    assert len(pred_a) == len(pred_b)
+
+    # Create a contingency table
+    table = pd.DataFrame([[0, 0], [0, 0]], index=['B_corr', 'B_wrong'], columns=['A_corr', 'A_wrong'])
+
+    for i in range(len(pred_a)):
+        # Get the true label
+        true_lbl = pred_a['true'].iloc[i]
+
+        # A and B correct
+        if pred_a['predicted'].iloc[i] == true_lbl and pred_b['predicted'].iloc[i] == true_lbl:
+            table.loc['B_corr', 'A_corr'] += 1
+        # A and B incorrect
+        elif pred_a['predicted'].iloc[i] != true_lbl and pred_b['predicted'].iloc[i] != true_lbl:
+            table.loc['B_wrong', 'A_wrong'] += 1
+        # A correct and B incorrect
+        elif pred_a['predicted'].iloc[i] == true_lbl and pred_b['predicted'].iloc[i] != true_lbl:
+            table.loc['B_wrong', 'A_corr'] += 1
+        # A incorrect and B correct
+        elif pred_a['predicted'].iloc[i] != true_lbl and pred_b['predicted'].iloc[i] == true_lbl:
+            table.loc['B_corr', 'A_wrong'] += 1
+
+    results = mcnemar(table.to_numpy(), exact=exact, correction=correction)
+
+    if show_result:
+        print("Statistic = " + str(results.statistic) + " p-value = " + str(results.pvalue))
+
+    return results.statistic, results.pvalue
+
+
+def mcnemar_pairwise_test(path, models, exact=False, correction=True, bonf_corr=True, sig_level=0.05, show_result=False):
+    """Repeated pairwise Mcnemar's test of homogeneity from statsmodels. Also uses Bonferroni correction for multiple tests.
+
+    Args:
+        path (str): Path to folder containing the model predictions.
+        models (list): List of all models to conduct pairwise tests. Must be in path/model/model_predictions.csv.
+        exact (bool): If exact is true, then the binomial distribution will be used. If exact is false,
+            then the chisquare distribution will be used, which is the approximation to the distribution of the test
+             statistic for large sample sizes.
+        correction (bool): If true, then a continuity correction is used for the chisquare distribution (if exact is false.)
+        bonf_corr (bool): Whether to apply Bonferroni correction. Default=True.
+        sig_level (float): The test significance level. Default=0.05.
+        show_result (bool): Whether to print the results of the test. Default=False.
+
+    Returns:
+        results (Dataframe): Dataframe contains pairwise comparisons per-row,
+            with columns ['Model_A', 'Model_B', 'statistic', 'p-value', 'reject', 'p-corrected', 'bonf_alpha']
+    """
+    # Get all pairwise combinations
+    combinations = list(itertools.combinations(models, 2))
+
+    results_list = []
+    # For each pair compute mcnemar's
+    for pair in combinations:
+
+        # Get the data
+        m_a_data = load_predictions(os.path.join(path, pair[0], pair[0] + '_predictions.csv'))
+        m_b_data = load_predictions(os.path.join(path, pair[1], pair[1] + '_predictions.csv'))
+
+        # Run mcnemar
+        t, p = mcnemar_test(m_a_data, m_b_data, exact=exact, correction=correction, show_result=False)
+
+        # Create dict for this pair
+        results_list.append({'Model_A': pair[0], 'Model_B': pair[1], 'statistic': t, 'p-value': p})
+
+    # Create dataframe to hold results
+    results = pd.DataFrame(results_list)
+
+    # Conduct Bonferroni correction
+    if bonf_corr:
+        reject, p_corr, _, bonf_alpha = multipletests(results['p-value'].to_numpy(), alpha=sig_level, method='bonferroni', returnsorted=False)
+        results['reject'] = reject
+        results['p-corrected'] = p_corr
+        results['bonf_alpha'] = bonf_alpha
+
+    if show_result:
+        print(results)
+    return results
+
+
+def pair_data(a, b):
+    data = []
+    for i in range(len(a)):
+        data.append([a[i], b[i]])
+    return np.array(data)
+
+
+def beyes_signrank(data_a, data_b, model_a, model_b, rope=0.01, show_result=False):
+    """Beyesian Sign Rank test from:
+    Benavoli, A., Corani, G., Demšar, J. and Zaffalon, M. (2017)
+    Time for a Change: A Tutorial for Comparing Multiple Classifiers Through Bayesian Analysis.
+    Journal of Machine Learning Research
+
+    Args:
+        data_a (list): List with all scores for model A.
+        data_b (list): List with all scores for model B.
+        model_a (str): Name of model A.
+        model_b (str): Name of model B.
+        rope (float): The region of practical equivalence. We consider two classifiers equivalent if the difference in their performance is smaller than rope.
+        show_result (bool): Whether to print the results of the test. Default=False.
+
+    Returns:
+        results (Dataframe): Dataframe contains pairwise comparisons per-row,
+            with columns ['Model_A', 'Model_B', 'P({a} > {b})', 'P({a} == {b})', 'P({b} > {a})', 'left', 'within', 'right]
+    """
+
+    # Pair data into 2d array
+    curr_data = pair_data(data_a, data_b)
+
+    # Apply Beyesian sign rank
+    left, within, right = bt.signtest(curr_data, rope=rope, verbose=False)
+    result = pd.DataFrame({'model_A': model_a, 'model_B': model_b, 'P({a} > {b})': left, 'P({a} == {b})': within,
+                           'P({b} > {a})': right, 'left': left, 'within': within, 'right': right}, index=[0])
+
+    if show_result:
+        print('P({c1} > {c2}) = {pl}, P({c1} == {c2}) = {pe}, P({c2} > {c1}) = {pr}'.
+              format(c1=model_a, c2=model_b, pl=left, pe=within, pr=right))
+
+    return result
+
+
+def pairwise_beyes_signrank(data, exp_param, metric, rope=0.01, show_result=False):
+    """Repeated pairwise Beyesian Sign Rank test from:
+    Benavoli, A., Corani, G., Demšar, J. and Zaffalon, M. (2017)
+    Time for a Change: A Tutorial for Comparing Multiple Classifiers Through Bayesian Analysis.
+    Journal of Machine Learning Research
+
+    Args:
+        data (DataFrame): Dataframe grouped by model_name and experiment_type values.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+        rope (float): The region of practical equivalence. We consider two classifiers equivalent if the difference in their performance is smaller than rope.
+        show_result (bool): Whether to print the results of the test. Default=False.
+
+    Returns:
+        results (Dataframe): Dataframe contains pairwise comparisons per-row,
+            with columns ['Model_A', 'Model_B', 'P({a} > {b})', 'P({a} == {b})', 'P({b} > {a})', 'left', 'within', 'right]
+    """
+    # Get all pairwise combinations
+    combinations = list(itertools.combinations(data[exp_param].unique(), 2))
+
+    results_list = []
+    # For each pair compute mcnemar's
+    for pair in combinations:
+
+        # Get the data for this pair
+        a = data.loc[(data[exp_param] == pair[0])][metric].tolist()
+        b = data.loc[(data[exp_param] == pair[1])][metric].tolist()
+
+        # Run Bayes for this pair
+        results_list.append(beyes_signrank(a, b, pair[0], pair[1], rope=rope, show_result=False))
+
+    results = pd.concat(results_list)
+
+    if show_result:
+        print(results)
+    return results

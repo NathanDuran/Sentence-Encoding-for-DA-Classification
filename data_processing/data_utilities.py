@@ -2,6 +2,12 @@ import os
 import pandas as pd
 
 
+def load_predictions(path, columns=None):
+    if columns is None:
+        columns = ['true', 'predicted']
+    return pd.read_csv(path, index_col=False, header=0, usecols=columns, quotechar="'")
+
+
 def load_dataframe(path, multi_index=False, num_header_rows=1):
     # Create list for the number of rows with headers
     header_rows = [0 + i for i in range(num_header_rows + 1)]
