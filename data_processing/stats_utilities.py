@@ -878,7 +878,7 @@ def pair_data(a, b):
     return np.array(data)
 
 
-def beyes_signrank(data_a, data_b, model_a, model_b, rope=0.01, show_result=False):
+def bayes_signrank(data_a, data_b, model_a, model_b, rope=0.01, show_result=False):
     """Beyesian Sign Rank test from:
     Benavoli, A., Corani, G., Demšar, J. and Zaffalon, M. (2017)
     Time for a Change: A Tutorial for Comparing Multiple Classifiers Through Bayesian Analysis.
@@ -901,10 +901,10 @@ def beyes_signrank(data_a, data_b, model_a, model_b, rope=0.01, show_result=Fals
     curr_data = pair_data(data_a, data_b)
 
     # Apply Beyesian sign rank
-    left, within, right = bt.signtest(curr_data, rope=rope, verbose=False)
+    left, within, right = bt.signrank(curr_data, rope=rope, verbose=False)
     result = pd.DataFrame({'model_A': model_a, 'model_B': model_b, 'P({a} > {b})': left, 'P({a} == {b})': within,
                            'P({b} > {a})': right, 'left': left, 'within': within, 'right': right}, index=[0])
-
+    result.reset_index(drop=True, inplace=True)
     if show_result:
         print('P({c1} > {c2}) = {pl}, P({c1} == {c2}) = {pe}, P({c2} > {c1}) = {pr}'.
               format(c1=model_a, c2=model_b, pl=left, pe=within, pr=right))
@@ -912,7 +912,7 @@ def beyes_signrank(data_a, data_b, model_a, model_b, rope=0.01, show_result=Fals
     return result
 
 
-def pairwise_beyes_signrank(data, exp_param, metric, rope=0.01, show_result=False):
+def pairwise_bayes_signrank(data, exp_param, metric, rope=0.01, show_result=False):
     """Repeated pairwise Beyesian Sign Rank test from:
     Benavoli, A., Corani, G., Demšar, J. and Zaffalon, M. (2017)
     Time for a Change: A Tutorial for Comparing Multiple Classifiers Through Bayesian Analysis.
@@ -931,6 +931,7 @@ def pairwise_beyes_signrank(data, exp_param, metric, rope=0.01, show_result=Fals
     """
     # Get all pairwise combinations
     combinations = list(itertools.combinations(data[exp_param].unique(), 2))
+    combinations.sort()
 
     results_list = []
     # For each pair compute mcnemar's
@@ -941,10 +942,61 @@ def pairwise_beyes_signrank(data, exp_param, metric, rope=0.01, show_result=Fals
         b = data.loc[(data[exp_param] == pair[1])][metric].tolist()
 
         # Run Bayes for this pair
-        results_list.append(beyes_signrank(a, b, pair[0], pair[1], rope=rope, show_result=False))
+        results_list.append(bayes_signrank(a, b, pair[0], pair[1], rope=rope, show_result=False))
 
     results = pd.concat(results_list)
+    results.reset_index(drop=True, inplace=True)
+    if show_result:
+        print(results)
+    return results
 
+
+def multi_pairwise_bayes_signrank(data, items, exp_param, metric, rope=0.01, show_result=False):
+    """Multiple per-item repeated pairwise Beyesian Sign Rank test from:
+    Benavoli, A., Corani, G., Demšar, J. and Zaffalon, M. (2017)
+    Time for a Change: A Tutorial for Comparing Multiple Classifiers Through Bayesian Analysis.
+    Journal of Machine Learning Research
+
+    Args:
+        data (DataFrame): Dataframe grouped by model_name and experiment_type values.
+        items (string): Key in dataframe to repeatedly conduct pairwise tests, e.g. model_name.
+        exp_param (string): Indicates which columns values to group data for comparison i.e. vocab_size.
+        metric (string): Indicates which column name has the result values i.e. test_acc.
+        rope (float): The region of practical equivalence. We consider two classifiers equivalent if the difference in their performance is smaller than rope.
+        show_result (bool): Whether to print the results of the test. Default=False.
+
+    Returns:
+        results (Dataframe): Dataframe contains pairwise comparisons per-row,
+            with columns ['Model_A', 'Model_B', 'P({a} > {b})', 'P({a} == {b})', 'P({b} > {a})', 'left', 'within', 'right]
+    """
+    # Get all pairwise combinations
+    combinations = list(itertools.combinations(data[exp_param].unique(), 2))
+    combinations.sort()
+
+    # For each item compute pairwise mcnemar's
+    results_list = []
+    for item in data[items].unique():
+        current_data = data.loc[(data[items] == item)]
+
+        item_results_list = []
+        # For each pair compute mcnemar's
+        for pair in combinations:
+
+            # Get the data for this pair
+            a = current_data.loc[(current_data[exp_param] == pair[0])][metric].tolist()
+            b = current_data.loc[(current_data[exp_param] == pair[1])][metric].tolist()
+
+            # Run Bayes for this pair
+            item_results_list.append(bayes_signrank(a, b, pair[0], pair[1], rope=rope, show_result=False))
+
+        item_results = pd.concat(item_results_list)
+        item_results.reset_index(drop=True, inplace=True)
+        item_results.insert(0, items, item)
+
+        results_list.append(item_results)
+
+    results = pd.concat(results_list)
+    results.reset_index(drop=True, inplace=True)
     if show_result:
         print(results)
     return results
