@@ -1,0 +1,61 @@
+index,model_name,model_A,model_B,P({a} > {b}),P({a} == {b}),P({b} > {a}),left,within,right
+0,cnn,fasttext,deps,0.00038,0.99962,0.0,0.00038,0.99962,0.0
+1,cnn,fasttext,word2vec,0.00036,0.99964,0.0,0.00036,0.99964,0.0
+2,cnn,glove,deps,0.0,1.0,0.0,0.0,1.0,0.0
+3,cnn,glove,fasttext,0.0,1.0,0.0,0.0,1.0,0.0
+4,cnn,glove,numberbatch,0.0,1.0,0.0,0.0,1.0,0.0
+5,cnn,glove,word2vec,0.0,1.0,0.0,0.0,1.0,0.0
+6,cnn,numberbatch,deps,0.0,1.0,0.0,0.0,1.0,0.0
+7,cnn,numberbatch,fasttext,0.0,0.99006,0.00994,0.0,0.99006,0.00994
+8,cnn,numberbatch,word2vec,0.0,1.0,0.0,0.0,1.0,0.0
+9,cnn,word2vec,deps,0.0,1.0,0.0,0.0,1.0,0.0
+10,text cnn,fasttext,deps,2e-05,0.99998,0.0,2e-05,0.99998,0.0
+11,text cnn,fasttext,word2vec,0.12736,0.87264,0.0,0.12736,0.87264,0.0
+12,text cnn,glove,deps,0.0,0.55364,0.44636,0.0,0.55364,0.44636
+13,text cnn,glove,fasttext,0.0,2e-05,0.99998,0.0,2e-05,0.99998
+14,text cnn,glove,numberbatch,0.0,0.17076,0.82924,0.0,0.17076,0.82924
+15,text cnn,glove,word2vec,0.0,0.9945,0.0055,0.0,0.9945,0.0055
+16,text cnn,numberbatch,deps,0.0,1.0,0.0,0.0,1.0,0.0
+17,text cnn,numberbatch,fasttext,0.0,0.99998,2e-05,0.0,0.99998,2e-05
+18,text cnn,numberbatch,word2vec,0.0,1.0,0.0,0.0,1.0,0.0
+19,text cnn,word2vec,deps,0.0,1.0,0.0,0.0,1.0,0.0
+20,dcnn,fasttext,deps,1.0,0.0,0.0,1.0,0.0,0.0
+21,dcnn,fasttext,word2vec,1.0,0.0,0.0,1.0,0.0,0.0
+22,dcnn,glove,deps,1.0,0.0,0.0,1.0,0.0,0.0
+23,dcnn,glove,fasttext,0.0,0.99998,2e-05,0.0,0.99998,2e-05
+24,dcnn,glove,numberbatch,1.0,0.0,0.0,1.0,0.0,0.0
+25,dcnn,glove,word2vec,1.0,0.0,0.0,1.0,0.0,0.0
+26,dcnn,numberbatch,deps,0.05124,0.94876,0.0,0.05124,0.94876,0.0
+27,dcnn,numberbatch,fasttext,0.0,0.0,1.0,0.0,0.0,1.0
+28,dcnn,numberbatch,word2vec,0.8183,0.1817,0.0,0.8183,0.1817,0.0
+29,dcnn,word2vec,deps,0.0,0.82298,0.17702,0.0,0.82298,0.17702
+30,rcnn,fasttext,deps,0.0,0.99788,0.00212,0.0,0.99788,0.00212
+31,rcnn,fasttext,word2vec,0.0,1.0,0.0,0.0,1.0,0.0
+32,rcnn,glove,deps,0.0,0.00038,0.99962,0.0,0.00038,0.99962
+33,rcnn,glove,fasttext,0.0,0.99208,0.00792,0.0,0.99208,0.00792
+34,rcnn,glove,numberbatch,0.0,0.1104,0.8896,0.0,0.1104,0.8896
+35,rcnn,glove,word2vec,0.0,0.5479,0.4521,0.0,0.5479,0.4521
+36,rcnn,numberbatch,deps,0.0,1.0,0.0,0.0,1.0,0.0
+37,rcnn,numberbatch,fasttext,0.0,1.0,0.0,0.0,1.0,0.0
+38,rcnn,numberbatch,word2vec,0.0,1.0,0.0,0.0,1.0,0.0
+39,rcnn,word2vec,deps,0.0,1.0,0.0,0.0,1.0,0.0
+40,lstm,fasttext,deps,1.0,0.0,0.0,1.0,0.0,0.0
+41,lstm,fasttext,word2vec,1.0,0.0,0.0,1.0,0.0,0.0
+42,lstm,glove,deps,1.0,0.0,0.0,1.0,0.0,0.0
+43,lstm,glove,fasttext,0.99768,0.00232,0.0,0.99768,0.00232,0.0
+44,lstm,glove,numberbatch,1.0,0.0,0.0,1.0,0.0,0.0
+45,lstm,glove,word2vec,1.0,0.0,0.0,1.0,0.0,0.0
+46,lstm,numberbatch,deps,0.01522,0.96554,0.01924,0.01522,0.96554,0.01924
+47,lstm,numberbatch,fasttext,0.0,0.0,1.0,0.0,0.0,1.0
+48,lstm,numberbatch,word2vec,0.76376,0.0639,0.17234,0.76376,0.0639,0.17234
+49,lstm,word2vec,deps,0.2282,0.07946,0.69234,0.2282,0.07946,0.69234
+50,gru,fasttext,deps,0.0,0.98824,0.01176,0.0,0.98824,0.01176
+51,gru,fasttext,word2vec,0.0,0.99994,6e-05,0.0,0.99994,6e-05
+52,gru,glove,deps,0.0,0.14486,0.85514,0.0,0.14486,0.85514
+53,gru,glove,fasttext,0.0,0.99952,0.00048,0.0,0.99952,0.00048
+54,gru,glove,numberbatch,0.0,0.60708,0.39292,0.0,0.60708,0.39292
+55,gru,glove,word2vec,0.0,0.84244,0.15756,0.0,0.84244,0.15756
+56,gru,numberbatch,deps,0.0,1.0,0.0,0.0,1.0,0.0
+57,gru,numberbatch,fasttext,0.00364,0.99636,0.0,0.00364,0.99636,0.0
+58,gru,numberbatch,word2vec,0.0,1.0,0.0,0.0,1.0,0.0
+59,gru,word2vec,deps,0.0,1.0,0.0,0.0,1.0,0.0
